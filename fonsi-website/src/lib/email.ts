@@ -23,7 +23,7 @@ const transporter = nodemailer.createTransport({
 export async function sendConfirmationEmail(data: ConfirmationEmailData) {
   const htmlContent = `
     <div style="font-family: 'Arial', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <div style="background: linear-gradient(135deg, #c9a96e 0%, #9d7a4e 100%); padding: 40px; text-align: center; border-radius: 8px 8px 0 0;">
+      <div style="background: linear-gradient(135deg, #333333 0%, #1a1a1a 100%); padding: 40px; text-align: center; border-radius: 8px 8px 0 0;">
         <h1 style="color: white; margin: 0; font-size: 32px;">Fonsi</h1>
         <p style="color: white; margin: 5px 0 0 0; font-size: 14px;">by Cristal</p>
       </div>
@@ -33,8 +33,8 @@ export async function sendConfirmationEmail(data: ConfirmationEmailData) {
         <p style="color: #333;">Dear ${data.name},</p>
         <p style="color: #333;">Thank you for booking with Fonsi by Cristal. Your appointment has been confirmed.</p>
 
-        <div style="background: white; padding: 20px; border-left: 4px solid #c9a96e; margin: 20px 0;">
-          <h3 style="color: #c9a96e; margin-top: 0;">Appointment Details</h3>
+        <div style="background: white; padding: 20px; border-left: 4px solid #333333; margin: 20px 0;">
+          <h3 style="color: #333333; margin-top: 0;">Appointment Details</h3>
           <p style="color: #333; margin: 10px 0;"><strong>Service:</strong> ${data.serviceName}</p>
           <p style="color: #333; margin: 10px 0;"><strong>Date:</strong> ${data.date}</p>
           <p style="color: #333; margin: 10px 0;"><strong>Time:</strong> ${data.time}</p>

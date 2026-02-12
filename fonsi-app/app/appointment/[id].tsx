@@ -1,5 +1,5 @@
 /**
- * Individual appointment detail screen
+ * Appointment detail screen with gradient cards, filled status badges, and Feather icons
  */
 
 import React, { useEffect, useState } from 'react';
@@ -9,17 +9,37 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
   Alert,
   ViewStyle,
   TextStyle,
 } from 'react-native';
 import { format } from 'date-fns';
 import { router, useLocalSearchParams } from 'expo-router';
+import { Feather } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS } from '@constants/theme';
 import { useAppointmentStore } from '@store/appointmentStore';
 import { apiClient } from '@api/client';
 import { Appointment } from '@types/index';
+import { GradientCard } from '@components/GradientCard';
+import { GradientButton } from '@components/GradientButton';
+import { AnimatedSection } from '@components/AnimatedSection';
+import { SkeletonLoader, SkeletonCard } from '@components/SkeletonLoader';
+
+const getStatusConfig = (status: string) => {
+  switch (status) {
+    case 'confirmed':
+      return { color: COLORS.success, bg: 'rgba(76, 175, 80, 0.15)', icon: 'check-circle' as const, label: 'Confirmed' };
+    case 'pending':
+      return { color: COLORS.warning, bg: 'rgba(255, 152, 0, 0.15)', icon: 'clock' as const, label: 'Pending' };
+    case 'completed':
+      return { color: COLORS.info, bg: 'rgba(33, 150, 243, 0.15)', icon: 'award' as const, label: 'Completed' };
+    case 'cancelled':
+      return { color: COLORS.error, bg: 'rgba(244, 67, 54, 0.15)', icon: 'x-circle' as const, label: 'Cancelled' };
+    default:
+      return { color: COLORS.textMuted, bg: 'rgba(136, 136, 136, 0.15)', icon: 'help-circle' as const, label: 'Unknown' };
+  }
+};
 
 export default function AppointmentDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -34,12 +54,10 @@ export default function AppointmentDetailScreen() {
     const loadAppointment = async () => {
       try {
         setIsLoading(true);
-        // Try to get from store first
         const cachedApt = getAppointmentById(id as string);
         if (cachedApt) {
           setAppointment(cachedApt);
         } else {
-          // Try to fetch from API
           const apt = await apiClient.getAppointment(id as string);
           if (apt) {
             setAppointment(apt);
@@ -114,200 +132,225 @@ export default function AppointmentDetailScreen() {
 
   if (isLoading) {
     return (
-      <View style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={styles.loadingText}>Loading appointment...</Text>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButtonContainer}>
+            <Feather name="arrow-left" size={20} color={COLORS.primary} />
+            <Text style={styles.backText}>Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Appointment Details</Text>
+          <View style={styles.spacer} />
         </View>
-      </View>
+        <View style={styles.content}>
+          <SkeletonLoader width="40%" height={32} style={{ alignSelf: 'center', marginBottom: SPACING.xl }} />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </View>
+      </SafeAreaView>
     );
   }
 
   if (!appointment) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <View style={styles.errorContainer}>
+          <Feather name="alert-circle" size={40} color={COLORS.error} />
           <Text style={styles.errorText}>Appointment not found</Text>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.backButton}
-          >
-            <Text style={styles.backButtonText}>← Go Back</Text>
-          </TouchableOpacity>
+          <View style={{ marginTop: SPACING.lg }}>
+            <GradientButton
+              title="Go Back"
+              onPress={() => router.back()}
+              variant="outline"
+              icon="arrow-left"
+            />
+          </View>
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 
   const appointmentDate = new Date(`${appointment.date}T${appointment.time}`);
   const formattedDate = format(appointmentDate, 'EEEE, MMMM d, yyyy');
   const formattedTime = format(appointmentDate, 'h:mm a');
-
-  const getStatusColor = () => {
-    switch (appointment.status) {
-      case 'confirmed':
-        return COLORS.success;
-      case 'pending':
-        return COLORS.warning;
-      case 'completed':
-        return COLORS.info;
-      case 'cancelled':
-        return COLORS.error;
-      default:
-        return COLORS.textMuted;
-    }
-  };
-
-  const isPast = new Date() > appointmentDate;
-  const canCancel = !isPast && appointment.status !== 'cancelled';
+  const statusConfig = getStatusConfig(appointment.status);
+  const isPastAppointment = new Date() > appointmentDate;
+  const canCancel = !isPastAppointment && appointment.status !== 'cancelled';
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.closeButton}
-        >
-          <Text style={styles.closeButtonText}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Appointment Details</Text>
-        <View style={styles.spacer} />
-      </View>
+      <SafeAreaView edges={['top']}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButtonContainer}>
+            <Feather name="arrow-left" size={20} color={COLORS.primary} />
+            <Text style={styles.backText}>Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Appointment Details</Text>
+          <View style={styles.spacer} />
+        </View>
+      </SafeAreaView>
 
-      {/* Main Content */}
       <View style={styles.content}>
         {/* Status Badge */}
-        <View style={styles.statusSection}>
-          <View
-            style={[
-              styles.statusBadge,
-              { borderColor: getStatusColor() },
-            ]}
-          >
-            <Text style={[styles.statusText, { color: getStatusColor() }]}>
-              {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
-            </Text>
+        <AnimatedSection delay={100}>
+          <View style={styles.statusSection}>
+            <View style={[styles.statusBadge, { backgroundColor: statusConfig.bg }]}>
+              <Feather name={statusConfig.icon} size={16} color={statusConfig.color} />
+              <Text style={[styles.statusText, { color: statusConfig.color }]}>
+                {statusConfig.label}
+              </Text>
+            </View>
           </View>
-        </View>
+        </AnimatedSection>
 
         {/* Service Card */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Service</Text>
-          <Text style={styles.serviceName}>{appointment.service.name}</Text>
-          <Text style={styles.serviceDescription}>
-            {appointment.service.description}
-          </Text>
-        </View>
+        <AnimatedSection delay={200}>
+          <GradientCard style={styles.card}>
+            <View style={styles.cardTitleRow}>
+              <Feather name="scissors" size={16} color={COLORS.primary} />
+              <Text style={styles.cardTitle}>Service</Text>
+            </View>
+            <Text style={styles.serviceName}>{appointment.service.name}</Text>
+            <Text style={styles.serviceDescription}>
+              {appointment.service.description}
+            </Text>
+          </GradientCard>
+        </AnimatedSection>
 
         {/* Date & Time Card */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Date & Time</Text>
-          <View style={styles.detailRow}>
-            <Text style={styles.label}>Date</Text>
-            <Text style={styles.value}>{formattedDate}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.label}>Time</Text>
-            <Text style={styles.value}>{formattedTime}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.label}>Duration</Text>
-            <Text style={styles.value}>{appointment.service.duration} minutes</Text>
-          </View>
-        </View>
+        <AnimatedSection delay={300}>
+          <GradientCard style={styles.card}>
+            <View style={styles.cardTitleRow}>
+              <Feather name="calendar" size={16} color={COLORS.primary} />
+              <Text style={styles.cardTitle}>Date & Time</Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.label}>Date</Text>
+              <Text style={styles.value}>{formattedDate}</Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.label}>Time</Text>
+              <Text style={styles.value}>{formattedTime}</Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.label}>Duration</Text>
+              <Text style={styles.value}>{appointment.service.duration} minutes</Text>
+            </View>
+          </GradientCard>
+        </AnimatedSection>
 
         {/* Pricing Card */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Pricing</Text>
-          <View style={styles.detailRow}>
-            <Text style={styles.label}>Price Range</Text>
-            <Text style={styles.priceValue}>
-              ${appointment.service.priceMin} - ${appointment.service.priceMax}
-            </Text>
-          </View>
-        </View>
+        <AnimatedSection delay={400}>
+          <GradientCard style={styles.card}>
+            <View style={styles.cardTitleRow}>
+              <Feather name="dollar-sign" size={16} color={COLORS.primary} />
+              <Text style={styles.cardTitle}>Pricing</Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.label}>Price Range</Text>
+              <Text style={styles.priceValue}>
+                ${appointment.service.priceMin} - ${appointment.service.priceMax}
+              </Text>
+            </View>
+          </GradientCard>
+        </AnimatedSection>
 
         {/* Client Info Card */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Client Information</Text>
-          <View style={styles.detailRow}>
-            <Text style={styles.label}>Name</Text>
-            <Text style={styles.value}>
-              {appointment.clientInfo.firstName} {appointment.clientInfo.lastName}
-            </Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.label}>Email</Text>
-            <Text style={styles.value}>{appointment.clientInfo.email}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.label}>Phone</Text>
-            <Text style={styles.value}>{appointment.clientInfo.phone}</Text>
-          </View>
-        </View>
+        <AnimatedSection delay={500}>
+          <GradientCard style={styles.card}>
+            <View style={styles.cardTitleRow}>
+              <Feather name="user" size={16} color={COLORS.primary} />
+              <Text style={styles.cardTitle}>Client Information</Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.label}>Name</Text>
+              <Text style={styles.value}>
+                {appointment.clientInfo.firstName} {appointment.clientInfo.lastName}
+              </Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.label}>Email</Text>
+              <Text style={styles.value}>{appointment.clientInfo.email}</Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.label}>Phone</Text>
+              <Text style={styles.value}>{appointment.clientInfo.phone}</Text>
+            </View>
+          </GradientCard>
+        </AnimatedSection>
 
         {/* Notes Card */}
         {appointment.notes && (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Notes</Text>
-            <Text style={styles.notes}>{appointment.notes}</Text>
-          </View>
+          <AnimatedSection delay={600}>
+            <GradientCard style={styles.card}>
+              <View style={styles.cardTitleRow}>
+                <Feather name="file-text" size={16} color={COLORS.primary} />
+                <Text style={styles.cardTitle}>Notes</Text>
+              </View>
+              <Text style={styles.notes}>{appointment.notes}</Text>
+            </GradientCard>
+          </AnimatedSection>
         )}
 
         {/* Metadata */}
-        <View style={styles.metadata}>
-          <Text style={styles.metadataLabel}>Booking ID</Text>
-          <Text style={styles.metadataValue}>{appointment.id}</Text>
-        </View>
+        <AnimatedSection delay={650}>
+          <View style={styles.metadata}>
+            <Feather name="hash" size={12} color={COLORS.textMuted} />
+            <Text style={styles.metadataLabel}>Booking ID: </Text>
+            <Text style={styles.metadataValue}>{appointment.id}</Text>
+          </View>
+        </AnimatedSection>
 
         {/* Action Buttons */}
-        <View style={styles.actionsSection}>
-          {!isPast && appointment.status !== 'cancelled' && (
-            <TouchableOpacity
-              onPress={handleReschedule}
-              style={styles.actionButton}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.actionButtonText}>📅 Reschedule</Text>
-            </TouchableOpacity>
-          )}
+        <AnimatedSection delay={700}>
+          <View style={styles.actionsSection}>
+            {!isPastAppointment && appointment.status !== 'cancelled' && (
+              <GradientButton
+                title="Reschedule"
+                onPress={handleReschedule}
+                icon="calendar"
+                style={styles.actionButtonSpacing}
+              />
+            )}
 
-          {canCancel && (
-            <TouchableOpacity
-              onPress={handleCancel}
-              style={[styles.actionButton, styles.cancelActionButton]}
-              activeOpacity={0.7}
-              disabled={isSubmitting}
-            >
-              <Text style={styles.cancelActionButtonText}>
-                {isSubmitting ? 'Cancelling...' : '✕ Cancel Appointment'}
-              </Text>
-            </TouchableOpacity>
-          )}
+            {canCancel && (
+              <GradientButton
+                title={isSubmitting ? 'Cancelling...' : 'Cancel Appointment'}
+                onPress={handleCancel}
+                variant="outline"
+                icon="x"
+                disabled={isSubmitting}
+                style={styles.actionButtonSpacing}
+              />
+            )}
 
-          <TouchableOpacity
-            onPress={() => router.push('/profile')}
-            style={[styles.actionButton, styles.secondaryButton]}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.secondaryButtonText}>👤 View Profile</Text>
-          </TouchableOpacity>
-        </View>
+            <GradientButton
+              title="View Profile"
+              onPress={() => router.push('/profile')}
+              variant="outline"
+              icon="user"
+              style={styles.actionButtonSpacing}
+            />
+          </View>
+        </AnimatedSection>
 
         {/* Contact Info */}
-        <View style={styles.contactCard}>
-          <Text style={styles.contactTitle}>Need Help?</Text>
-          <Text style={styles.contactText}>
-            Contact us if you need to reschedule or have questions about your appointment.
-          </Text>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.contactLink}
-          >
-            <Text style={styles.contactLinkText}>📞 (210) 551-7742</Text>
-          </TouchableOpacity>
-        </View>
+        <AnimatedSection delay={800}>
+          <GradientCard variant="glass" showAccent={false}>
+            <View style={styles.contactSection}>
+              <Feather name="phone" size={20} color={COLORS.primary} />
+              <Text style={styles.contactTitle}>Need Help?</Text>
+              <Text style={styles.contactText}>
+                Contact us if you need to reschedule or have questions.
+              </Text>
+              <TouchableOpacity activeOpacity={0.7} style={styles.contactLink}>
+                <Feather name="phone" size={14} color={COLORS.primary} />
+                <Text style={styles.contactLinkText}>(210) 551-7742</Text>
+              </TouchableOpacity>
+            </View>
+          </GradientCard>
+        </AnimatedSection>
       </View>
     </ScrollView>
   );
@@ -324,24 +367,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
-    borderBottomColor: COLORS.borderColor,
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
     borderBottomWidth: 1,
   } as ViewStyle,
-  closeButton: {
+  backButtonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
   } as ViewStyle,
-  closeButtonText: {
+  backText: {
     color: COLORS.primary,
-    fontWeight: '600',
+    fontFamily: FONTS.sansSerifSemiBold,
     fontSize: FONTS.base,
+    marginLeft: SPACING.xs,
   } as TextStyle,
   headerTitle: {
     fontSize: FONTS.lg,
-    fontWeight: '600',
+    fontFamily: FONTS.serifSemiBold,
     color: COLORS.textPrimary,
     flex: 1,
     textAlign: 'center',
-    fontFamily: 'Georgia, serif',
   } as TextStyle,
   spacer: {
     flex: 1,
@@ -350,17 +395,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.xl,
   } as ViewStyle,
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: SPACING['4xl'],
-  } as ViewStyle,
-  loadingText: {
-    marginTop: SPACING.md,
-    fontSize: FONTS.base,
-    color: COLORS.textSecondary,
-  } as TextStyle,
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -370,54 +404,42 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: FONTS.lg,
     color: COLORS.error,
-    marginBottom: SPACING.md,
-  } as TextStyle,
-  backButton: {
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.lg,
-    backgroundColor: COLORS.cardBg,
-    borderRadius: BORDER_RADIUS.md,
-    borderColor: COLORS.borderColor,
-    borderWidth: 1,
-  } as ViewStyle,
-  backButtonText: {
-    color: COLORS.primary,
-    fontWeight: '600',
-    fontSize: FONTS.base,
+    fontFamily: FONTS.sansSerifSemiBold,
+    marginTop: SPACING.md,
   } as TextStyle,
   statusSection: {
     alignItems: 'center',
     marginBottom: SPACING.xl,
   } as ViewStyle,
   statusBadge: {
-    borderWidth: 2,
-    borderRadius: BORDER_RADIUS.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: BORDER_RADIUS.full,
     paddingHorizontal: SPACING.xl,
     paddingVertical: SPACING.md,
   } as ViewStyle,
   statusText: {
     fontSize: FONTS.base,
-    fontWeight: '700',
+    fontFamily: FONTS.sansSerifBold,
+    marginLeft: SPACING.sm,
   } as TextStyle,
   card: {
-    backgroundColor: COLORS.cardBg,
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.lg,
-    borderColor: COLORS.borderColor,
-    borderWidth: 1,
     marginBottom: SPACING.lg,
-    ...SHADOWS.md,
+  } as ViewStyle,
+  cardTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
   } as ViewStyle,
   cardTitle: {
     fontSize: FONTS.lg,
-    fontWeight: '600',
+    fontFamily: FONTS.serifSemiBold,
     color: COLORS.primary,
-    marginBottom: SPACING.md,
-    fontFamily: 'Georgia, serif',
+    marginLeft: SPACING.sm,
   } as TextStyle,
   serviceName: {
     fontSize: FONTS.lg,
-    fontWeight: '600',
+    fontFamily: FONTS.sansSerifSemiBold,
     color: COLORS.textPrimary,
     marginBottom: SPACING.sm,
   } as TextStyle,
@@ -425,6 +447,7 @@ const styles = StyleSheet.create({
     fontSize: FONTS.sm,
     color: COLORS.textSecondary,
     lineHeight: 20,
+    fontFamily: FONTS.sansSerif,
   } as TextStyle,
   detailRow: {
     flexDirection: 'row',
@@ -437,25 +460,28 @@ const styles = StyleSheet.create({
   label: {
     fontSize: FONTS.sm,
     color: COLORS.textSecondary,
-    fontWeight: '500',
+    fontFamily: FONTS.sansSerifMedium,
   } as TextStyle,
   value: {
     fontSize: FONTS.sm,
     color: COLORS.textPrimary,
-    fontWeight: '500',
+    fontFamily: FONTS.sansSerifMedium,
   } as TextStyle,
   priceValue: {
     fontSize: FONTS.base,
     color: COLORS.primary,
-    fontWeight: '600',
+    fontFamily: FONTS.sansSerifBold,
   } as TextStyle,
   notes: {
     fontSize: FONTS.sm,
     color: COLORS.textSecondary,
     lineHeight: 20,
+    fontFamily: FONTS.sansSerif,
   } as TextStyle,
   metadata: {
-    backgroundColor: COLORS.bgSecondary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.glassBackground,
     borderRadius: BORDER_RADIUS.md,
     padding: SPACING.md,
     marginBottom: SPACING.lg,
@@ -463,64 +489,30 @@ const styles = StyleSheet.create({
   metadataLabel: {
     fontSize: FONTS.xs,
     color: COLORS.textMuted,
-    fontWeight: '500',
-    marginBottom: SPACING.xs,
+    fontFamily: FONTS.sansSerifMedium,
+    marginLeft: SPACING.xs,
   } as TextStyle,
   metadataValue: {
-    fontSize: FONTS.sm,
+    fontSize: FONTS.xs,
     color: COLORS.textSecondary,
-    fontFamily: 'Courier New, monospace',
+    fontFamily: FONTS.sansSerif,
   } as TextStyle,
   actionsSection: {
     marginBottom: SPACING.xl,
   } as ViewStyle,
-  actionButton: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: SPACING.lg,
-    borderRadius: BORDER_RADIUS.lg,
-    alignItems: 'center',
+  actionButtonSpacing: {
     marginBottom: SPACING.md,
-    ...SHADOWS.md,
   } as ViewStyle,
-  actionButtonText: {
-    color: COLORS.bgPrimary,
-    fontWeight: '600',
-    fontSize: FONTS.base,
-  } as TextStyle,
-  cancelActionButton: {
-    backgroundColor: 'transparent',
-    borderColor: COLORS.error,
-    borderWidth: 2,
-  } as ViewStyle,
-  cancelActionButtonText: {
-    color: COLORS.error,
-    fontWeight: '600',
-    fontSize: FONTS.base,
-  } as TextStyle,
-  secondaryButton: {
-    backgroundColor: COLORS.bgSecondary,
-    borderColor: COLORS.borderColor,
-    borderWidth: 1,
-  } as ViewStyle,
-  secondaryButtonText: {
-    color: COLORS.textPrimary,
-    fontWeight: '600',
-    fontSize: FONTS.base,
-  } as TextStyle,
-  contactCard: {
-    backgroundColor: COLORS.cardBg,
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.lg,
-    borderColor: COLORS.borderColor,
-    borderWidth: 1,
+  contactSection: {
     alignItems: 'center',
+    paddingVertical: SPACING.md,
   } as ViewStyle,
   contactTitle: {
     fontSize: FONTS.lg,
-    fontWeight: '600',
+    fontFamily: FONTS.serifSemiBold,
     color: COLORS.textPrimary,
+    marginTop: SPACING.sm,
     marginBottom: SPACING.sm,
-    fontFamily: 'Georgia, serif',
   } as TextStyle,
   contactText: {
     fontSize: FONTS.sm,
@@ -528,16 +520,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: SPACING.md,
     lineHeight: 20,
+    fontFamily: FONTS.sansSerif,
   } as TextStyle,
   contactLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.lg,
-    backgroundColor: COLORS.bgSecondary,
+    backgroundColor: COLORS.glassBackground,
     borderRadius: BORDER_RADIUS.md,
+    borderColor: COLORS.glassBorder,
+    borderWidth: 1,
   } as ViewStyle,
   contactLinkText: {
     color: COLORS.primary,
-    fontWeight: '600',
+    fontFamily: FONTS.sansSerifSemiBold,
     fontSize: FONTS.base,
+    marginLeft: SPACING.sm,
   } as TextStyle,
 });

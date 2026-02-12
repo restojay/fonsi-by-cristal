@@ -33,11 +33,10 @@ class ApiClient {
       },
     });
 
-    // Add response interceptor for error handling
+    // Add response interceptor
     this.client.interceptors.response.use(
       (response) => response.data,
       (error) => {
-        console.error('API Error:', error.response?.data || error.message);
         throw error;
       }
     );

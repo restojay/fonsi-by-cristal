@@ -1,5 +1,5 @@
 /**
- * Home screen with welcome header, quick-book button, upcoming appointment, featured services
+ * Home screen with hero gradient, animated sections, skeleton loading, and vector icons
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
@@ -9,15 +9,20 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
   ViewStyle,
   TextStyle,
 } from 'react-native';
 import { router } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import { Header } from '@components/Header';
 import { AppointmentCard } from '@components/AppointmentCard';
 import { ServiceCard } from '@components/ServiceCard';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS } from '@constants/theme';
+import { AnimatedSection } from '@components/AnimatedSection';
+import { SkeletonList } from '@components/SkeletonLoader';
+import { GradientButton } from '@components/GradientButton';
+import { GradientCard } from '@components/GradientCard';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS, GRADIENTS } from '@constants/theme';
 import { useAppointmentStore } from '@store/appointmentStore';
 import { useBookingStore } from '@store/bookingStore';
 import { apiClient } from '@api/client';
@@ -47,17 +52,12 @@ export default function HomeScreen() {
     const loadFeaturedServices = async () => {
       try {
         const services = await apiClient.getServices();
-        // Get featured services (first 3 from Hair category)
         const hairServices = services.filter((s) => s.category === 'Hair').slice(0, 3);
         setFeaturedServices(hairServices);
       } catch (error) {
         console.error('Failed to load featured services', error);
-        // Use fallback
         const { SERVICES } = require('@constants/services');
-        const hairServices = SERVICES.filter((s: Service) => s.category === 'Hair').slice(
-          0,
-          3
-        );
+        const hairServices = SERVICES.filter((s: Service) => s.category === 'Hair').slice(0, 3);
         setFeaturedServices(hairServices);
       } finally {
         setIsLoading(false);
@@ -84,107 +84,118 @@ export default function HomeScreen() {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Header
-        title="Fonsi by Cristal"
-        subtitle="Premium Hair & Makeup Studio"
-        showLogo={true}
-      />
-
-      {/* Quick Book Button */}
-      <TouchableOpacity
-        onPress={handleQuickBook}
-        style={styles.quickBookButton}
-        activeOpacity={0.8}
+      {/* Hero Section */}
+      <LinearGradient
+        colors={[...GRADIENTS.heroGold]}
+        style={styles.heroSection}
       >
-        <Text style={styles.quickBookButtonEmoji}>✨</Text>
-        <View style={styles.quickBookContent}>
-          <Text style={styles.quickBookTitle}>Quick Book</Text>
-          <Text style={styles.quickBookSubtitle}>
-            Schedule your next appointment
-          </Text>
-        </View>
-        <Text style={styles.quickBookArrow}>→</Text>
-      </TouchableOpacity>
+        <Header
+          title="Fonsi by Cristal"
+          subtitle="Let me help you shine!"
+          showLogo={true}
+        />
+
+        {/* Quick Book */}
+        <AnimatedSection delay={100} style={styles.quickBookSection}>
+          <GradientButton
+            title="Book Your Appointment"
+            onPress={handleQuickBook}
+            icon={"sparkles" as any}
+            iconRight="arrow-right"
+            size="large"
+          />
+        </AnimatedSection>
+      </LinearGradient>
 
       {/* Upcoming Appointment */}
-      {nextAppointment && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Upcoming Appointment</Text>
+      <AnimatedSection delay={200} style={styles.section}>
+        <Text style={styles.sectionTitle}>Upcoming Appointment</Text>
+        {nextAppointment ? (
           <AppointmentCard
             appointment={nextAppointment}
             onPress={() => handleAppointmentPress(nextAppointment.id)}
           />
-        </View>
-      )}
-
-      {!nextAppointment && (
-        <View style={styles.section}>
-          <View style={styles.noAppointmentCard}>
-            <Text style={styles.noAppointmentText}>
-              No upcoming appointments
-            </Text>
-            <Text style={styles.noAppointmentSubtext}>
-              Book your first appointment today!
-            </Text>
-          </View>
-        </View>
-      )}
+        ) : (
+          <GradientCard variant="glass" showAccent={false}>
+            <View style={styles.emptyState}>
+              <Feather name="calendar" size={28} color={COLORS.textMuted} />
+              <Text style={styles.noAppointmentText}>No upcoming appointments</Text>
+              <Text style={styles.noAppointmentSubtext}>
+                Book your first appointment today!
+              </Text>
+            </View>
+          </GradientCard>
+        )}
+      </AnimatedSection>
 
       {/* Featured Services */}
-      <View style={styles.section}>
+      <AnimatedSection delay={300} style={styles.section}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Featured Services</Text>
-          <TouchableOpacity onPress={() => router.push('/services')}>
-            <Text style={styles.seeAllLink}>See All →</Text>
+          <TouchableOpacity
+            onPress={() => router.push('/services')}
+            style={styles.seeAllButton}
+          >
+            <Text style={styles.seeAllLink}>See All</Text>
+            <Feather name="arrow-right" size={14} color={COLORS.primary} />
           </TouchableOpacity>
         </View>
 
         {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
-          </View>
+          <SkeletonList count={3} />
         ) : (
           <View>
-            {featuredServices.map((service) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                onBookPress={() => handleBookService(service)}
-              />
+            {featuredServices.map((service, index) => (
+              <AnimatedSection key={service.id} index={index} delay={400}>
+                <ServiceCard
+                  service={service}
+                  onBookPress={() => handleBookService(service)}
+                />
+              </AnimatedSection>
             ))}
           </View>
         )}
-      </View>
+      </AnimatedSection>
 
       {/* Contact Info */}
-      <View style={styles.section}>
-        <View style={styles.contactCard}>
+      <AnimatedSection delay={500} style={styles.section}>
+        <GradientCard>
           <Text style={styles.contactTitle}>Contact Us</Text>
           <View style={styles.contactItem}>
-            <Text style={styles.contactLabel}>📍 Address</Text>
+            <View style={styles.contactLabelRow}>
+              <Feather name="map-pin" size={14} color={COLORS.primary} />
+              <Text style={styles.contactLabel}>Address</Text>
+            </View>
             <Text style={styles.contactValue}>
               6626 West Loop 1604 North suite 105
             </Text>
             <Text style={styles.contactValue}>San Antonio, TX 78254</Text>
           </View>
           <View style={styles.contactItem}>
-            <Text style={styles.contactLabel}>📞 Phone</Text>
+            <View style={styles.contactLabelRow}>
+              <Feather name="phone" size={14} color={COLORS.primary} />
+              <Text style={styles.contactLabel}>Phone</Text>
+            </View>
             <TouchableOpacity>
               <Text style={styles.contactLink}>(210) 551-7742</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.contactItem}>
-            <Text style={styles.contactLabel}>🕐 Hours</Text>
+            <View style={styles.contactLabelRow}>
+              <Feather name="clock" size={14} color={COLORS.primary} />
+              <Text style={styles.contactLabel}>Hours</Text>
+            </View>
             <Text style={styles.contactValue}>Tuesday - Saturday</Text>
             <Text style={styles.contactValue}>10:00 AM - 6:30 PM</Text>
-            <Text style={styles.contactValue}>Sunday & Monday - Closed</Text>
+            <Text style={styles.contactValueMuted}>Sunday & Monday - Closed</Text>
           </View>
-        </View>
-      </View>
+        </GradientCard>
+      </AnimatedSection>
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>By appointment only</Text>
+        <View style={styles.footerLine} />
+        <Text style={styles.footerText}>Call or Text to Book</Text>
       </View>
     </ScrollView>
   );
@@ -195,37 +206,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   } as ViewStyle,
-  quickBookButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    margin: SPACING.lg,
-    padding: SPACING.lg,
-    backgroundColor: COLORS.primary,
-    borderRadius: BORDER_RADIUS.xl,
-    ...SHADOWS.lg,
+  heroSection: {
+    paddingBottom: SPACING.lg,
   } as ViewStyle,
-  quickBookButtonEmoji: {
-    fontSize: 28,
-    marginRight: SPACING.md,
-  } as TextStyle,
-  quickBookContent: {
-    flex: 1,
+  quickBookSection: {
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.lg,
   } as ViewStyle,
-  quickBookTitle: {
-    fontSize: FONTS.lg,
-    fontWeight: '700',
-    color: COLORS.bgPrimary,
-  } as TextStyle,
-  quickBookSubtitle: {
-    fontSize: FONTS.sm,
-    color: COLORS.bgSecondary,
-    marginTop: SPACING.xs,
-  } as TextStyle,
-  quickBookArrow: {
-    fontSize: FONTS.xl,
-    color: COLORS.bgPrimary,
-    marginLeft: SPACING.md,
-  } as TextStyle,
   section: {
     paddingHorizontal: SPACING.lg,
     marginBottom: SPACING['2xl'],
@@ -238,79 +225,93 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   sectionTitle: {
     fontSize: FONTS.xl,
-    fontWeight: '600',
+    fontFamily: FONTS.serifSemiBold,
     color: COLORS.textPrimary,
-    fontFamily: 'Georgia, serif',
+    marginBottom: SPACING.md,
   } as TextStyle,
+  seeAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  } as ViewStyle,
   seeAllLink: {
     fontSize: FONTS.sm,
     color: COLORS.primary,
-    fontWeight: '600',
+    fontFamily: FONTS.sansSerifSemiBold,
+    marginRight: SPACING.xs,
   } as TextStyle,
-  noAppointmentCard: {
-    backgroundColor: COLORS.cardBg,
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.xl,
+  emptyState: {
     alignItems: 'center',
-    borderColor: COLORS.borderColor,
-    borderWidth: 1,
+    paddingVertical: SPACING.lg,
   } as ViewStyle,
   noAppointmentText: {
     fontSize: FONTS.lg,
-    fontWeight: '600',
+    fontFamily: FONTS.sansSerifSemiBold,
     color: COLORS.textPrimary,
+    marginTop: SPACING.md,
   } as TextStyle,
   noAppointmentSubtext: {
     fontSize: FONTS.sm,
     color: COLORS.textSecondary,
-    marginTop: SPACING.sm,
+    marginTop: SPACING.xs,
+    fontFamily: FONTS.sansSerif,
   } as TextStyle,
-  loadingContainer: {
-    paddingVertical: SPACING['3xl'],
-    alignItems: 'center',
-  } as ViewStyle,
-  contactCard: {
-    backgroundColor: COLORS.cardBg,
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.lg,
-    borderColor: COLORS.borderColor,
-    borderWidth: 1,
-  } as ViewStyle,
   contactTitle: {
     fontSize: FONTS.lg,
-    fontWeight: '600',
+    fontFamily: FONTS.serifSemiBold,
     color: COLORS.textPrimary,
-    marginBottom: SPACING.md,
-    fontFamily: 'Georgia, serif',
+    marginBottom: SPACING.lg,
   } as TextStyle,
   contactItem: {
-    marginBottom: SPACING.md,
+    marginBottom: SPACING.lg,
+  } as ViewStyle,
+  contactLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.xs,
   } as ViewStyle,
   contactLabel: {
     fontSize: FONTS.sm,
-    fontWeight: '600',
+    fontFamily: FONTS.sansSerifSemiBold,
     color: COLORS.primary,
-    marginBottom: SPACING.xs,
+    marginLeft: SPACING.sm,
   } as TextStyle,
   contactValue: {
     fontSize: FONTS.sm,
     color: COLORS.textSecondary,
     lineHeight: 20,
+    fontFamily: FONTS.sansSerif,
+    marginLeft: SPACING.xl + 2,
+  } as TextStyle,
+  contactValueMuted: {
+    fontSize: FONTS.sm,
+    color: COLORS.textMuted,
+    lineHeight: 20,
+    fontFamily: FONTS.sansSerif,
+    marginLeft: SPACING.xl + 2,
   } as TextStyle,
   contactLink: {
     fontSize: FONTS.sm,
     color: COLORS.primary,
-    fontWeight: '600',
+    fontFamily: FONTS.sansSerifSemiBold,
     textDecorationLine: 'underline',
+    marginLeft: SPACING.xl + 2,
   } as TextStyle,
   footer: {
     alignItems: 'center',
     paddingVertical: SPACING['2xl'],
-    borderTopColor: COLORS.borderColor,
-    borderTopWidth: 1,
+    paddingHorizontal: SPACING.lg,
+  } as ViewStyle,
+  footerLine: {
+    height: 1,
+    width: 60,
+    backgroundColor: COLORS.primary,
+    opacity: 0.3,
+    marginBottom: SPACING.md,
   } as ViewStyle,
   footerText: {
     fontSize: FONTS.sm,
     color: COLORS.textMuted,
+    fontFamily: FONTS.sansSerif,
   } as TextStyle,
 });

@@ -1,5 +1,5 @@
 /**
- * Services screen with category filters and service cards
+ * Services screen with category icons, gradient active tabs, skeleton loading, and staggered cards
  */
 
 import React, { useEffect, useState } from 'react';
@@ -9,14 +9,17 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
   ViewStyle,
   TextStyle,
 } from 'react-native';
 import { router } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Header } from '@components/Header';
 import { ServiceCard } from '@components/ServiceCard';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS } from '@constants/theme';
+import { AnimatedSection } from '@components/AnimatedSection';
+import { SkeletonList } from '@components/SkeletonLoader';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS, GRADIENTS } from '@constants/theme';
 import { useBookingStore } from '@store/bookingStore';
 import { apiClient } from '@api/client';
 import { Service } from '@types/index';
@@ -24,7 +27,15 @@ import { SERVICES } from '@constants/services';
 
 type ServiceCategory = 'Hair' | 'Bridal' | 'Makeup' | 'Waxing';
 
-const CATEGORIES: ServiceCategory[] = ['Hair', 'Bridal', 'Makeup', 'Waxing'];
+const CATEGORY_CONFIG: {
+  name: ServiceCategory;
+  icon: string;
+}[] = [
+  { name: 'Hair', icon: 'content-cut' },
+  { name: 'Bridal', icon: 'diamond-stone' },
+  { name: 'Makeup', icon: 'brush' },
+  { name: 'Waxing', icon: 'spa' },
+];
 
 export default function ServicesScreen() {
   const [selectedCategory, setSelectedCategory] = useState<ServiceCategory>('Hair');
@@ -50,6 +61,8 @@ export default function ServicesScreen() {
   }, []);
 
   const filteredServices = services.filter((s) => s.category === selectedCategory);
+  const categoryCount = (cat: ServiceCategory) =>
+    services.filter((s) => s.category === cat).length;
 
   const handleBookService = (service: Service) => {
     setSelectedService(service);
@@ -70,41 +83,72 @@ export default function ServicesScreen() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={styles.categoriesList}
           contentContainerStyle={styles.categoriesContent}
         >
-          {CATEGORIES.map((category) => (
-            <TouchableOpacity
-              key={category}
-              onPress={() => setSelectedCategory(category)}
-              style={[
-                styles.categoryTab,
-                selectedCategory === category && styles.categoryTabActive,
-              ]}
-              activeOpacity={0.7}
-            >
-              <Text
-                style={[
-                  styles.categoryTabText,
-                  selectedCategory === category && styles.categoryTabTextActive,
-                ]}
+          {CATEGORY_CONFIG.map((cat) => {
+            const isActive = selectedCategory === cat.name;
+            const count = categoryCount(cat.name);
+
+            if (isActive) {
+              return (
+                <TouchableOpacity
+                  key={cat.name}
+                  onPress={() => setSelectedCategory(cat.name)}
+                  activeOpacity={0.8}
+                >
+                  <LinearGradient
+                    colors={[...GRADIENTS.goldButton]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.categoryTab}
+                  >
+                    <MaterialCommunityIcons
+                      name={cat.icon as any}
+                      size={16}
+                      color={COLORS.bgPrimary}
+                    />
+                    <Text style={styles.categoryTabTextActive}>{cat.name}</Text>
+                    {count > 0 && (
+                      <View style={styles.countBadgeActive}>
+                        <Text style={styles.countBadgeTextActive}>{count}</Text>
+                      </View>
+                    )}
+                  </LinearGradient>
+                </TouchableOpacity>
+              );
+            }
+
+            return (
+              <TouchableOpacity
+                key={cat.name}
+                onPress={() => setSelectedCategory(cat.name)}
+                style={styles.categoryTabInactive}
+                activeOpacity={0.7}
               >
-                {category}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <MaterialCommunityIcons
+                  name={cat.icon as any}
+                  size={16}
+                  color={COLORS.textSecondary}
+                />
+                <Text style={styles.categoryTabText}>{cat.name}</Text>
+                {count > 0 && (
+                  <View style={styles.countBadge}>
+                    <Text style={styles.countBadgeText}>{count}</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
       </View>
 
       {/* Services List */}
       <View style={styles.servicesSection}>
         {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
-            <Text style={styles.loadingText}>Loading services...</Text>
-          </View>
+          <SkeletonList count={4} />
         ) : filteredServices.length === 0 ? (
           <View style={styles.emptyContainer}>
+            <MaterialCommunityIcons name="magnify" size={32} color={COLORS.textMuted} />
             <Text style={styles.emptyText}>No services found</Text>
           </View>
         ) : (
@@ -113,12 +157,13 @@ export default function ServicesScreen() {
               {filteredServices.length} {selectedCategory} Service
               {filteredServices.length !== 1 ? 's' : ''}
             </Text>
-            {filteredServices.map((service) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                onBookPress={() => handleBookService(service)}
-              />
+            {filteredServices.map((service, index) => (
+              <AnimatedSection key={service.id} index={index}>
+                <ServiceCard
+                  service={service}
+                  onBookPress={() => handleBookService(service)}
+                />
+              </AnimatedSection>
             ))}
           </View>
         )}
@@ -134,35 +179,63 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   categoriesSection: {
     paddingVertical: SPACING.md,
-    borderBottomColor: COLORS.borderColor,
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
     borderBottomWidth: 1,
-  } as ViewStyle,
-  categoriesList: {
-    flexGrow: 0,
   } as ViewStyle,
   categoriesContent: {
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.sm,
+    gap: SPACING.sm,
   } as ViewStyle,
   categoryTab: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
-    marginRight: SPACING.md,
-    borderRadius: BORDER_RADIUS.xl,
-    backgroundColor: COLORS.bgSecondary,
-    borderColor: COLORS.borderColor,
-    borderWidth: 1,
+    borderRadius: BORDER_RADIUS.full,
+    gap: SPACING.sm,
   } as ViewStyle,
-  categoryTabActive: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
+  categoryTabInactive: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    borderRadius: BORDER_RADIUS.full,
+    backgroundColor: COLORS.glassBackground,
+    borderColor: COLORS.glassBorder,
+    borderWidth: 1,
+    gap: SPACING.sm,
   } as ViewStyle,
   categoryTabText: {
     fontSize: FONTS.sm,
-    fontWeight: '600',
+    fontFamily: FONTS.sansSerifSemiBold,
     color: COLORS.textSecondary,
   } as TextStyle,
   categoryTabTextActive: {
+    fontSize: FONTS.sm,
+    fontFamily: FONTS.sansSerifSemiBold,
+    color: COLORS.bgPrimary,
+  } as TextStyle,
+  countBadge: {
+    backgroundColor: COLORS.glassBackgroundLight,
+    borderRadius: BORDER_RADIUS.full,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
+  } as ViewStyle,
+  countBadgeText: {
+    fontSize: FONTS.xs - 1,
+    fontFamily: FONTS.sansSerifSemiBold,
+    color: COLORS.textMuted,
+  } as TextStyle,
+  countBadgeActive: {
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    borderRadius: BORDER_RADIUS.full,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
+  } as ViewStyle,
+  countBadgeTextActive: {
+    fontSize: FONTS.xs - 1,
+    fontFamily: FONTS.sansSerifSemiBold,
     color: COLORS.bgPrimary,
   } as TextStyle,
   servicesSection: {
@@ -171,18 +244,9 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   categoryCount: {
     fontSize: FONTS.sm,
-    color: COLORS.textSecondary,
+    color: COLORS.textMuted,
     marginBottom: SPACING.md,
-    fontWeight: '500',
-  } as TextStyle,
-  loadingContainer: {
-    alignItems: 'center',
-    paddingVertical: SPACING['4xl'],
-  } as ViewStyle,
-  loadingText: {
-    marginTop: SPACING.md,
-    fontSize: FONTS.sm,
-    color: COLORS.textSecondary,
+    fontFamily: FONTS.sansSerifMedium,
   } as TextStyle,
   emptyContainer: {
     alignItems: 'center',
@@ -191,6 +255,7 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: FONTS.lg,
     color: COLORS.textSecondary,
-    fontWeight: '500',
+    fontFamily: FONTS.sansSerifMedium,
+    marginTop: SPACING.md,
   } as TextStyle,
 });

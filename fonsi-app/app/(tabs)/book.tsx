@@ -1,13 +1,8 @@
 /**
- * Booking screen with 5-step booking flow
- * Step 1: Service selection
- * Step 2: Date picker
- * Step 3: Time slot selection
- * Step 4: Contact info form
- * Step 5: Confirmation summary
+ * Booking screen with animated progress bar, gradient step indicators, and smooth transitions
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   ScrollView,
   View,
@@ -15,18 +10,35 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  ActivityIndicator,
   Alert,
   ViewStyle,
   TextStyle,
+  Animated as RNAnimated,
 } from 'react-native';
 import { format, addDays, isPast, isSunday, isMonday } from 'date-fns';
 import { Calendar } from 'react-native-calendars';
 import { router } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Feather } from '@expo/vector-icons';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  Easing,
+  FadeIn,
+  FadeOut,
+  SlideInRight,
+  SlideInLeft,
+} from 'react-native-reanimated';
 import { Header } from '@components/Header';
 import { ServiceCard } from '@components/ServiceCard';
 import { TimeSlotPicker } from '@components/TimeSlotPicker';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS } from '@constants/theme';
+import { GradientButton } from '@components/GradientButton';
+import { GradientCard } from '@components/GradientCard';
+import { AnimatedSection } from '@components/AnimatedSection';
+import { SkeletonList, SkeletonLoader } from '@components/SkeletonLoader';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS, GRADIENTS, ANIMATION } from '@constants/theme';
 import { useBookingStore, useBookingValidation } from '@store/bookingStore';
 import { useAppointmentStore } from '@store/appointmentStore';
 import { apiClient } from '@api/client';
@@ -63,8 +75,19 @@ export default function BookScreen() {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  const progressWidth = useSharedValue(20);
 
-  // Load services on mount
+  useEffect(() => {
+    progressWidth.value = withTiming((step / 5) * 100, {
+      duration: ANIMATION.timing.normal,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [step]);
+
+  const progressStyle = useAnimatedStyle(() => ({
+    width: `${progressWidth.value}%` as any,
+  }));
+
   useEffect(() => {
     const loadServices = async () => {
       try {
@@ -79,7 +102,6 @@ export default function BookScreen() {
     loadServices();
   }, []);
 
-  // Load time slots when date and service change
   useEffect(() => {
     if (selectedDate && selectedService) {
       const loadSlots = async () => {
@@ -89,7 +111,6 @@ export default function BookScreen() {
           setTimeSlots(slots);
         } catch (error) {
           console.error('Failed to load time slots', error);
-          // Use default slots
           setTimeSlots(generateDefaultSlots());
         } finally {
           setIsLoading(false);
@@ -115,21 +136,11 @@ export default function BookScreen() {
     return slots;
   };
 
-  const isDateDisabled = (dateString: string): boolean => {
-    const date = new Date(dateString);
-    return (
-      isPast(date) ||
-      isSunday(date) ||
-      isMonday(date)
-    );
-  };
-
   const getDisabledDates = () => {
     const disabled: { [key: string]: { disabled: boolean; disableTouchEvent: boolean } } = {};
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Disable next 90 days
     for (let i = 0; i < 90; i++) {
       const date = addDays(today, i);
       if (isSunday(date) || isMonday(date) || i === 0) {
@@ -229,112 +240,136 @@ export default function BookScreen() {
       {/* Progress Indicator */}
       <View style={styles.progressSection}>
         <View style={styles.progressBar}>
-          <View
-            style={[
-              styles.progressFill,
-              { width: `${(step / 5) * 100}%` },
-            ]}
-          />
+          <Animated.View style={[styles.progressFillContainer, progressStyle]}>
+            <LinearGradient
+              colors={[...GRADIENTS.goldButton]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.progressFill}
+            />
+          </Animated.View>
         </View>
         <View style={styles.stepsContainer}>
-          {STEPS.map((stepName, index) => (
-            <View
-              key={index}
-              style={[
-                styles.stepIndicator,
-                index + 1 <= step && styles.stepIndicatorActive,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.stepNumber,
-                  index + 1 <= step && styles.stepNumberActive,
-                ]}
-              >
-                {index + 1}
-              </Text>
-              <Text
-                style={[
-                  styles.stepLabel,
-                  index + 1 <= step && styles.stepLabelActive,
-                ]}
-              >
-                {stepName}
-              </Text>
-            </View>
-          ))}
+          {STEPS.map((stepName, index) => {
+            const isCompleted = index + 1 < step;
+            const isCurrent = index + 1 === step;
+            const isActive = index + 1 <= step;
+
+            return (
+              <View key={index} style={styles.stepIndicator}>
+                {isActive ? (
+                  <LinearGradient
+                    colors={[...GRADIENTS.goldButton]}
+                    style={styles.stepCircle}
+                  >
+                    {isCompleted ? (
+                      <Feather name="check" size={14} color={COLORS.bgPrimary} />
+                    ) : (
+                      <Text style={styles.stepNumberActive}>{index + 1}</Text>
+                    )}
+                  </LinearGradient>
+                ) : (
+                  <View style={styles.stepCircleInactive}>
+                    <Text style={styles.stepNumber}>{index + 1}</Text>
+                  </View>
+                )}
+                <Text
+                  style={[
+                    styles.stepLabel,
+                    isActive && styles.stepLabelActive,
+                  ]}
+                >
+                  {stepName}
+                </Text>
+              </View>
+            );
+          })}
         </View>
       </View>
 
       {/* Step 1: Service Selection */}
       {step === 1 && (
-        <View style={styles.stepContent}>
+        <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
           <Text style={styles.stepTitle}>Select a Service</Text>
           {allServices.length === 0 ? (
-            <ActivityIndicator size="large" color={COLORS.primary} />
+            <SkeletonList count={4} />
           ) : (
-            <ScrollView>
-              {allServices.map((service) => (
-                <ServiceCard
-                  key={service.id}
-                  service={service}
-                  isSelected={selectedService?.id === service.id}
-                  onPress={() => setSelectedService(service)}
-                />
+            <View>
+              {allServices.map((service, index) => (
+                <AnimatedSection key={service.id} index={index}>
+                  <ServiceCard
+                    service={service}
+                    isSelected={selectedService?.id === service.id}
+                    onPress={() => setSelectedService(service)}
+                  />
+                </AnimatedSection>
               ))}
-            </ScrollView>
+            </View>
           )}
-        </View>
+        </Animated.View>
       )}
 
       {/* Step 2: Date Selection */}
       {step === 2 && (
-        <View style={styles.stepContent}>
+        <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
           <Text style={styles.stepTitle}>Choose a Date</Text>
           <Text style={styles.stepSubtitle}>
             Available: Tuesday - Saturday
           </Text>
-          <Calendar
-            onDayPress={(day) => setSelectedDate(day.dateString)}
-            markedDates={{
-              ...getDisabledDates(),
-              [selectedDate || '']: {
-                selected: true,
-                selectedColor: COLORS.primary,
-              },
-            }}
-            theme={{
-              backgroundColor: COLORS.cardBg,
-              calendarBackground: COLORS.cardBg,
-              textSectionTitleColor: COLORS.textPrimary,
-              textSectionTitleDisabledColor: COLORS.textMuted,
-              selectedDayBackgroundColor: COLORS.primary,
-              selectedDayTextColor: COLORS.bgPrimary,
-              todayTextColor: COLORS.primary,
-              dayTextColor: COLORS.textPrimary,
-              textDisabledColor: COLORS.textMuted,
-              dotColor: COLORS.primary,
-              selectedDotColor: COLORS.bgPrimary,
-              monthTextColor: COLORS.textPrimary,
-              arrowColor: COLORS.primary,
-              disabledArrowColor: COLORS.textMuted,
-              textDayFontFamily: 'System',
-              textMonthFontFamily: 'Georgia, serif',
-              textDayHeaderFontFamily: 'System',
-              textDayFontSize: 14,
-              textMonthFontSize: 18,
-              textDayHeaderFontSize: 12,
-            }}
-          />
-        </View>
+          <GradientCard showAccent={false}>
+            <Calendar
+              onDayPress={(day) => setSelectedDate(day.dateString)}
+              markedDates={{
+                ...getDisabledDates(),
+                [selectedDate || '']: {
+                  selected: true,
+                  selectedColor: COLORS.primary,
+                },
+              }}
+              theme={{
+                backgroundColor: 'transparent',
+                calendarBackground: 'transparent',
+                textSectionTitleColor: COLORS.textPrimary,
+                textSectionTitleDisabledColor: COLORS.textMuted,
+                selectedDayBackgroundColor: COLORS.primary,
+                selectedDayTextColor: COLORS.bgPrimary,
+                todayTextColor: COLORS.primary,
+                dayTextColor: COLORS.textPrimary,
+                textDisabledColor: COLORS.textMuted,
+                dotColor: COLORS.primary,
+                selectedDotColor: COLORS.bgPrimary,
+                monthTextColor: COLORS.textPrimary,
+                arrowColor: COLORS.primary,
+                disabledArrowColor: COLORS.textMuted,
+                textDayFontFamily: FONTS.sansSerif,
+                textMonthFontFamily: FONTS.serifSemiBold,
+                textDayHeaderFontFamily: FONTS.sansSerifMedium,
+                textDayFontSize: 14,
+                textMonthFontSize: 18,
+                textDayHeaderFontSize: 12,
+              }}
+            />
+          </GradientCard>
+        </Animated.View>
       )}
 
       {/* Step 3: Time Selection */}
       {step === 3 && (
-        <View style={styles.stepContent}>
+        <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
           <Text style={styles.stepTitle}>Select a Time</Text>
           {isLoading ? (
-            <ActivityIndicator size="large" color={COLORS.primary} />
+            <View style={styles.loadingTimeSlots}>
+              {[0, 1, 2].map((i) => (
+                <View key={i} style={{ marginBottom: SPACING.lg }}>
+                  <SkeletonLoader width={120} height={18} style={{ marginBottom: SPACING.sm }} />
+                  <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
+                    <SkeletonLoader width="30%" height={44} borderRadius={BORDER_RADIUS.md} />
+                    <SkeletonLoader width="30%" height={44} borderRadius={BORDER_RADIUS.md} />
+                    <SkeletonLoader width="30%" height={44} borderRadius={BORDER_RADIUS.md} />
+                  </View>
+                </View>
+              ))}
+            </View>
           ) : (
             <TimeSlotPicker
               slots={timeSlots}
@@ -342,16 +377,19 @@ export default function BookScreen() {
               onSelectTime={setSelectedTime}
             />
           )}
-        </View>
+        </Animated.View>
       )}
 
       {/* Step 4: Contact Info */}
       {step === 4 && (
-        <View style={styles.stepContent}>
+        <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
           <Text style={styles.stepTitle}>Your Information</Text>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>First Name</Text>
+            <View style={styles.labelRow}>
+              <Feather name="user" size={14} color={COLORS.primary} />
+              <Text style={styles.label}>First Name</Text>
+            </View>
             <TextInput
               style={[
                 styles.input,
@@ -370,7 +408,10 @@ export default function BookScreen() {
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Last Name</Text>
+            <View style={styles.labelRow}>
+              <Feather name="user" size={14} color={COLORS.primary} />
+              <Text style={styles.label}>Last Name</Text>
+            </View>
             <TextInput
               style={[
                 styles.input,
@@ -389,7 +430,10 @@ export default function BookScreen() {
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Email</Text>
+            <View style={styles.labelRow}>
+              <Feather name="mail" size={14} color={COLORS.primary} />
+              <Text style={styles.label}>Email</Text>
+            </View>
             <TextInput
               style={[
                 styles.input,
@@ -409,7 +453,10 @@ export default function BookScreen() {
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Phone Number</Text>
+            <View style={styles.labelRow}>
+              <Feather name="phone" size={14} color={COLORS.primary} />
+              <Text style={styles.label}>Phone Number</Text>
+            </View>
             <TextInput
               style={[
                 styles.input,
@@ -427,31 +474,40 @@ export default function BookScreen() {
               <Text style={styles.errorText}>{formErrors.phone}</Text>
             )}
           </View>
-        </View>
+        </Animated.View>
       )}
 
       {/* Step 5: Review */}
       {step === 5 && (
-        <View style={styles.stepContent}>
+        <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
           <Text style={styles.stepTitle}>Confirm Your Booking</Text>
 
-          <View style={styles.reviewCard}>
+          <GradientCard>
             <View style={styles.reviewSection}>
-              <Text style={styles.reviewLabel}>Service</Text>
+              <View style={styles.reviewLabelRow}>
+                <Feather name="scissors" size={14} color={COLORS.primary} />
+                <Text style={styles.reviewLabel}>Service</Text>
+              </View>
               <Text style={styles.reviewValue}>
                 {selectedService?.name || 'Not selected'}
               </Text>
             </View>
 
             <View style={styles.reviewSection}>
-              <Text style={styles.reviewLabel}>Price Range</Text>
+              <View style={styles.reviewLabelRow}>
+                <Feather name="dollar-sign" size={14} color={COLORS.primary} />
+                <Text style={styles.reviewLabel}>Price Range</Text>
+              </View>
               <Text style={styles.reviewValue}>
                 ${selectedService?.priceMin} - ${selectedService?.priceMax}
               </Text>
             </View>
 
             <View style={styles.reviewSection}>
-              <Text style={styles.reviewLabel}>Date & Time</Text>
+              <View style={styles.reviewLabelRow}>
+                <Feather name="calendar" size={14} color={COLORS.primary} />
+                <Text style={styles.reviewLabel}>Date & Time</Text>
+              </View>
               <Text style={styles.reviewValue}>
                 {selectedDate && format(new Date(selectedDate), 'EEEE, MMMM d, yyyy')}
                 {'\n'}
@@ -462,62 +518,64 @@ export default function BookScreen() {
             <View style={styles.reviewDivider} />
 
             <View style={styles.reviewSection}>
-              <Text style={styles.reviewLabel}>Name</Text>
+              <View style={styles.reviewLabelRow}>
+                <Feather name="user" size={14} color={COLORS.primary} />
+                <Text style={styles.reviewLabel}>Name</Text>
+              </View>
               <Text style={styles.reviewValue}>
                 {clientInfo.firstName} {clientInfo.lastName}
               </Text>
             </View>
 
             <View style={styles.reviewSection}>
-              <Text style={styles.reviewLabel}>Email</Text>
+              <View style={styles.reviewLabelRow}>
+                <Feather name="mail" size={14} color={COLORS.primary} />
+                <Text style={styles.reviewLabel}>Email</Text>
+              </View>
               <Text style={styles.reviewValue}>{clientInfo.email}</Text>
             </View>
 
             <View style={styles.reviewSection}>
-              <Text style={styles.reviewLabel}>Phone</Text>
+              <View style={styles.reviewLabelRow}>
+                <Feather name="phone" size={14} color={COLORS.primary} />
+                <Text style={styles.reviewLabel}>Phone</Text>
+              </View>
               <Text style={styles.reviewValue}>{clientInfo.phone}</Text>
             </View>
-          </View>
+          </GradientCard>
 
           <Text style={styles.confirmNote}>
             We'll contact you to confirm your appointment within 24 hours.
           </Text>
-        </View>
+        </Animated.View>
       )}
 
       {/* Navigation Buttons */}
       <View style={styles.buttonContainer}>
         {step > 1 && (
-          <TouchableOpacity
-            onPress={prevStep}
-            style={styles.buttonSecondary}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.buttonSecondaryText}>← Back</Text>
-          </TouchableOpacity>
+          <View style={{ flex: 1 }}>
+            <GradientButton
+              title="Back"
+              onPress={prevStep}
+              variant="outline"
+              icon="arrow-left"
+            />
+          </View>
         )}
 
-        <TouchableOpacity
-          onPress={handleNextStep}
-          style={[
-            styles.buttonPrimary,
-            !validation[`isStep${step}Valid` as keyof typeof validation] &&
-              styles.buttonDisabled,
-          ]}
-          activeOpacity={0.8}
-          disabled={
-            !validation[`isStep${step}Valid` as keyof typeof validation] ||
-            isLoading
-          }
-        >
-          {isLoading ? (
-            <ActivityIndicator color={COLORS.bgPrimary} />
-          ) : (
-            <Text style={styles.buttonPrimaryText}>
-              {step === 5 ? 'Book Now' : 'Next →'}
-            </Text>
-          )}
-        </TouchableOpacity>
+        <View style={{ flex: 1 }}>
+          <GradientButton
+            title={step === 5 ? 'Book Now' : 'Next'}
+            onPress={handleNextStep}
+            disabled={
+              !validation[`isStep${step}Valid` as keyof typeof validation] ||
+              isLoading
+            }
+            loading={isLoading && step === 5}
+            icon={step === 5 ? 'check' : undefined}
+            iconRight={step < 5 ? 'arrow-right' : undefined}
+          />
+        </View>
       </View>
     </ScrollView>
   );
@@ -535,13 +593,17 @@ const styles = StyleSheet.create({
   progressBar: {
     height: 4,
     backgroundColor: COLORS.bgSecondary,
-    borderRadius: BORDER_RADIUS.sm,
+    borderRadius: BORDER_RADIUS.full,
     overflow: 'hidden',
     marginBottom: SPACING.lg,
   } as ViewStyle,
-  progressFill: {
+  progressFillContainer: {
     height: '100%',
-    backgroundColor: COLORS.primary,
+    borderRadius: BORDER_RADIUS.full,
+    overflow: 'hidden',
+  } as ViewStyle,
+  progressFill: {
+    flex: 1,
   } as ViewStyle,
   stepsContainer: {
     flexDirection: 'row',
@@ -551,31 +613,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   } as ViewStyle,
-  stepIndicatorActive: {
-    opacity: 1,
+  stepCircle: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: SPACING.xs,
   } as ViewStyle,
-  stepNumber: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+  stepCircleInactive: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     backgroundColor: COLORS.bgSecondary,
     borderColor: COLORS.borderColor,
     borderWidth: 1,
-    color: COLORS.textMuted,
-    fontSize: FONTS.sm,
-    fontWeight: '600',
-    textAlign: 'center',
-    lineHeight: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: SPACING.xs,
+  } as ViewStyle,
+  stepNumber: {
+    fontSize: FONTS.sm,
+    fontFamily: FONTS.sansSerifSemiBold,
+    color: COLORS.textMuted,
   } as TextStyle,
   stepNumberActive: {
-    backgroundColor: COLORS.primary,
+    fontSize: FONTS.sm,
+    fontFamily: FONTS.sansSerifSemiBold,
     color: COLORS.bgPrimary,
   } as TextStyle,
   stepLabel: {
     fontSize: FONTS.xs,
     color: COLORS.textMuted,
-    fontWeight: '500',
+    fontFamily: FONTS.sansSerifMedium,
   } as TextStyle,
   stepLabelActive: {
     color: COLORS.textPrimary,
@@ -587,24 +657,32 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   stepTitle: {
     fontSize: FONTS['2xl'],
-    fontWeight: '600',
+    fontFamily: FONTS.serifSemiBold,
     color: COLORS.textPrimary,
     marginBottom: SPACING.sm,
-    fontFamily: 'Georgia, serif',
   } as TextStyle,
   stepSubtitle: {
     fontSize: FONTS.sm,
     color: COLORS.textSecondary,
     marginBottom: SPACING.lg,
+    fontFamily: FONTS.sansSerif,
   } as TextStyle,
+  loadingTimeSlots: {
+    paddingVertical: SPACING.lg,
+  } as ViewStyle,
   formGroup: {
     marginBottom: SPACING.lg,
   } as ViewStyle,
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  } as ViewStyle,
   label: {
     fontSize: FONTS.sm,
-    fontWeight: '600',
+    fontFamily: FONTS.sansSerifSemiBold,
     color: COLORS.textPrimary,
-    marginBottom: SPACING.sm,
+    marginLeft: SPACING.sm,
   } as TextStyle,
   input: {
     backgroundColor: COLORS.inputBg,
@@ -615,37 +693,37 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.md,
     color: COLORS.textPrimary,
     fontSize: FONTS.base,
-  } as ViewStyle,
+    fontFamily: FONTS.sansSerif,
+  } as TextStyle,
   inputError: {
     borderColor: COLORS.error,
-  } as ViewStyle,
+  } as TextStyle,
   errorText: {
     color: COLORS.error,
     fontSize: FONTS.xs,
     marginTop: SPACING.xs,
+    fontFamily: FONTS.sansSerif,
   } as TextStyle,
-  reviewCard: {
-    backgroundColor: COLORS.cardBg,
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.lg,
-    borderColor: COLORS.borderColor,
-    borderWidth: 1,
-    marginVertical: SPACING.lg,
-  } as ViewStyle,
   reviewSection: {
     marginBottom: SPACING.md,
+  } as ViewStyle,
+  reviewLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.xs,
   } as ViewStyle,
   reviewLabel: {
     fontSize: FONTS.sm,
     color: COLORS.textSecondary,
-    fontWeight: '500',
-    marginBottom: SPACING.xs,
+    fontFamily: FONTS.sansSerifMedium,
+    marginLeft: SPACING.sm,
   } as TextStyle,
   reviewValue: {
     fontSize: FONTS.base,
     color: COLORS.textPrimary,
-    fontWeight: '500',
+    fontFamily: FONTS.sansSerifMedium,
     lineHeight: 22,
+    marginLeft: SPACING.xl + 2,
   } as TextStyle,
   reviewDivider: {
     height: 1,
@@ -656,8 +734,9 @@ const styles = StyleSheet.create({
     fontSize: FONTS.sm,
     color: COLORS.textSecondary,
     textAlign: 'center',
-    marginBottom: SPACING.lg,
+    marginVertical: SPACING.lg,
     fontStyle: 'italic',
+    fontFamily: FONTS.sansSerif,
   } as TextStyle,
   buttonContainer: {
     flexDirection: 'row',
@@ -665,35 +744,4 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xl,
     gap: SPACING.md,
   } as ViewStyle,
-  buttonSecondary: {
-    flex: 1,
-    paddingVertical: SPACING.lg,
-    borderRadius: BORDER_RADIUS.lg,
-    borderColor: COLORS.primary,
-    borderWidth: 2,
-    alignItems: 'center',
-  } as ViewStyle,
-  buttonSecondaryText: {
-    color: COLORS.primary,
-    fontWeight: '600',
-    fontSize: FONTS.base,
-  } as TextStyle,
-  buttonPrimary: {
-    flex: 1,
-    paddingVertical: SPACING.lg,
-    borderRadius: BORDER_RADIUS.lg,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...SHADOWS.lg,
-  } as ViewStyle,
-  buttonDisabled: {
-    backgroundColor: COLORS.buttonDisabled,
-    opacity: 0.6,
-  } as ViewStyle,
-  buttonPrimaryText: {
-    color: COLORS.bgPrimary,
-    fontWeight: '600',
-    fontSize: FONTS.base,
-  } as TextStyle,
 });

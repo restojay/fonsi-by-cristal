@@ -5,6 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "scheme": "fonsi",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
@@ -41,7 +42,7 @@
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
-          "color": "#c9a96e"
+          "color": "#ffffff"
         }
       ]
     ],

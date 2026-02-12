@@ -1,5 +1,5 @@
 /**
- * Reusable service card component with dark theme and gold accents
+ * Service card with gradient card wrapper, category icon, duration badge, and animated book button
  */
 
 import React from 'react';
@@ -11,8 +11,16 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from 'react-native-reanimated';
 import { Service } from '@types/index';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS } from '@constants/theme';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS, ANIMATION } from '@constants/theme';
+import { GradientCard } from './GradientCard';
+import { GradientButton } from './GradientButton';
 
 interface ServiceCardProps {
   service: Service;
@@ -21,63 +29,105 @@ interface ServiceCardProps {
   isSelected?: boolean;
 }
 
+const getCategoryIcon = (category: string): { name: any; type: 'feather' | 'material' } => {
+  switch (category) {
+    case 'Hair':
+      return { name: 'content-cut', type: 'material' };
+    case 'Bridal':
+      return { name: 'diamond-stone', type: 'material' };
+    case 'Makeup':
+      return { name: 'brush', type: 'material' };
+    case 'Waxing':
+      return { name: 'spa', type: 'material' };
+    default:
+      return { name: 'star', type: 'material' };
+  }
+};
+
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+
 export const ServiceCard: React.FC<ServiceCardProps> = ({
   service,
   onPress,
   onBookPress,
   isSelected = false,
 }) => {
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.98, ANIMATION.spring);
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, ANIMATION.spring);
+  };
+
   const priceRange =
-    service.priceMin === service.priceMax
-      ? `$${service.priceMin}`
-      : `$${service.priceMin} - $${service.priceMax}`;
+    service.priceMin === 0 && service.priceMax === 0
+      ? 'Consultation'
+      : service.priceMin === service.priceMax
+        ? `$${service.priceMin}`
+        : `$${service.priceMin} - $${service.priceMax}`;
+
+  const categoryIcon = getCategoryIcon(service.category);
 
   return (
-    <TouchableOpacity
+    <AnimatedTouchable
       onPress={onPress}
-      activeOpacity={0.7}
-      style={[
-        styles.card,
-        isSelected && styles.selectedCard,
-      ]}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      activeOpacity={0.9}
+      style={[animatedStyle, styles.wrapper, isSelected && styles.selectedWrapper]}
     >
-      <View style={styles.content}>
-        <View style={styles.headerRow}>
-          <Text style={styles.name}>{service.name}</Text>
-          <Text style={styles.duration}>{service.duration}m</Text>
-        </View>
+      <GradientCard showAccent={true} style={isSelected ? styles.selectedCard : undefined}>
+        <View style={styles.content}>
+          <View style={styles.headerRow}>
+            <View style={styles.titleRow}>
+              <View style={styles.iconContainer}>
+                <MaterialCommunityIcons
+                  name={categoryIcon.name}
+                  size={16}
+                  color={COLORS.primary}
+                />
+              </View>
+              <Text style={styles.name} numberOfLines={2}>{service.name}</Text>
+            </View>
+            <View style={styles.durationBadge}>
+              <Feather name="clock" size={12} color={COLORS.primary} />
+              <Text style={styles.durationText}>{service.duration}m</Text>
+            </View>
+          </View>
 
-        {service.description && (
-          <Text style={styles.description}>{service.description}</Text>
-        )}
-
-        <View style={styles.footer}>
-          <Text style={styles.price}>{priceRange}</Text>
-          {onBookPress && (
-            <TouchableOpacity
-              onPress={onBookPress}
-              style={styles.bookButton}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.bookButtonText}>Book</Text>
-            </TouchableOpacity>
+          {service.description && (
+            <Text style={styles.description} numberOfLines={2}>{service.description}</Text>
           )}
+
+          <View style={styles.footer}>
+            <Text style={styles.price}>{priceRange}</Text>
+            {onBookPress && (
+              <GradientButton
+                title="Book"
+                onPress={onBookPress}
+                size="small"
+                icon="calendar"
+              />
+            )}
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
+      </GradientCard>
+    </AnimatedTouchable>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: COLORS.cardBg,
-    borderRadius: BORDER_RADIUS.lg,
-    borderColor: COLORS.borderColor,
-    borderWidth: 1,
-    padding: SPACING.lg,
+  wrapper: {
     marginBottom: SPACING.md,
-    ...SHADOWS.md,
   } as ViewStyle,
+  selectedWrapper: {} as ViewStyle,
   selectedCard: {
     borderColor: COLORS.primary,
     borderWidth: 2,
@@ -91,27 +141,47 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: SPACING.sm,
   } as ViewStyle,
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  } as ViewStyle,
+  iconContainer: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: SPACING.sm,
+  } as ViewStyle,
   name: {
     fontSize: FONTS.lg,
-    fontWeight: '600',
+    fontFamily: FONTS.serifSemiBold,
     color: COLORS.textPrimary,
     flex: 1,
-    fontFamily: 'Georgia, serif',
   } as TextStyle,
-  duration: {
-    fontSize: FONTS.sm,
-    color: COLORS.primary,
-    backgroundColor: COLORS.bgSecondary,
+  durationBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     paddingHorizontal: SPACING.sm,
     paddingVertical: SPACING.xs,
-    borderRadius: BORDER_RADIUS.sm,
+    borderRadius: BORDER_RADIUS.full,
     marginLeft: SPACING.sm,
+  } as ViewStyle,
+  durationText: {
+    fontSize: FONTS.xs,
+    color: COLORS.primary,
+    fontFamily: FONTS.sansSerifMedium,
+    marginLeft: 4,
   } as TextStyle,
   description: {
     fontSize: FONTS.sm,
     color: COLORS.textSecondary,
     marginBottom: SPACING.md,
     lineHeight: 20,
+    fontFamily: FONTS.sansSerif,
   } as TextStyle,
   footer: {
     flexDirection: 'row',
@@ -120,18 +190,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   price: {
     fontSize: FONTS.lg,
-    fontWeight: '700',
+    fontFamily: FONTS.sansSerifBold,
     color: COLORS.primary,
-  } as TextStyle,
-  bookButton: {
-    backgroundColor: COLORS.buttonBg,
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.sm,
-    borderRadius: BORDER_RADIUS.md,
-  } as ViewStyle,
-  bookButtonText: {
-    color: COLORS.bgPrimary,
-    fontWeight: '600',
-    fontSize: FONTS.sm,
   } as TextStyle,
 });

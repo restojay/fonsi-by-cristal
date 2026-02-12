@@ -43,8 +43,9 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Montserrat:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
+        <script async src="https://www.instagram.com/embed.js" />
       </head>
-      <body className="bg-dark-900 text-gray-100 font-sans">
+      <body className="bg-dark-900 text-gray-100 font-sans bg-noise">
         <Navbar />
         <main className="min-h-screen">{children}</main>
         <Footer />

@@ -15,29 +15,30 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
-    "next": "^16.1.6",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
     "@prisma/client": "^7.3.0",
-    "next-auth": "^5.0.0",
-    "date-fns": "^4.1.0",
-    "nodemailer": "^6.10.0",
-    "zod": "^3.24.0",
     "@tailwindcss/postcss": "^4.1.0",
-    "tailwindcss": "^4.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.0",
-    "lucide-react": "^0.475.0"
+    "date-fns": "^4.1.0",
+    "framer-motion": "^12.34.0",
+    "lucide-react": "^0.475.0",
+    "next": "^16.1.6",
+    "next-auth": "5.0.0-beta.25",
+    "nodemailer": "^6.10.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tailwindcss": "^4.1.0",
+    "zod": "^3.24.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "@types/nodemailer": "^6.4.17",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@types/nodemailer": "^6.4.17",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.1.0",
     "prisma": "^7.3.0",
     "ts-node": "^10.9.2",
-    "typescript": "~5.9.3",
-    "eslint": "^9.0.0",
-    "eslint-config-next": "^16.1.0"
+    "typescript": "~5.9.3"
   }
 }

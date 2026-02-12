@@ -1,5 +1,5 @@
 /**
- * Profile/account screen with client info, appointment history, and settings
+ * Profile screen with gradient avatar, stats row, Feather icons, and glass cards
  */
 
 import React, { useMemo, useState } from 'react';
@@ -14,15 +14,30 @@ import {
   TextStyle,
 } from 'react-native';
 import { router } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Feather } from '@expo/vector-icons';
 import { Header } from '@components/Header';
 import { AppointmentCard } from '@components/AppointmentCard';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS } from '@constants/theme';
+import { AnimatedSection } from '@components/AnimatedSection';
+import { GradientButton } from '@components/GradientButton';
+import { GradientCard } from '@components/GradientCard';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS, GRADIENTS } from '@constants/theme';
 import { useBookingStore } from '@store/bookingStore';
 import { useAppointmentStore } from '@store/appointmentStore';
-import { Appointment } from '@types/index';
+
+const SETTINGS_ITEMS: {
+  label: string;
+  subtitle: string;
+  icon: keyof typeof Feather.glyphMap;
+}[] = [
+  { label: 'Notifications', subtitle: 'Manage alerts', icon: 'bell' },
+  { label: 'Preferences', subtitle: 'App settings', icon: 'settings' },
+  { label: 'Privacy Policy', subtitle: 'Your data', icon: 'shield' },
+  { label: 'Terms of Service', subtitle: 'Legal', icon: 'file-text' },
+];
 
 export default function ProfileScreen() {
-  const { clientInfo, setClientInfo } = useBookingStore();
+  const { clientInfo } = useBookingStore();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const appointments = useAppointmentStore((state) => state.appointments);
   const upcoming = useMemo(() => {
@@ -52,6 +67,8 @@ export default function ProfileScreen() {
       );
   }, [appointments]);
 
+  const totalVisits = appointments.filter((a) => a.status === 'completed').length;
+
   const handleLogout = () => {
     Alert.alert(
       'Sign Out',
@@ -61,8 +78,6 @@ export default function ProfileScreen() {
         {
           text: 'Sign Out',
           onPress: () => {
-            // Clear booking state
-            // In a real app, you'd also clear auth tokens
             router.replace('/');
           },
           style: 'destructive',
@@ -80,7 +95,6 @@ export default function ProfileScreen() {
         {
           text: 'Cancel Appointment',
           onPress: () => {
-            // In a real app, call API to cancel
             Alert.alert('Success', 'Appointment cancelled');
           },
           style: 'destructive',
@@ -98,31 +112,40 @@ export default function ProfileScreen() {
       <Header title="Profile" subtitle="Your account" showLogo={false} />
 
       {/* Client Info Card */}
-      <View style={styles.section}>
-        <View style={styles.infoCard}>
+      <AnimatedSection delay={100} style={styles.section}>
+        <GradientCard>
           <View style={styles.profileHeader}>
-            <View style={styles.avatar}>
+            <LinearGradient
+              colors={[...GRADIENTS.goldButton]}
+              style={styles.avatar}
+            >
               <Text style={styles.avatarText}>
-                {clientInfo.firstName.charAt(0).toUpperCase()}
+                {clientInfo.firstName ? clientInfo.firstName.charAt(0).toUpperCase() : 'G'}
               </Text>
-            </View>
+            </LinearGradient>
             <View style={styles.profileInfo}>
               <Text style={styles.profileName}>
-                {clientInfo.firstName} {clientInfo.lastName}
+                {clientInfo.firstName || 'Guest'} {clientInfo.lastName}
               </Text>
-              {clientInfo.email && (
-                <Text style={styles.profileEmail}>{clientInfo.email}</Text>
-              )}
-              {clientInfo.phone && (
-                <Text style={styles.profilePhone}>{clientInfo.phone}</Text>
-              )}
+              {clientInfo.email ? (
+                <View style={styles.profileDetailRow}>
+                  <Feather name="mail" size={12} color={COLORS.textMuted} />
+                  <Text style={styles.profileDetail}>{clientInfo.email}</Text>
+                </View>
+              ) : null}
+              {clientInfo.phone ? (
+                <View style={styles.profileDetailRow}>
+                  <Feather name="phone" size={12} color={COLORS.textMuted} />
+                  <Text style={styles.profileDetail}>{clientInfo.phone}</Text>
+                </View>
+              ) : null}
             </View>
             {!isEditingProfile && (
               <TouchableOpacity
                 onPress={() => setIsEditingProfile(true)}
                 style={styles.editButton}
               >
-                <Text style={styles.editButtonText}>✎</Text>
+                <Feather name="edit-2" size={16} color={COLORS.primary} />
               </TouchableOpacity>
             )}
           </View>
@@ -132,31 +155,52 @@ export default function ProfileScreen() {
               <Text style={styles.editNote}>
                 Edit your information below
               </Text>
-              {/* In a production app, you'd add editable TextInputs here */}
-              <TouchableOpacity
+              <GradientButton
+                title="Done"
                 onPress={() => setIsEditingProfile(false)}
-                style={styles.saveButton}
-              >
-                <Text style={styles.saveButtonText}>Done</Text>
-              </TouchableOpacity>
+                size="small"
+              />
             </View>
           )}
+        </GradientCard>
+      </AnimatedSection>
+
+      {/* Stats Row */}
+      <AnimatedSection delay={200} style={styles.section}>
+        <View style={styles.statsRow}>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>{totalVisits}</Text>
+            <Text style={styles.statLabel}>Total Visits</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>2025</Text>
+            <Text style={styles.statLabel}>Member Since</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>{upcoming.length}</Text>
+            <Text style={styles.statLabel}>Upcoming</Text>
+          </View>
         </View>
-      </View>
+      </AnimatedSection>
 
       {/* Upcoming Appointments */}
-      <View style={styles.section}>
+      <AnimatedSection delay={300} style={styles.section}>
         <Text style={styles.sectionTitle}>Upcoming Appointments</Text>
         {upcoming.length === 0 ? (
-          <View style={styles.emptyCard}>
-            <Text style={styles.emptyText}>No upcoming appointments</Text>
-            <TouchableOpacity
-              onPress={() => router.push('/book')}
-              style={styles.bookButton}
-            >
-              <Text style={styles.bookButtonText}>Book Now</Text>
-            </TouchableOpacity>
-          </View>
+          <GradientCard variant="glass" showAccent={false}>
+            <View style={styles.emptyState}>
+              <Feather name="calendar" size={24} color={COLORS.textMuted} />
+              <Text style={styles.emptyText}>No upcoming appointments</Text>
+              <View style={{ marginTop: SPACING.md }}>
+                <GradientButton
+                  title="Book Now"
+                  onPress={() => router.push('/book')}
+                  size="small"
+                  icon="calendar"
+                />
+              </View>
+            </View>
+          </GradientCard>
         ) : (
           <View>
             {upcoming.map((appointment) => (
@@ -170,20 +214,19 @@ export default function ProfileScreen() {
                     onPress={() => handleCancelAppointment(appointment.id)}
                     style={styles.cancelButton}
                   >
-                    <Text style={styles.cancelButtonText}>
-                      Cancel Appointment
-                    </Text>
+                    <Feather name="x" size={14} color={COLORS.error} />
+                    <Text style={styles.cancelButtonText}>Cancel Appointment</Text>
                   </TouchableOpacity>
                 )}
               </View>
             ))}
           </View>
         )}
-      </View>
+      </AnimatedSection>
 
       {/* Past Appointments */}
       {past.length > 0 && (
-        <View style={styles.section}>
+        <AnimatedSection delay={400} style={styles.section}>
           <Text style={styles.sectionTitle}>Past Appointments</Text>
           <View>
             {past.map((appointment) => (
@@ -195,83 +238,72 @@ export default function ProfileScreen() {
               />
             ))}
           </View>
-        </View>
+        </AnimatedSection>
       )}
 
       {/* Settings */}
-      <View style={styles.section}>
+      <AnimatedSection delay={500} style={styles.section}>
         <Text style={styles.sectionTitle}>Settings</Text>
-
-        <TouchableOpacity style={styles.settingItem} activeOpacity={0.7}>
-          <View style={styles.settingContent}>
-            <Text style={styles.settingLabel}>Notifications</Text>
-            <Text style={styles.settingValue}>Enabled</Text>
-          </View>
-          <Text style={styles.settingArrow}>→</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.settingItem} activeOpacity={0.7}>
-          <View style={styles.settingContent}>
-            <Text style={styles.settingLabel}>Preferences</Text>
-            <Text style={styles.settingValue}>Edit</Text>
-          </View>
-          <Text style={styles.settingArrow}>→</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.settingItem} activeOpacity={0.7}>
-          <View style={styles.settingContent}>
-            <Text style={styles.settingLabel}>Privacy Policy</Text>
-            <Text style={styles.settingValue}>View</Text>
-          </View>
-          <Text style={styles.settingArrow}>→</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.settingItem} activeOpacity={0.7}>
-          <View style={styles.settingContent}>
-            <Text style={styles.settingLabel}>Terms of Service</Text>
-            <Text style={styles.settingValue}>View</Text>
-          </View>
-          <Text style={styles.settingArrow}>→</Text>
-        </TouchableOpacity>
-      </View>
+        {SETTINGS_ITEMS.map((item, index) => (
+          <TouchableOpacity
+            key={item.label}
+            style={styles.settingItem}
+            activeOpacity={0.7}
+          >
+            <View style={styles.settingIconContainer}>
+              <Feather name={item.icon} size={18} color={COLORS.primary} />
+            </View>
+            <View style={styles.settingContent}>
+              <Text style={styles.settingLabel}>{item.label}</Text>
+              <Text style={styles.settingValue}>{item.subtitle}</Text>
+            </View>
+            <Feather name="chevron-right" size={18} color={COLORS.textMuted} />
+          </TouchableOpacity>
+        ))}
+      </AnimatedSection>
 
       {/* About */}
-      <View style={styles.section}>
-        <View style={styles.aboutCard}>
+      <AnimatedSection delay={600} style={styles.section}>
+        <GradientCard>
           <Text style={styles.aboutTitle}>About Fonsi by Cristal</Text>
           <Text style={styles.aboutText}>
-            Premium hair and makeup studio in San Antonio, TX. By appointment only.
+            Beauty is my passion and my passion shows on every client that walks out of my doors. Through extensive, ongoing continuing education I stay up to date on the latest cut and color styles and techniques to bring you the looks you want.
           </Text>
           <View style={styles.aboutInfo}>
-            <Text style={styles.aboutLabel}>Address</Text>
-            <Text style={styles.aboutValue}>
-              6626 West Loop 1604 North suite 105
-            </Text>
-            <Text style={styles.aboutValue}>
-              San Antonio, TX 78254
-            </Text>
+            <View style={styles.aboutLabelRow}>
+              <Feather name="map-pin" size={12} color={COLORS.primary} />
+              <Text style={styles.aboutLabel}>Address</Text>
+            </View>
+            <Text style={styles.aboutValue}>6626 West Loop 1604 North suite 105</Text>
+            <Text style={styles.aboutValue}>San Antonio, TX 78254</Text>
           </View>
           <View style={styles.aboutInfo}>
-            <Text style={styles.aboutLabel}>Phone</Text>
+            <View style={styles.aboutLabelRow}>
+              <Feather name="phone" size={12} color={COLORS.primary} />
+              <Text style={styles.aboutLabel}>Phone</Text>
+            </View>
             <Text style={styles.aboutValue}>(210) 551-7742</Text>
           </View>
           <View style={styles.aboutInfo}>
-            <Text style={styles.aboutLabel}>Version</Text>
+            <View style={styles.aboutLabelRow}>
+              <Feather name="info" size={12} color={COLORS.primary} />
+              <Text style={styles.aboutLabel}>Version</Text>
+            </View>
             <Text style={styles.aboutValue}>1.0.0</Text>
           </View>
-        </View>
-      </View>
+        </GradientCard>
+      </AnimatedSection>
 
       {/* Logout Button */}
-      <View style={styles.section}>
-        <TouchableOpacity
+      <AnimatedSection delay={700} style={styles.section}>
+        <GradientButton
+          title="Sign Out"
           onPress={handleLogout}
-          style={styles.logoutButton}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.logoutButtonText}>Sign Out</Text>
-        </TouchableOpacity>
-      </View>
+          variant="outline"
+          icon="log-out"
+        />
+        <View style={{ height: SPACING.xl }} />
+      </AnimatedSection>
     </ScrollView>
   );
 }
@@ -287,70 +319,60 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   sectionTitle: {
     fontSize: FONTS.lg,
-    fontWeight: '600',
+    fontFamily: FONTS.serifSemiBold,
     color: COLORS.textPrimary,
     marginBottom: SPACING.md,
-    fontFamily: 'Georgia, serif',
   } as TextStyle,
-  infoCard: {
-    backgroundColor: COLORS.cardBg,
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.lg,
-    borderColor: COLORS.borderColor,
-    borderWidth: 1,
-    ...SHADOWS.md,
-  } as ViewStyle,
   profileHeader: {
     flexDirection: 'row',
     alignItems: 'center',
   } as ViewStyle,
   avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: COLORS.primary,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: SPACING.md,
+    marginRight: SPACING.lg,
   } as ViewStyle,
   avatarText: {
-    fontSize: FONTS['2xl'],
-    fontWeight: '700',
+    fontSize: FONTS['3xl'],
+    fontFamily: FONTS.serifBold,
     color: COLORS.bgPrimary,
   } as TextStyle,
   profileInfo: {
     flex: 1,
   } as ViewStyle,
   profileName: {
-    fontSize: FONTS.base,
-    fontWeight: '600',
+    fontSize: FONTS.lg,
+    fontFamily: FONTS.sansSerifSemiBold,
     color: COLORS.textPrimary,
+    marginBottom: SPACING.xs,
   } as TextStyle,
-  profileEmail: {
+  profileDetailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: SPACING.xs,
+  } as ViewStyle,
+  profileDetail: {
     fontSize: FONTS.sm,
     color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
-  } as TextStyle,
-  profilePhone: {
-    fontSize: FONTS.sm,
-    color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
+    fontFamily: FONTS.sansSerif,
+    marginLeft: SPACING.sm,
   } as TextStyle,
   editButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: COLORS.bgSecondary,
+    backgroundColor: COLORS.glassBackground,
+    borderColor: COLORS.glassBorder,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   } as ViewStyle,
-  editButtonText: {
-    fontSize: FONTS.lg,
-    color: COLORS.primary,
-  } as TextStyle,
   editSection: {
     marginTop: SPACING.lg,
-    paddingTopColor: COLORS.borderColor,
+    borderTopColor: COLORS.borderColor,
     borderTopWidth: 1,
     paddingTop: SPACING.lg,
   } as ViewStyle,
@@ -358,133 +380,127 @@ const styles = StyleSheet.create({
     fontSize: FONTS.sm,
     color: COLORS.textSecondary,
     marginBottom: SPACING.md,
+    fontFamily: FONTS.sansSerif,
   } as TextStyle,
-  saveButton: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.md,
+  statsRow: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+  } as ViewStyle,
+  statCard: {
+    flex: 1,
+    backgroundColor: COLORS.glassBackground,
+    borderColor: COLORS.glassBorder,
+    borderWidth: 1,
+    borderRadius: BORDER_RADIUS.lg,
+    paddingVertical: SPACING.lg,
     alignItems: 'center',
   } as ViewStyle,
-  saveButtonText: {
-    color: COLORS.bgPrimary,
-    fontWeight: '600',
-    fontSize: FONTS.base,
+  statValue: {
+    fontSize: FONTS['2xl'],
+    fontFamily: FONTS.sansSerifBold,
+    color: COLORS.primary,
+    marginBottom: SPACING.xs,
   } as TextStyle,
-  emptyCard: {
-    backgroundColor: COLORS.cardBg,
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.xl,
+  statLabel: {
+    fontSize: FONTS.xs,
+    fontFamily: FONTS.sansSerifMedium,
+    color: COLORS.textMuted,
+  } as TextStyle,
+  emptyState: {
     alignItems: 'center',
-    borderColor: COLORS.borderColor,
-    borderWidth: 1,
+    paddingVertical: SPACING.lg,
   } as ViewStyle,
   emptyText: {
     fontSize: FONTS.base,
     color: COLORS.textSecondary,
-    marginBottom: SPACING.md,
-  } as TextStyle,
-  bookButton: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: SPACING.xl,
-    paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.md,
-  } as ViewStyle,
-  bookButtonText: {
-    color: COLORS.bgPrimary,
-    fontWeight: '600',
-    fontSize: FONTS.sm,
+    fontFamily: FONTS.sansSerif,
+    marginTop: SPACING.sm,
   } as TextStyle,
   appointmentContainer: {
     marginBottom: SPACING.lg,
   } as ViewStyle,
   cancelButton: {
-    marginTop: SPACING.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: SPACING.sm,
     paddingVertical: SPACING.md,
     borderWidth: 1,
     borderColor: COLORS.error,
     borderRadius: BORDER_RADIUS.md,
-    alignItems: 'center',
   } as ViewStyle,
   cancelButtonText: {
     color: COLORS.error,
-    fontWeight: '600',
+    fontFamily: FONTS.sansSerifSemiBold,
     fontSize: FONTS.sm,
+    marginLeft: SPACING.sm,
   } as TextStyle,
   settingItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.md,
-    backgroundColor: COLORS.cardBg,
+    backgroundColor: COLORS.glassBackground,
+    borderColor: COLORS.glassBorder,
+    borderWidth: 1,
     borderRadius: BORDER_RADIUS.lg,
     marginBottom: SPACING.sm,
-    borderColor: COLORS.borderColor,
-    borderWidth: 1,
+  } as ViewStyle,
+  settingIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: SPACING.md,
   } as ViewStyle,
   settingContent: {
     flex: 1,
   } as ViewStyle,
   settingLabel: {
     fontSize: FONTS.base,
-    fontWeight: '500',
+    fontFamily: FONTS.sansSerifMedium,
     color: COLORS.textPrimary,
   } as TextStyle,
   settingValue: {
-    fontSize: FONTS.sm,
-    color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
+    fontSize: FONTS.xs,
+    color: COLORS.textMuted,
+    fontFamily: FONTS.sansSerif,
+    marginTop: 2,
   } as TextStyle,
-  settingArrow: {
-    fontSize: FONTS.lg,
-    color: COLORS.primary,
-    marginLeft: SPACING.md,
-  } as TextStyle,
-  aboutCard: {
-    backgroundColor: COLORS.cardBg,
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.lg,
-    borderColor: COLORS.borderColor,
-    borderWidth: 1,
-  } as ViewStyle,
   aboutTitle: {
     fontSize: FONTS.lg,
-    fontWeight: '600',
+    fontFamily: FONTS.serifSemiBold,
     color: COLORS.textPrimary,
     marginBottom: SPACING.md,
-    fontFamily: 'Georgia, serif',
   } as TextStyle,
   aboutText: {
     fontSize: FONTS.sm,
     color: COLORS.textSecondary,
     lineHeight: 20,
     marginBottom: SPACING.md,
+    fontFamily: FONTS.sansSerif,
   } as TextStyle,
   aboutInfo: {
     marginBottom: SPACING.md,
   } as ViewStyle,
+  aboutLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.xs,
+  } as ViewStyle,
   aboutLabel: {
     fontSize: FONTS.xs,
-    fontWeight: '600',
+    fontFamily: FONTS.sansSerifSemiBold,
     color: COLORS.primary,
-    marginBottom: SPACING.xs,
+    marginLeft: SPACING.sm,
   } as TextStyle,
   aboutValue: {
     fontSize: FONTS.sm,
     color: COLORS.textSecondary,
     lineHeight: 20,
-  } as TextStyle,
-  logoutButton: {
-    paddingVertical: SPACING.lg,
-    borderWidth: 2,
-    borderColor: COLORS.error,
-    borderRadius: BORDER_RADIUS.lg,
-    alignItems: 'center',
-    marginBottom: SPACING.xl,
-  } as ViewStyle,
-  logoutButtonText: {
-    color: COLORS.error,
-    fontWeight: '600',
-    fontSize: FONTS.base,
+    fontFamily: FONTS.sansSerif,
+    marginLeft: SPACING.xl,
   } as TextStyle,
 });
