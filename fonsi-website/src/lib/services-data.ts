@@ -1,0 +1,218 @@
+export interface ServiceData {
+  category: string
+  name: string
+  description?: string
+  priceMin: number
+  priceMax: number
+  duration: number
+}
+
+export const servicesData: ServiceData[] = [
+  // Hair Services
+  {
+    category: 'Hair',
+    name: 'Cuts',
+    description: 'Professional hair cutting service',
+    priceMin: 55,
+    priceMax: 85,
+    duration: 45,
+  },
+  {
+    category: 'Hair',
+    name: 'Fringe Trim',
+    description: 'Quick fringe/bangs trim',
+    priceMin: 10,
+    priceMax: 15,
+    duration: 15,
+  },
+  {
+    category: 'Hair',
+    name: 'Shampoo & Blowouts',
+    description: 'Shampoo, condition, and style blowout',
+    priceMin: 45,
+    priceMax: 85,
+    duration: 60,
+  },
+  {
+    category: 'Hair',
+    name: 'Styling',
+    description: 'Professional hair styling service',
+    priceMin: 35,
+    priceMax: 120,
+    duration: 60,
+  },
+  {
+    category: 'Hair',
+    name: 'Special Occasion Updo',
+    description: 'Elegant updo styling for special events',
+    priceMin: 55,
+    priceMax: 125,
+    duration: 90,
+  },
+  {
+    category: 'Hair',
+    name: 'Men Cuts',
+    description: 'Professional men\'s haircut',
+    priceMin: 29.95,
+    priceMax: 55,
+    duration: 30,
+  },
+  {
+    category: 'Hair',
+    name: 'Perm',
+    description: 'Permanent wave treatment',
+    priceMin: 135,
+    priceMax: 225,
+    duration: 180,
+  },
+  {
+    category: 'Hair',
+    name: 'Keratin Treatment',
+    description: 'Keratin smoothing treatment (consultation required)',
+    priceMin: 150,
+    priceMax: 250,
+    duration: 180,
+  },
+  {
+    category: 'Hair',
+    name: 'Color Retouch',
+    description: 'Root touch-up and color refresh',
+    priceMin: 85,
+    priceMax: 135,
+    duration: 90,
+  },
+  {
+    category: 'Hair',
+    name: 'Full Color',
+    description: 'Complete hair coloring service',
+    priceMin: 95,
+    priceMax: 205,
+    duration: 120,
+  },
+  {
+    category: 'Hair',
+    name: 'Color Correction',
+    description: 'Color correction service (in-person consultation)',
+    priceMin: 150,
+    priceMax: 400,
+    duration: 180,
+  },
+  {
+    category: 'Hair',
+    name: 'Foil Highlights',
+    description: 'Foil highlights and dimensional coloring',
+    priceMin: 205,
+    priceMax: 350,
+    duration: 150,
+  },
+  {
+    category: 'Hair',
+    name: 'Ombre/Balayage',
+    description: 'Ombre or balayage hair coloring (in-person consultation)',
+    priceMin: 225,
+    priceMax: 400,
+    duration: 150,
+  },
+  {
+    category: 'Hair',
+    name: 'Additional Colors',
+    description: 'Additional color services',
+    priceMin: 35,
+    priceMax: 95,
+    duration: 30,
+  },
+  {
+    category: 'Hair',
+    name: 'Partial Foil',
+    description: 'Partial foil highlights',
+    priceMin: 75,
+    priceMax: 205,
+    duration: 120,
+  },
+  {
+    category: 'Hair',
+    name: 'Toners',
+    description: 'Hair toning service',
+    priceMin: 35,
+    priceMax: 65,
+    duration: 45,
+  },
+  {
+    category: 'Hair',
+    name: 'Hair Treatments',
+    description: 'Various hair treatment services',
+    priceMin: 35,
+    priceMax: 195,
+    duration: 60,
+  },
+  {
+    category: 'Hair',
+    name: 'Olaplex Treatment',
+    description: 'Olaplex hair treatment for damage repair',
+    priceMin: 125,
+    priceMax: 200,
+    duration: 90,
+  },
+
+  // Bridal Services
+  {
+    category: 'Bridal',
+    name: 'Bride Package',
+    description: 'Complete bridal hair and makeup package',
+    priceMin: 350,
+    priceMax: 350,
+    duration: 180,
+  },
+  {
+    category: 'Bridal',
+    name: 'Day of Wedding Party',
+    description: 'Wedding party styling and makeup (upon request)',
+    priceMin: 200,
+    priceMax: 500,
+    duration: 120,
+  },
+  {
+    category: 'Bridal',
+    name: 'On Site Service',
+    description: 'On-site bridal services (upon request)',
+    priceMin: 250,
+    priceMax: 600,
+    duration: 180,
+  },
+
+  // Makeup Services
+  {
+    category: 'Makeup',
+    name: 'MAC Full Face',
+    description: 'Full face makeup application',
+    priceMin: 85,
+    priceMax: 85,
+    duration: 60,
+  },
+  {
+    category: 'Makeup',
+    name: 'MAC Eye Only',
+    description: 'Eye makeup application only',
+    priceMin: 50,
+    priceMax: 50,
+    duration: 30,
+  },
+  {
+    category: 'Makeup',
+    name: 'On-Site Makeup',
+    description: 'On-site makeup services (consultation required)',
+    priceMin: 150,
+    priceMax: 400,
+    duration: 90,
+  },
+
+  // Waxing Services
+  {
+    category: 'Waxing',
+    name: 'Eyebrow Waxing',
+    description: 'Professional eyebrow waxing',
+    priceMin: 17,
+    priceMax: 35,
+    duration: 15,
+  },
+]

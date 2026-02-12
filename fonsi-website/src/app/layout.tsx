@@ -1,0 +1,54 @@
+import type { Metadata } from 'next'
+import './globals.css'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
+
+export const metadata: Metadata = {
+  title: 'Fonsi by Cristal | Hair Salon & Makeup Studio San Antonio',
+  description:
+    'Luxury hair salon and makeup studio in San Antonio, TX. Book your appointment for hair cuts, color, styling, bridal services, and makeup. By appointment only.',
+  keywords:
+    'hair salon, makeup studio, hair color, bridal services, San Antonio, Texas',
+  authors: [{ name: 'Fonsi by Cristal' }],
+  viewport: 'width=device-width, initial-scale=1.0',
+  robots: 'index, follow',
+  openGraph: {
+    title: 'Fonsi by Cristal | Hair Salon & Makeup Studio',
+    description:
+      'Luxury hair salon and makeup studio offering professional hair services and makeup in San Antonio, TX.',
+    url: 'https://fonsi-by-cristal.com',
+    type: 'website',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Fonsi by Cristal',
+      },
+    ],
+  },
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Montserrat:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="bg-dark-900 text-gray-100 font-sans">
+        <Navbar />
+        <main className="min-h-screen">{children}</main>
+        <Footer />
+      </body>
+    </html>
+  )
+}

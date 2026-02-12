@@ -1,0 +1,148 @@
+@import "tailwindcss";
+
+/* ===== Tailwind v4 Theme Configuration (replaces tailwind.config.ts) ===== */
+@theme {
+  /* Gold palette */
+  --color-gold-50: #faf8f3;
+  --color-gold-100: #f5f1e8;
+  --color-gold-200: #ebe4d1;
+  --color-gold-300: #dfd5b8;
+  --color-gold-400: #d0c297;
+  --color-gold-500: #c9a96e;
+  --color-gold-600: #b8925f;
+  --color-gold-700: #9d7a4e;
+  --color-gold-800: #7f6440;
+  --color-gold-900: #654c2f;
+
+  /* Dark palette */
+  --color-dark-50: #f9fafb;
+  --color-dark-100: #f3f4f6;
+  --color-dark-200: #e5e7eb;
+  --color-dark-300: #d1d5db;
+  --color-dark-400: #9ca3af;
+  --color-dark-500: #6b7280;
+  --color-dark-600: #4b5563;
+  --color-dark-700: #2d3748;
+  --color-dark-800: #1a202c;
+  --color-dark-900: #0a0a0a;
+
+  /* Fonts */
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Montserrat', 'Inter', system-ui, sans-serif;
+  --font-display: 'Playfair Display', serif;
+
+  /* Shadows */
+  --shadow-gold: 0 0 20px rgba(201, 169, 110, 0.3);
+  --shadow-gold-lg: 0 0 40px rgba(201, 169, 110, 0.4);
+}
+
+/* ===== Base Styles ===== */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #0a0a0a;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a202c;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c9a96e;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b8925f;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+}
+
+/* Smooth transitions */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Focus states */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #c9a96e;
+  outline-offset: 2px;
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, #c9a96e 0%, #9d7a4e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Hero image overlay */
+.hero-overlay {
+  position: relative;
+}
+
+.hero-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.7) 0%, rgba(26, 32, 44, 0.5) 100%);
+  z-index: 1;
+}
+
+.hero-overlay > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Section spacing */
+.section-padding {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+  .section-padding {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+}
+
+/* Container max width */
+.container-custom {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-custom {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-custom {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}

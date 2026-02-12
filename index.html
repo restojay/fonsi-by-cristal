@@ -1,0 +1,1823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fonsi by Cristal | Hair, Makeup & Beauty | San Antonio, TX</title>
+    <meta name="description" content="Fonsi by Cristal - Full service hair salon and makeup studio in San Antonio, Texas. Hair cuts, color, bridal, makeup by licensed cosmetologist Cristal Gutierrez.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-card: #1a1a1a;
+            --bg-accent: #222222;
+            --gold: #c9a96e;
+            --gold-light: #d4bc8b;
+            --gold-dark: #a8843f;
+            --text-primary: #f5f0eb;
+            --text-secondary: #b8b0a8;
+            --text-muted: #7a7370;
+            --border: #2a2520;
+            --white: #ffffff;
+            --success: #4a9e6e;
+            --error: #c25050;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.7;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            letter-spacing: 0.03em;
+        }
+
+        a { text-decoration: none; color: inherit; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ===== TOP BAR ===== */
+        .top-bar {
+            background: var(--gold-dark);
+            padding: 8px 0;
+            text-align: center;
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--white);
+        }
+
+        .top-bar a { color: var(--white); }
+        .top-bar a:hover { text-decoration: underline; }
+
+        /* ===== NAV ===== */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10,10,10,0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(201,169,110,0.15);
+            transition: all 0.4s ease;
+        }
+
+        nav.scrolled {
+            background: rgba(10,10,10,0.98);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+        }
+
+        .nav-inner {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 80px;
+        }
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold);
+        }
+
+        .logo span { color: var(--text-secondary); font-weight: 300; font-size: 0.85em; }
+
+        .nav-links {
+            display: flex;
+            gap: 36px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--gold);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--gold); }
+        .nav-links a:hover::after { width: 100%; }
+
+        .nav-book-btn {
+            background: var(--gold);
+            color: var(--bg-primary) !important;
+            padding: 10px 28px;
+            font-size: 0.65rem !important;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-book-btn:hover {
+            background: var(--gold-light);
+            transform: translateY(-1px);
+        }
+
+        .nav-book-btn::after { display: none !important; }
+
+        .mobile-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 8px;
+        }
+
+        .mobile-toggle span {
+            display: block;
+            width: 24px;
+            height: 1.5px;
+            background: var(--gold);
+            transition: all 0.3s;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            position: relative;
+            height: 100vh;
+            min-height: 700px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #1a1510 0%, #0a0a0a 40%, #12100e 100%);
+        }
+
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 70% 50%, rgba(201,169,110,0.08) 0%, transparent 60%);
+        }
+
+        .hero-particles {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--gold);
+            border-radius: 50%;
+            opacity: 0;
+            animation: float-particle 8s infinite;
+        }
+
+        @keyframes float-particle {
+            0% { opacity: 0; transform: translateY(100vh) scale(0); }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.3; }
+            100% { opacity: 0; transform: translateY(-10vh) scale(1); }
+        }
+
+        .hero-content {
+            position: relative;
+            text-align: center;
+            z-index: 2;
+            padding: 0 24px;
+        }
+
+        .hero-eyebrow {
+            font-size: 0.7rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 24px;
+            opacity: 0;
+            animation: fadeUp 1s 0.3s forwards;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 7vw, 6rem);
+            font-weight: 300;
+            line-height: 1.1;
+            margin-bottom: 12px;
+            opacity: 0;
+            animation: fadeUp 1s 0.5s forwards;
+        }
+
+        .hero-title em {
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        .hero-subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            font-weight: 300;
+            font-style: italic;
+            color: var(--text-secondary);
+            margin-bottom: 48px;
+            opacity: 0;
+            animation: fadeUp 1s 0.7s forwards;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            opacity: 0;
+            animation: fadeUp 1s 0.9s forwards;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--gold);
+            color: var(--bg-primary);
+            padding: 16px 40px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            transition: all 0.4s;
+        }
+
+        .btn-primary:hover {
+            background: var(--gold-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(201,169,110,0.3);
+        }
+
+        .btn-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: transparent;
+            color: var(--gold);
+            padding: 16px 40px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            border: 1px solid var(--gold);
+            cursor: pointer;
+            transition: all 0.4s;
+        }
+
+        .btn-outline:hover {
+            background: rgba(201,169,110,0.1);
+            transform: translateY(-2px);
+        }
+
+        .hero-scroll {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: 0.6rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            animation: bounce 2s infinite;
+        }
+
+        .hero-scroll .line {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--gold), transparent);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(8px); }
+        }
+
+        /* ===== SECTION STYLES ===== */
+        section { padding: 120px 0; }
+
+        .section-eyebrow {
+            font-size: 0.65rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--gold);
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            text-align: center;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .section-subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.15rem;
+            font-style: italic;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 64px;
+        }
+
+        .gold-line {
+            width: 60px;
+            height: 1px;
+            background: var(--gold);
+            margin: 24px auto 0;
+        }
+
+        /* ===== ABOUT ===== */
+        .about { background: var(--bg-secondary); }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .about-image {
+            position: relative;
+        }
+
+        .about-image .img-placeholder {
+            width: 100%;
+            aspect-ratio: 3/4;
+            background: linear-gradient(135deg, var(--bg-accent), var(--bg-card));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            border: 1px solid var(--border);
+        }
+
+        .about-image::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: -20px;
+            bottom: -20px;
+            border: 1px solid var(--gold);
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        .about-text .section-eyebrow,
+        .about-text .section-title { text-align: left; }
+
+        .about-text p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            line-height: 1.9;
+        }
+
+        .about-credentials {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .credential-tag {
+            padding: 6px 16px;
+            background: rgba(201,169,110,0.08);
+            border: 1px solid rgba(201,169,110,0.2);
+            color: var(--gold-light);
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* ===== SERVICES ===== */
+        .services { background: var(--bg-primary); }
+
+        .services-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
+        }
+
+        .services-tab {
+            padding: 12px 28px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .services-tab.active,
+        .services-tab:hover {
+            background: var(--gold);
+            border-color: var(--gold);
+            color: var(--bg-primary);
+        }
+
+        .services-category { display: none; }
+        .services-category.active { display: block; }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+
+        .service-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 28px 32px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .service-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+
+        .service-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .service-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        .service-price {
+            font-size: 0.85rem;
+            color: var(--gold);
+            font-weight: 500;
+            white-space: nowrap;
+            margin-left: 16px;
+        }
+
+        .service-desc {
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            line-height: 1.6;
+        }
+
+        .service-card .book-service {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--gold);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .service-card:hover .book-service { opacity: 1; }
+
+        /* ===== GALLERY ===== */
+        .gallery { background: var(--bg-secondary); }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 280px;
+            gap: 6px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            background: var(--bg-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .gallery-item:nth-child(1) { grid-row: span 2; }
+        .gallery-item:nth-child(5) { grid-column: span 2; }
+
+        .gallery-item .img-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--bg-accent), var(--bg-card));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            transition: transform 0.6s;
+        }
+
+        .gallery-item:hover .img-placeholder { transform: scale(1.05); }
+
+        .gallery-item::after {
+            content: 'View';
+            position: absolute;
+            inset: 0;
+            background: rgba(10,10,10,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--gold);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .gallery-item:hover::after { opacity: 1; }
+
+        /* ===== BOOKING SECTION ===== */
+        .booking {
+            background: var(--bg-primary);
+            padding: 120px 0;
+        }
+
+        .booking-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .booking-steps {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 48px;
+        }
+
+        .booking-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0.4;
+            transition: opacity 0.3s;
+        }
+
+        .booking-step.active { opacity: 1; }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--gold);
+            transition: all 0.3s;
+        }
+
+        .booking-step.active .step-number {
+            background: var(--gold);
+            color: var(--bg-primary);
+        }
+
+        .booking-step.completed .step-number {
+            background: var(--gold);
+            color: var(--bg-primary);
+        }
+
+        .step-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .booking-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 48px;
+        }
+
+        .booking-form-step { display: none; }
+        .booking-form-step.active { display: block; }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+
+        .form-group label {
+            display: block;
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--gold);
+        }
+
+        .form-group select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c9a96e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+
+        .form-group select option {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .time-slot {
+            padding: 12px;
+            text-align: center;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .time-slot:hover,
+        .time-slot.selected {
+            border-color: var(--gold);
+            color: var(--gold);
+            background: rgba(201,169,110,0.08);
+        }
+
+        .time-slot.unavailable {
+            opacity: 0.3;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
+        .booking-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+        }
+
+        .booking-confirm {
+            background: var(--bg-primary);
+            padding: 24px;
+            border: 1px solid var(--border);
+            margin-top: 24px;
+        }
+
+        .confirm-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+
+        .confirm-item:last-child { border-bottom: none; }
+
+        .confirm-label { color: var(--text-muted); }
+        .confirm-value { color: var(--text-primary); }
+
+        /* ===== CONTACT ===== */
+        .contact { background: var(--bg-secondary); }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+
+        .contact-info-item {
+            margin-bottom: 36px;
+        }
+
+        .contact-info-item h4 {
+            font-size: 0.7rem;
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 12px;
+        }
+
+        .contact-info-item p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .map-placeholder {
+            width: 100%;
+            height: 400px;
+            background: var(--bg-accent);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border);
+            padding: 60px 0 30px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+
+        .footer-brand .logo { margin-bottom: 16px; display: block; }
+
+        .footer-brand p {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            line-height: 1.7;
+        }
+
+        .footer-col h5 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .footer-col a {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+
+        .footer-col a:hover { color: var(--gold); }
+
+        .footer-bottom {
+            border-top: 1px solid var(--border);
+            padding-top: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-bottom p {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 16px;
+        }
+
+        .social-links a {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* ===== BOOKING MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 48px;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.show .modal {
+            transform: translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover { color: var(--gold); }
+
+        .success-message {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 2rem;
+            color: var(--success);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .about-grid { grid-template-columns: 1fr; gap: 40px; }
+            .about-image { max-width: 400px; margin: 0 auto; }
+            .contact-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .gallery-grid { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 220px; }
+        }
+
+        @media (max-width: 768px) {
+            nav .nav-links { display: none; }
+            .mobile-toggle { display: flex; }
+
+            .nav-links.mobile-open {
+                display: flex !important;
+                position: fixed;
+                top: 80px;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: var(--bg-primary);
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 32px;
+                z-index: 999;
+            }
+
+            .hero-title { font-size: 2.8rem; }
+            .hero-ctas { flex-direction: column; align-items: center; }
+            .services-grid { grid-template-columns: 1fr; }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 200px; }
+            .gallery-item:nth-child(1) { grid-row: span 1; }
+            .gallery-item:nth-child(5) { grid-column: span 1; }
+            .form-row { grid-template-columns: 1fr; }
+            .time-slots { grid-template-columns: repeat(3, 1fr); }
+            .booking-panel { padding: 32px 24px; }
+            .booking-steps { gap: 20px; flex-wrap: wrap; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Calendar Styles */
+        .calendar {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 20px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-header h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .calendar-nav {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--gold);
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .calendar-nav:hover {
+            background: var(--gold);
+            color: var(--bg-primary);
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+        }
+
+        .calendar-day-header {
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 8px 0;
+        }
+
+        .calendar-day {
+            padding: 10px 4px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .calendar-day:hover:not(.disabled):not(.empty) {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .calendar-day.selected {
+            background: var(--gold);
+            color: var(--bg-primary);
+            font-weight: 600;
+        }
+
+        .calendar-day.disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.today {
+            border-color: var(--gold);
+        }
+
+        .calendar-day.empty { cursor: default; }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav id="navbar">
+        <div class="nav-inner">
+            <a href="#" class="logo">Fonsi <span>by Cristal</span></a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="#booking" class="nav-book-btn">Book Now</a></li>
+            </ul>
+            <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-bg">
+            <div class="hero-particles" id="particles"></div>
+        </div>
+        <div class="hero-content">
+            <p class="hero-eyebrow">San Antonio's Premier Hair & Beauty Studio</p>
+            <h1 class="hero-title">Beauty is an <em>Art</em></h1>
+            <p class="hero-subtitle">Let me help you shine</p>
+            <div class="hero-ctas">
+                <a href="#booking" class="btn-primary">Book Your Appointment</a>
+                <a href="#services" class="btn-outline">View Services</a>
+            </div>
+        </div>
+        <div class="hero-scroll">
+            <span>Scroll</span>
+            <div class="line"></div>
+        </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-image reveal">
+                    <div class="img-placeholder">[ Cristal's Photo ]</div>
+                </div>
+                <div class="about-text reveal">
+                    <p class="section-eyebrow">Meet Your Stylist</p>
+                    <h2 class="section-title">Cristal Gutierrez</h2>
+                    <div class="gold-line" style="margin: 24px 0;"></div>
+                    <p>Cristal is an artist when it comes to her craft with over twelve years experience. Her education includes several advanced haircutting, color and makeup classes.</p>
+                    <p>As a Freelance Makeup Artist and Texas Licensed Cosmetologist with over ten years experience in salon and studio for runway, bridal, headshots, pageants and special events, Cristal brings artistry and precision to every client.</p>
+                    <p>Currently the owner and operator of a full service salon in San Antonio, Texas, offering client makeup applications for all occasions with experience in fashion styling and on-set styling, plus full hair services for women and men.</p>
+                    <div class="about-credentials">
+                        <span class="credential-tag">Texas Licensed</span>
+                        <span class="credential-tag">MAC Pro Certified</span>
+                        <span class="credential-tag">Olaplex Pro</span>
+                        <span class="credential-tag">12+ Years</span>
+                        <span class="credential-tag">Bridal Specialist</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="services" id="services">
+        <div class="container">
+            <p class="section-eyebrow reveal">What We Offer</p>
+            <h2 class="section-title reveal">Services & Pricing</h2>
+            <p class="section-subtitle reveal">From everyday style to your most special occasions</p>
+
+            <div class="services-tabs reveal">
+                <button class="services-tab active" data-tab="hair">Hair</button>
+                <button class="services-tab" data-tab="bridal">Bridal</button>
+                <button class="services-tab" data-tab="makeup">Makeup</button>
+                <button class="services-tab" data-tab="waxing">Waxing</button>
+            </div>
+
+            <div class="services-category active" id="tab-hair">
+                <div class="services-grid">
+                    <div class="service-card" onclick="openBooking('Hair Cuts For Women')">
+                        <div class="service-card-header">
+                            <span class="service-name">Hair Cuts for Women</span>
+                            <span class="service-price">$55 - $85</span>
+                        </div>
+                        <p class="service-desc">Shampoo included. Price based on type of cut, density, texture and length. Blowout/style +$20, flat iron +$20-$65.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                    <div class="service-card" onclick="openBooking('Shampoo & Blowouts')">
+                        <div class="service-card-header">
+                            <span class="service-name">Shampoo & Blowouts</span>
+                            <span class="service-price">$45 - $85</span>
+                        </div>
+                        <p class="service-desc">Price depends on length, density and texture of hair.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                    <div class="service-card" onclick="openBooking('Styling')">
+                        <div class="service-card-header">
+                            <span class="service-name">Styling</span>
+                            <span class="service-price">$35 - $120</span>
+                        </div>
+                        <p class="service-desc">Blow-dry & style with iron $45-$80. Shampoo wet set $25-$60. Flatiron/curling iron $10-$65.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                    <div class="service-card" onclick="openBooking('Special Occasion Updo')">
+                        <div class="service-card-header">
+                            <span class="service-name">Special Occasion Updo</span>
+                            <span class="service-price">$55 - $125</span>
+                        </div>
+                        <p class="service-desc">Price depends on length, density, texture and complexity of style.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                    <div class="service-card" onclick="openBooking('Men\'s Cuts')">
+                        <div class="service-card-header">
+                            <span class="service-name">Men's Cuts</span>
+                            <span class="service-price">$29.95 - $55</span>
+                        </div>
+                        <p class="service-desc">Clean, sharp cuts for the modern gentleman.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                    <div class="service-card" onclick="openBooking('Full Color')">
+                        <div class="service-card-header">
+                            <span class="service-name">Full Color</span>
+                            <span class="service-price">$95 - $205+</span>
+                        </div>
+                        <p class="service-desc">Complete color transformation with premium products.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                    <div class="service-card" onclick="openBooking('Color Retouch')">
+                        <div class="service-card-header">
+                            <span class="service-name">Color Retouch</span>
+                            <span class="service-price">$85 - $135</span>
+                        </div>
+                        <p class="service-desc">Less than 1" in length. Does not include bleaching new growth if needed.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                    <div class="service-card" onclick="openBooking('Foil Highlights')">
+                        <div class="service-card-header">
+                            <span class="service-name">Foil Highlights</span>
+                            <span class="service-price">$205+</span>
+                        </div>
+                        <p class="service-desc">Beautiful dimension and depth with precision foil work.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                    <div class="service-card" onclick="openBooking('Keratin Treatment')">
+                        <div class="service-card-header">
+                            <span class="service-name">Keratin Treatment</span>
+                            <span class="service-price">Consultation</span>
+                        </div>
+                        <p class="service-desc">Eliminate frizz and make your hair easier to style and tame in the mornings.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                    <div class="service-card" onclick="openBooking('Perm & Body Wave')">
+                        <div class="service-card-header">
+                            <span class="service-name">Perm & Body Wave</span>
+                            <span class="service-price">$135 - $225</span>
+                        </div>
+                        <p class="service-desc">Add volume and texture with lasting curls or waves.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                    <div class="service-card" onclick="openBooking('Olaplex Bond Shaper')">
+                        <div class="service-card-header">
+                            <span class="service-name">Olaplex Bond Shaper</span>
+                            <span class="service-price">$125 - $200</span>
+                        </div>
+                        <p class="service-desc">Revive your natural curl pattern. Enhances, strengthens, and rebuilds natural curls.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                    <div class="service-card" onclick="openBooking('Fringe Trim')">
+                        <div class="service-card-header">
+                            <span class="service-name">Fringe Trim</span>
+                            <span class="service-price">$10 - $15</span>
+                        </div>
+                        <p class="service-desc">Quick bang trims to keep your look sharp.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="services-category" id="tab-bridal">
+                <div class="services-grid">
+                    <div class="service-card" onclick="openBooking('The Bride Package')">
+                        <div class="service-card-header">
+                            <span class="service-name">The Bride Package</span>
+                            <span class="service-price">$350</span>
+                        </div>
+                        <p class="service-desc">Includes first consultation and practice run updo, day-of wedding updo, and one full makeup session.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                    <div class="service-card" onclick="openBooking('Day of Wedding Party')">
+                        <div class="service-card-header">
+                            <span class="service-name">Day of Wedding Party</span>
+                            <span class="service-price">Upon Request</span>
+                        </div>
+                        <p class="service-desc">Have your bridal party get ready in one place with hair and makeup, while enjoying a light breakfast and mimosas.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                    <div class="service-card" onclick="openBooking('On-Site Bridal')">
+                        <div class="service-card-header">
+                            <span class="service-name">On-Site Service</span>
+                            <span class="service-price">Upon Request</span>
+                        </div>
+                        <p class="service-desc">Can't make it to the salon? We can come to you. Get ready in the comfort of your own space.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="services-category" id="tab-makeup">
+                <div class="services-grid">
+                    <div class="service-card" onclick="openBooking('MAC Full Face Application')">
+                        <div class="service-card-header">
+                            <span class="service-name">MAC Full Face Application</span>
+                            <span class="service-price">$85</span>
+                        </div>
+                        <p class="service-desc">Look like you just walked off a runway. MAC Cosmetics used exclusively.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                    <div class="service-card" onclick="openBooking('MAC Eye Makeup Only')">
+                        <div class="service-card-header">
+                            <span class="service-name">MAC Eye Makeup Only</span>
+                            <span class="service-price">$50</span>
+                        </div>
+                        <p class="service-desc">When you just want those beautiful eyes to pop.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                    <div class="service-card" onclick="openBooking('On-Site Makeup Application')">
+                        <div class="service-card-header">
+                            <span class="service-name">On-Site Application</span>
+                            <span class="service-price">Consultation</span>
+                        </div>
+                        <p class="service-desc">I go to where you need me for your special occasion.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="services-category" id="tab-waxing">
+                <div class="services-grid">
+                    <div class="service-card" onclick="openBooking('Eyebrow Waxing')">
+                        <div class="service-card-header">
+                            <span class="service-name">Eyebrow Waxing</span>
+                            <span class="service-price">$17 - $35</span>
+                        </div>
+                        <p class="service-desc">Have your eyebrows cleaned up or completely reshaped. Feel confident in your new silky smooth skin.</p>
+                        <span class="book-service">Book this service &rarr;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section class="gallery" id="gallery">
+        <div class="container">
+            <p class="section-eyebrow reveal">Our Work</p>
+            <h2 class="section-title reveal">Gallery</h2>
+            <p class="section-subtitle reveal">Every client leaves feeling confident and beautiful</p>
+
+            <div class="gallery-grid reveal">
+                <div class="gallery-item"><div class="img-placeholder">Blonde Highlights</div></div>
+                <div class="gallery-item"><div class="img-placeholder">Balayage</div></div>
+                <div class="gallery-item"><div class="img-placeholder">Bridal Updo</div></div>
+                <div class="gallery-item"><div class="img-placeholder">Fashion Color</div></div>
+                <div class="gallery-item"><div class="img-placeholder">Blonde Transformation</div></div>
+                <div class="gallery-item"><div class="img-placeholder">Bridal Makeup</div></div>
+                <div class="gallery-item"><div class="img-placeholder">Color Melt</div></div>
+                <div class="gallery-item"><div class="img-placeholder">Styling</div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BOOKING -->
+    <section class="booking" id="booking">
+        <div class="container">
+            <p class="section-eyebrow reveal">Schedule Your Visit</p>
+            <h2 class="section-title reveal">Book an Appointment</h2>
+            <p class="section-subtitle reveal">Select your service, pick a date, and you're all set</p>
+
+            <div class="booking-wrapper reveal">
+                <div class="booking-steps">
+                    <div class="booking-step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <span class="step-label">Service</span>
+                    </div>
+                    <div class="booking-step" data-step="2">
+                        <div class="step-number">2</div>
+                        <span class="step-label">Date & Time</span>
+                    </div>
+                    <div class="booking-step" data-step="3">
+                        <div class="step-number">3</div>
+                        <span class="step-label">Your Info</span>
+                    </div>
+                </div>
+
+                <div class="booking-panel">
+                    <!-- Step 1: Service -->
+                    <div class="booking-form-step active" id="bookingStep1">
+                        <div class="form-group">
+                            <label>Service Category</label>
+                            <select id="bookingCategory" onchange="updateServices()">
+                                <option value="">Select a category...</option>
+                                <option value="hair">Hair</option>
+                                <option value="bridal">Bridal</option>
+                                <option value="makeup">Makeup</option>
+                                <option value="waxing">Waxing</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Service</label>
+                            <select id="bookingService">
+                                <option value="">Select a service...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Additional Notes</label>
+                            <textarea rows="3" placeholder="Any special requests or details about what you're looking for..." style="resize: vertical;"></textarea>
+                        </div>
+                        <div class="booking-nav">
+                            <div></div>
+                            <button class="btn-primary" onclick="nextStep(2)">Continue &rarr;</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Date & Time -->
+                    <div class="booking-form-step" id="bookingStep2">
+                        <div class="form-group">
+                            <label>Select a Date</label>
+                            <div class="calendar" id="calendar"></div>
+                        </div>
+                        <div class="form-group" id="timeSlotsContainer" style="display:none;">
+                            <label>Available Times</label>
+                            <div class="time-slots" id="timeSlots"></div>
+                        </div>
+                        <div class="booking-nav">
+                            <button class="btn-outline" onclick="nextStep(1)">&larr; Back</button>
+                            <button class="btn-primary" onclick="nextStep(3)">Continue &rarr;</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Your Info -->
+                    <div class="booking-form-step" id="bookingStep3">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>First Name</label>
+                                <input type="text" id="firstName" placeholder="Jane">
+                            </div>
+                            <div class="form-group">
+                                <label>Last Name</label>
+                                <input type="text" id="lastName" placeholder="Doe">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="email" placeholder="jane@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="tel" id="phone" placeholder="(210) 555-0123">
+                            </div>
+                        </div>
+
+                        <div class="booking-confirm" id="confirmDetails">
+                            <h4 style="font-size:0.9rem; color:var(--gold); margin-bottom:16px;">Appointment Summary</h4>
+                            <div class="confirm-item">
+                                <span class="confirm-label">Service</span>
+                                <span class="confirm-value" id="confirmService">—</span>
+                            </div>
+                            <div class="confirm-item">
+                                <span class="confirm-label">Date</span>
+                                <span class="confirm-value" id="confirmDate">—</span>
+                            </div>
+                            <div class="confirm-item">
+                                <span class="confirm-label">Time</span>
+                                <span class="confirm-value" id="confirmTime">—</span>
+                            </div>
+                        </div>
+
+                        <div class="booking-nav">
+                            <button class="btn-outline" onclick="nextStep(2)">&larr; Back</button>
+                            <button class="btn-primary" onclick="submitBooking()">Confirm Booking</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <p class="section-eyebrow reveal">Get in Touch</p>
+            <h2 class="section-title reveal">Visit Us</h2>
+            <p class="section-subtitle reveal">We'd love to hear from you</p>
+
+            <div class="contact-grid reveal">
+                <div>
+                    <div class="contact-info-item">
+                        <h4>Location</h4>
+                        <p>6626 West Loop 1604 North<br>Suite 105, Ste. 39 & 41<br>San Antonio, Texas 78254</p>
+                    </div>
+                    <div class="contact-info-item">
+                        <h4>Hours</h4>
+                        <p>Tuesday - Saturday: 10:00 AM - 6:30 PM<br>Sunday & Monday: Closed<br><em style="color:var(--gold); font-size:0.8rem;">By appointment only</em></p>
+                    </div>
+                    <div class="contact-info-item">
+                        <h4>Contact</h4>
+                        <p>Phone: <a href="tel:2105517742" style="color:var(--gold);">(210) 551-7742</a><br>
+                        Text for quick booking<br>
+                        <a href="https://instagram.com" target="_blank" style="color:var(--gold);">@fonsibycristal</a></p>
+                    </div>
+                    <div class="contact-info-item">
+                        <h4>Cancellation Policy</h4>
+                        <p>Cancellations accepted up to 24 hours before the scheduled service. Within 24 hours, cancellations will be charged 50% of the scheduled cost.</p>
+                    </div>
+                </div>
+                <div>
+                    <div class="map-placeholder">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3472.5!2d-98.68!3d29.52!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjnCsDMxJzEyLjAiTiA5OMKwNDAnNDguMCJX!5e0!3m2!1sen!2sus!4v1234567890"
+                            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="#" class="logo">Fonsi <span>by Cristal</span></a>
+                    <p>Full-service hair salon and makeup studio in San Antonio, Texas. Beauty is our passion — let us help you shine.</p>
+                </div>
+                <div class="footer-col">
+                    <h5>Quick Links</h5>
+                    <a href="#about">About</a>
+                    <a href="#services">Services</a>
+                    <a href="#gallery">Gallery</a>
+                    <a href="#booking">Book Now</a>
+                </div>
+                <div class="footer-col">
+                    <h5>Services</h5>
+                    <a href="#services">Hair</a>
+                    <a href="#services">Bridal</a>
+                    <a href="#services">Makeup</a>
+                    <a href="#services">Waxing</a>
+                </div>
+                <div class="footer-col">
+                    <h5>Contact</h5>
+                    <a href="tel:2105517742">(210) 551-7742</a>
+                    <a href="#contact">Get Directions</a>
+                    <a href="https://instagram.com" target="_blank">Instagram</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Fonsi by Cristal / Makeup by Cristal. All rights reserved.</p>
+                <div class="social-links">
+                    <a href="https://instagram.com" target="_blank" aria-label="Instagram">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+                    </a>
+                    <a href="tel:2105517742" aria-label="Phone">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SUCCESS MODAL -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div class="success-message">
+                <div class="success-icon">&#10003;</div>
+                <h2 style="font-size: 2rem; margin-bottom: 12px;">You're All Set!</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 8px;">Your appointment request has been submitted.</p>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">We'll send a confirmation to your email shortly. If you need to make changes, please call or text <a href="tel:2105517742" style="color:var(--gold);">(210) 551-7742</a>.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== NAV SCROLL =====
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // ===== MOBILE MENU =====
+        const mobileToggle = document.getElementById('mobileToggle');
+        const navLinks = document.getElementById('navLinks');
+        mobileToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('mobile-open');
+        });
+        navLinks.querySelectorAll('a').forEach(a => {
+            a.addEventListener('click', () => navLinks.classList.remove('mobile-open'));
+        });
+
+        // ===== PARTICLES =====
+        const particlesEl = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.animationDelay = Math.random() * 8 + 's';
+            p.style.animationDuration = (6 + Math.random() * 6) + 's';
+            particlesEl.appendChild(p);
+        }
+
+        // ===== SCROLL REVEAL =====
+        const reveals = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.15 });
+        reveals.forEach(el => revealObserver.observe(el));
+
+        // ===== SERVICES TABS =====
+        document.querySelectorAll('.services-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.services-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.services-category').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // ===== BOOKING SYSTEM =====
+        const servicesByCategory = {
+            hair: [
+                'Hair Cuts for Women', 'Shampoo & Blowouts', 'Styling', 'Special Occasion Updo',
+                "Men's Cuts", 'Full Color', 'Color Retouch', 'Foil Highlights',
+                'Keratin Treatment', 'Perm & Body Wave', 'Olaplex Bond Shaper',
+                'Fringe Trim', 'Ombre/Balayage/Color Melting', 'Partial Foil', 'Toners', 'Treatments'
+            ],
+            bridal: ['The Bride Package', 'Day of Wedding Party', 'On-Site Bridal'],
+            makeup: ['MAC Full Face Application', 'MAC Eye Makeup Only', 'On-Site Makeup Application'],
+            waxing: ['Eyebrow Waxing']
+        };
+
+        let selectedDate = null;
+        let selectedTime = null;
+
+        function updateServices() {
+            const cat = document.getElementById('bookingCategory').value;
+            const serviceSelect = document.getElementById('bookingService');
+            serviceSelect.innerHTML = '<option value="">Select a service...</option>';
+            if (cat && servicesByCategory[cat]) {
+                servicesByCategory[cat].forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s;
+                    opt.textContent = s;
+                    serviceSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function openBooking(serviceName) {
+            document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => {
+                for (const [cat, services] of Object.entries(servicesByCategory)) {
+                    if (services.includes(serviceName)) {
+                        document.getElementById('bookingCategory').value = cat;
+                        updateServices();
+                        document.getElementById('bookingService').value = serviceName;
+                        break;
+                    }
+                }
+            }, 600);
+        }
+
+        function nextStep(step) {
+            document.querySelectorAll('.booking-form-step').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.booking-step').forEach(s => {
+                s.classList.remove('active');
+                if (parseInt(s.dataset.step) < step) s.classList.add('completed');
+                else s.classList.remove('completed');
+                if (parseInt(s.dataset.step) === step) s.classList.add('active');
+            });
+            document.getElementById('bookingStep' + step).classList.add('active');
+
+            if (step === 2) renderCalendar();
+            if (step === 3) updateConfirmation();
+        }
+
+        // ===== CALENDAR =====
+        let calendarMonth = new Date().getMonth();
+        let calendarYear = new Date().getFullYear();
+
+        function renderCalendar() {
+            const cal = document.getElementById('calendar');
+            const today = new Date();
+            const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+            const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+            const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+            let html = `
+                <div class="calendar-header">
+                    <button class="calendar-nav" onclick="changeMonth(-1)">&#8249;</button>
+                    <h4>${monthNames[calendarMonth]} ${calendarYear}</h4>
+                    <button class="calendar-nav" onclick="changeMonth(1)">&#8250;</button>
+                </div>
+                <div class="calendar-days">
+                    <div class="calendar-day-header">Sun</div>
+                    <div class="calendar-day-header">Mon</div>
+                    <div class="calendar-day-header">Tue</div>
+                    <div class="calendar-day-header">Wed</div>
+                    <div class="calendar-day-header">Thu</div>
+                    <div class="calendar-day-header">Fri</div>
+                    <div class="calendar-day-header">Sat</div>
+            `;
+
+            for (let i = 0; i < firstDay; i++) {
+                html += '<div class="calendar-day empty"></div>';
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const date = new Date(calendarYear, calendarMonth, d);
+                const dayOfWeek = date.getDay();
+                const isPast = date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                const isClosed = dayOfWeek === 0 || dayOfWeek === 1; // Sun & Mon
+                const isDisabled = isPast || isClosed;
+                const isToday = date.toDateString() === today.toDateString();
+                const isSelected = selectedDate && date.toDateString() === selectedDate.toDateString();
+
+                let classes = 'calendar-day';
+                if (isDisabled) classes += ' disabled';
+                if (isToday) classes += ' today';
+                if (isSelected) classes += ' selected';
+
+                html += `<div class="${classes}" onclick="${isDisabled ? '' : 'selectDate(' + calendarYear + ',' + calendarMonth + ',' + d + ')'}">${d}</div>`;
+            }
+
+            html += '</div>';
+            cal.innerHTML = html;
+        }
+
+        function changeMonth(dir) {
+            calendarMonth += dir;
+            if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
+            if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
+            renderCalendar();
+        }
+
+        function selectDate(y, m, d) {
+            selectedDate = new Date(y, m, d);
+            renderCalendar();
+            showTimeSlots();
+        }
+
+        function showTimeSlots() {
+            const container = document.getElementById('timeSlotsContainer');
+            const slotsDiv = document.getElementById('timeSlots');
+            container.style.display = 'block';
+
+            const slots = ['10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM',
+                          '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM', '3:00 PM', '3:30 PM',
+                          '4:00 PM', '4:30 PM', '5:00 PM', '5:30 PM'];
+
+            // Simulate some unavailable slots
+            const unavailable = [2, 5, 9, 13];
+
+            slotsDiv.innerHTML = slots.map((slot, i) => {
+                const isUnavailable = unavailable.includes(i);
+                const isSelected = selectedTime === slot;
+                return `<div class="time-slot ${isUnavailable ? 'unavailable' : ''} ${isSelected ? 'selected' : ''}"
+                    onclick="${isUnavailable ? '' : "selectTime('" + slot + "')"}">${slot}</div>`;
+            }).join('');
+        }
+
+        function selectTime(time) {
+            selectedTime = time;
+            showTimeSlots();
+        }
+
+        function updateConfirmation() {
+            const service = document.getElementById('bookingService').value || '—';
+            const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const dateStr = selectedDate ? `${monthNames[selectedDate.getMonth()]} ${selectedDate.getDate()}, ${selectedDate.getFullYear()}` : '—';
+
+            document.getElementById('confirmService').textContent = service;
+            document.getElementById('confirmDate').textContent = dateStr;
+            document.getElementById('confirmTime').textContent = selectedTime || '—';
+        }
+
+        function submitBooking() {
+            const modal = document.getElementById('successModal');
+            modal.classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('successModal').classList.remove('show');
+        }
+
+        // ===== SMOOTH SCROLL =====
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const offset = 80;
+                    const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                    window.scrollTo({ top, behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
