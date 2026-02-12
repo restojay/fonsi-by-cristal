@@ -7,7 +7,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="border-t border-neutral-900">
+    <footer className="bg-black border-t border-neutral-900">
       <div className="container-custom py-16 md:py-20">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
           {/* Brand */}
@@ -15,10 +15,10 @@ export default function Footer() {
             <h3 className="text-lg font-display font-bold text-white tracking-wide mb-1">
               FONSI
             </h3>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-600 font-sans mb-6">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-white font-sans mb-6">
               by Cristal
             </p>
-            <p className="text-neutral-500 text-sm font-sans leading-relaxed mb-6">
+            <p className="text-white text-sm font-sans leading-relaxed mb-6">
               Hair salon & makeup studio<br />
               San Antonio, TX
             </p>
@@ -26,7 +26,7 @@ export default function Footer() {
               href="https://www.instagram.com/fonsi_by_cristal/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-neutral-500 hover:text-white text-sm font-sans"
+              className="inline-flex items-center gap-2 text-neutral-400 hover:text-white text-sm font-sans"
             >
               <Instagram size={16} />
               @fonsi_by_cristal
@@ -45,11 +45,12 @@ export default function Footer() {
                 { href: '/gallery', label: 'Gallery' },
                 { href: '/about', label: 'About' },
                 { href: '/contact', label: 'Contact' },
+                { href: '/booking', label: 'Book' },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-neutral-500 hover:text-white text-sm font-sans"
+                    className="text-neutral-400 hover:text-white text-sm font-sans"
                   >
                     {link.label}
                   </Link>
@@ -63,8 +64,8 @@ export default function Footer() {
             <h4 className="text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans font-medium mb-6">
               Contact
             </h4>
-            <div className="space-y-3 text-sm font-sans text-neutral-500">
-              <a href="tel:2105517742" className="block hover:text-white">
+            <div className="space-y-3 text-sm font-sans text-white">
+              <a href="tel:2105517742" className="block text-neutral-400 hover:text-white">
                 (210) 551-7742
               </a>
               <p>
@@ -79,22 +80,22 @@ export default function Footer() {
             <h4 className="text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans font-medium mb-6">
               Hours
             </h4>
-            <div className="space-y-2 text-sm font-sans text-neutral-500">
+            <div className="space-y-2 text-sm font-sans text-white">
               <p>Tuesday &ndash; Saturday</p>
               <p className="text-white">10:00 AM &ndash; 6:30 PM</p>
               <p className="mt-3">Sunday & Monday</p>
               <p>Closed</p>
-              <p className="mt-4 text-xs text-neutral-600">By appointment only</p>
+              <p className="mt-4 text-xs text-white">By appointment only</p>
             </div>
           </div>
         </div>
 
         {/* Bottom */}
         <div className="mt-16 pt-8 border-t border-neutral-900 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-neutral-600 text-xs font-sans">
+          <p className="text-white text-xs font-sans">
             &copy; {currentYear} Fonsi by Cristal
           </p>
-          <p className="text-neutral-700 text-xs font-sans">
+          <p className="text-neutral-400 text-xs font-sans">
             24-hour cancellation policy &middot; 50% charge within 24 hours
           </p>
         </div>

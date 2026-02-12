@@ -1,35 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Service } from '@/types'
+import { useState } from 'react'
 import { formatPrice } from '@/lib/utils'
 import Link from 'next/link'
-import { Loader } from 'lucide-react'
 import { motion } from 'framer-motion'
 import ScrollReveal from '@/components/ScrollReveal'
+import { servicesData } from '@/lib/services-data'
+import { HoverBorderGradient } from '@/components/ui/hover-border-gradient'
+
+const services = servicesData.map((s, i) => ({ id: `service-${i + 1}`, ...s }))
 
 export default function ServicesPage() {
-  const [services, setServices] = useState<Service[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('Hair')
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const response = await fetch('/api/services')
-        if (response.ok) {
-          const data = await response.json()
-          setServices(data)
-        }
-      } catch (error) {
-        console.error('Error fetching services:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchServices()
-  }, [])
 
   const categories = ['Hair', 'Bridal', 'Makeup', 'Waxing']
   const groupedServices = services.reduce(
@@ -46,10 +28,10 @@ export default function ServicesPage() {
   return (
     <>
       {/* Header */}
-      <section className="pt-16 md:pt-24 pb-12 md:pb-16">
+      <section className="pt-16 md:pt-24 pb-12 md:pb-16 bg-black">
         <div className="container-custom">
           <ScrollReveal>
-            <p className="text-xs uppercase tracking-[0.3em] text-neutral-500 font-sans mb-6">
+            <p className="text-xs uppercase tracking-[0.3em] text-neutral-400 font-sans mb-6">
               What We Offer
             </p>
             <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6">
@@ -66,26 +48,36 @@ export default function ServicesPage() {
       <div className="divider" />
 
       {/* Category Tabs */}
-      <section className="py-8 border-b border-neutral-900">
+      <section className="py-8">
         <div className="container-custom">
-          <div className="flex gap-1">
+          <div className="inline-flex items-center gap-1 bg-neutral-100 border border-neutral-200 py-1 px-1 rounded-full">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`relative px-6 py-3 font-sans text-sm tracking-wide ${
+                className={`relative cursor-pointer text-sm font-sans font-semibold px-6 py-2 rounded-full transition-colors ${
                   selectedCategory === category
-                    ? 'text-white'
-                    : 'text-neutral-500 hover:text-neutral-300'
+                    ? 'text-neutral-900'
+                    : 'text-neutral-400 hover:text-neutral-900'
                 }`}
               >
                 {selectedCategory === category && (
                   <motion.div
                     layoutId="tab-indicator"
-                    className="absolute inset-0 bg-neutral-900"
-                    style={{ borderRadius: 0 }}
-                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                  />
+                    className="absolute inset-0 w-full bg-primary/5 rounded-full -z-10"
+                    initial={false}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 300,
+                      damping: 30,
+                    }}
+                  >
+                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary rounded-t-full">
+                      <div className="absolute w-12 h-6 bg-primary/20 rounded-full blur-md -top-2 -left-2" />
+                      <div className="absolute w-8 h-6 bg-primary/20 rounded-full blur-md -top-1" />
+                      <div className="absolute w-4 h-4 bg-primary/20 rounded-full blur-sm top-0 left-2" />
+                    </div>
+                  </motion.div>
                 )}
                 <span className="relative z-10">{category}</span>
               </button>
@@ -97,23 +89,19 @@ export default function ServicesPage() {
       {/* Services List */}
       <section className="section-padding">
         <div className="container-custom">
-          {isLoading ? (
-            <div className="flex justify-center items-center py-16">
-              <Loader className="animate-spin text-neutral-500" size={24} />
-            </div>
-          ) : displayedServices.length > 0 ? (
+          {displayedServices.length > 0 ? (
             <div className="max-w-3xl">
               {displayedServices.map((service, i) => (
                 <motion.div
                   key={service.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: i * 0.05 }}
-                  className="group border-b border-neutral-900 py-6 md:py-8"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.15, delay: i * 0.02 }}
+                  className="group border-b border-neutral-200 py-6 md:py-8"
                 >
                   <div className="flex items-start justify-between gap-8">
                     <div className="flex-1">
-                      <h3 className="text-lg font-serif font-semibold text-white mb-1 group-hover:text-neutral-200">
+                      <h3 className="text-lg font-serif font-semibold text-neutral-900 mb-1 group-hover:text-neutral-700">
                         {service.name}
                       </h3>
                       {service.description && (
@@ -123,7 +111,7 @@ export default function ServicesPage() {
                       )}
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <p className="text-white font-sans text-sm font-medium">
+                      <p className="text-neutral-900 font-sans text-sm font-medium">
                         {formatPrice(service.priceMin, service.priceMax)}
                       </p>
                       <p className="text-neutral-600 font-sans text-xs mt-1">
@@ -152,7 +140,7 @@ export default function ServicesPage() {
           <ScrollReveal>
             <div className="space-y-8">
               <div>
-                <h3 className="text-sm font-sans font-medium text-white uppercase tracking-[0.1em] mb-3">
+                <h3 className="text-sm font-sans font-medium text-neutral-900 uppercase tracking-[0.1em] mb-3">
                   Consultations
                 </h3>
                 <p className="text-neutral-500 font-sans text-sm leading-relaxed">
@@ -161,10 +149,10 @@ export default function ServicesPage() {
                 </p>
               </div>
 
-              <div className="h-px bg-neutral-900" />
+              <div className="h-px bg-neutral-200" />
 
               <div>
-                <h3 className="text-sm font-sans font-medium text-white uppercase tracking-[0.1em] mb-3">
+                <h3 className="text-sm font-sans font-medium text-neutral-900 uppercase tracking-[0.1em] mb-3">
                   Custom Pricing
                 </h3>
                 <p className="text-neutral-500 font-sans text-sm leading-relaxed">
@@ -173,10 +161,10 @@ export default function ServicesPage() {
                 </p>
               </div>
 
-              <div className="h-px bg-neutral-900" />
+              <div className="h-px bg-neutral-200" />
 
               <div>
-                <h3 className="text-sm font-sans font-medium text-white uppercase tracking-[0.1em] mb-3">
+                <h3 className="text-sm font-sans font-medium text-neutral-900 uppercase tracking-[0.1em] mb-3">
                   Cancellation Policy
                 </h3>
                 <p className="text-neutral-500 font-sans text-sm leading-relaxed">
@@ -190,11 +178,14 @@ export default function ServicesPage() {
 
           <ScrollReveal>
             <div className="mt-16">
-              <Link
-                href="/booking"
-                className="bg-white text-black px-8 py-4 font-sans text-sm uppercase tracking-[0.15em] font-medium hover:bg-neutral-200 inline-block"
-              >
-                Book Appointment
+              <Link href="/booking">
+                <HoverBorderGradient
+                  as="div"
+                  containerClassName="rounded-full"
+                  className="bg-black text-white px-8 py-3 font-sans text-sm uppercase tracking-[0.15em] font-medium"
+                >
+                  Book Appointment
+                </HoverBorderGradient>
               </Link>
             </div>
           </ScrollReveal>

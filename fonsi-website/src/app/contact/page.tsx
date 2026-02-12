@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { ChevronDown } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ScrollReveal from '@/components/ScrollReveal'
+import { HoverBorderGradient } from '@/components/ui/hover-border-gradient'
 
 const faqs = [
   {
@@ -37,12 +39,12 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <div className="border-b border-neutral-900">
+    <div className="border-b border-neutral-200">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full text-left py-6 flex items-center justify-between gap-6"
       >
-        <span className="font-sans text-sm text-white">{question}</span>
+        <span className="font-sans text-sm text-neutral-900">{question}</span>
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
@@ -74,10 +76,10 @@ export default function ContactPage() {
   return (
     <>
       {/* Header */}
-      <section className="pt-16 md:pt-24 pb-12 md:pb-16">
+      <section className="pt-16 md:pt-24 pb-12 md:pb-16 bg-black">
         <div className="container-custom">
           <ScrollReveal>
-            <p className="text-xs uppercase tracking-[0.3em] text-neutral-500 font-sans mb-6">
+            <p className="text-xs uppercase tracking-[0.3em] text-neutral-400 font-sans mb-6">
               Get in Touch
             </p>
             <h1 className="text-5xl md:text-7xl font-serif font-bold text-white">
@@ -95,30 +97,30 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8">
             <ScrollReveal delay={0}>
               <div>
-                <h3 className="text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans font-medium mb-4">
+                <h3 className="text-xs uppercase tracking-[0.15em] text-neutral-500 font-sans font-medium mb-4">
                   Address
                 </h3>
-                <p className="text-neutral-300 font-sans text-sm leading-relaxed">
+                <p className="text-neutral-700 font-sans text-sm leading-relaxed">
                   6626 West Loop 1604 North<br />
                   Suite 105<br />
                   San Antonio, Texas 78254
                 </p>
-                <p className="text-neutral-600 font-sans text-xs mt-2">(Suites 39 & 41)</p>
+                <p className="text-neutral-400 font-sans text-xs mt-2">(Suites 39 & 41)</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal delay={0.1}>
               <div>
-                <h3 className="text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans font-medium mb-4">
+                <h3 className="text-xs uppercase tracking-[0.15em] text-neutral-500 font-sans font-medium mb-4">
                   Phone
                 </h3>
                 <a
                   href="tel:2105517742"
-                  className="text-neutral-300 font-sans text-sm hover:text-white"
+                  className="text-neutral-700 font-sans text-sm hover:text-neutral-900"
                 >
                   (210) 551-7742
                 </a>
-                <p className="text-neutral-600 font-sans text-xs mt-2">
+                <p className="text-neutral-400 font-sans text-xs mt-2">
                   Call to book or modify appointments
                 </p>
               </div>
@@ -126,15 +128,15 @@ export default function ContactPage() {
 
             <ScrollReveal delay={0.2}>
               <div>
-                <h3 className="text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans font-medium mb-4">
+                <h3 className="text-xs uppercase tracking-[0.15em] text-neutral-500 font-sans font-medium mb-4">
                   Hours
                 </h3>
-                <div className="text-neutral-300 font-sans text-sm space-y-1">
+                <div className="text-neutral-700 font-sans text-sm space-y-1">
                   <p>Tuesday &ndash; Saturday</p>
-                  <p className="text-white">10:00 AM &ndash; 6:30 PM</p>
-                  <p className="mt-3 text-neutral-500">Sunday & Monday: Closed</p>
+                  <p className="text-neutral-900">10:00 AM &ndash; 6:30 PM</p>
+                  <p className="mt-3 text-neutral-400">Sunday & Monday: Closed</p>
                 </div>
-                <p className="text-neutral-600 font-sans text-xs mt-2">
+                <p className="text-neutral-400 font-sans text-xs mt-2">
                   By appointment only
                 </p>
               </div>
@@ -142,7 +144,7 @@ export default function ContactPage() {
 
             <ScrollReveal delay={0.3}>
               <div>
-                <h3 className="text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans font-medium mb-4">
+                <h3 className="text-xs uppercase tracking-[0.15em] text-neutral-500 font-sans font-medium mb-4">
                   Cancellation Policy
                 </h3>
                 <p className="text-neutral-500 font-sans text-sm leading-relaxed">
@@ -160,10 +162,10 @@ export default function ContactPage() {
       <section className="section-padding">
         <div className="container-custom">
           <ScrollReveal>
-            <div className="aspect-[16/7] bg-neutral-950 border border-neutral-900 flex items-center justify-center">
+            <div className="aspect-[16/7] bg-neutral-50 border border-neutral-200 flex items-center justify-center">
               <div className="text-center">
-                <p className="text-neutral-600 font-sans text-sm">Map</p>
-                <p className="text-neutral-700 font-sans text-xs mt-1">
+                <p className="text-neutral-500 font-sans text-sm">Map</p>
+                <p className="text-neutral-400 font-sans text-xs mt-1">
                   6626 West Loop 1604 North, San Antonio, TX 78254
                 </p>
               </div>
@@ -178,7 +180,7 @@ export default function ContactPage() {
       <section className="section-padding">
         <div className="container-custom max-w-2xl">
           <ScrollReveal>
-            <h2 className="text-4xl md:text-5xl font-serif font-bold text-white mb-12">
+            <h2 className="text-4xl md:text-5xl font-serif font-bold text-neutral-900 mb-12">
               Frequently Asked Questions
             </h2>
           </ScrollReveal>
@@ -197,25 +199,30 @@ export default function ContactPage() {
       <section className="section-padding">
         <div className="container-custom text-center max-w-xl">
           <ScrollReveal>
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mb-4">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-neutral-900 mb-4">
               Ready to book?
             </h2>
             <p className="text-neutral-500 font-sans text-sm mb-8">
               Schedule your appointment online or give us a call
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="/booking"
-                className="bg-white text-black px-8 py-4 font-sans text-sm uppercase tracking-[0.15em] font-medium hover:bg-neutral-200"
-              >
-                Book Online
-              </a>
-              <a
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <Link href="/booking">
+                <HoverBorderGradient
+                  as="div"
+                  containerClassName="rounded-full"
+                  className="bg-black text-white px-8 py-3 font-sans text-sm uppercase tracking-[0.15em] font-medium"
+                >
+                  Book Online
+                </HoverBorderGradient>
+              </Link>
+              <HoverBorderGradient
+                as="a"
                 href="tel:2105517742"
-                className="border border-neutral-700 text-neutral-300 px-8 py-4 font-sans text-sm uppercase tracking-[0.15em] font-medium hover:border-white hover:text-white"
+                containerClassName="rounded-full"
+                className="bg-black text-white px-8 py-3 font-sans text-sm uppercase tracking-[0.15em] font-medium"
               >
                 (210) 551-7742
-              </a>
+              </HoverBorderGradient>
             </div>
           </ScrollReveal>
         </div>

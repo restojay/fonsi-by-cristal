@@ -14,9 +14,27 @@
   --color-neutral-900: #171717;
   --color-neutral-950: #0a0a0a;
 
+  --color-background: #000000;
+  --color-foreground: #fafafa;
+  --color-primary: #fafafa;
+  --color-primary-foreground: #0a0a0a;
+  --color-muted: #171717;
+  --color-muted-foreground: #a3a3a3;
+  --color-accent: #262626;
+  --color-accent-foreground: #fafafa;
+  --color-border: #262626;
+  --color-input: #262626;
+  --color-ring: #d4d4d4;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #fafafa;
+  --color-secondary: #262626;
+  --color-secondary-foreground: #fafafa;
+
   --font-serif: 'Playfair Display', Georgia, serif;
   --font-sans: 'Montserrat', 'Inter', system-ui, sans-serif;
   --font-display: 'Playfair Display', serif;
+  --font-cursive: 'Alex Brush', cursive;
+  --font-heading: 'Bebas Neue', sans-serif;
 }
 
 /* ===== Base ===== */
@@ -25,8 +43,8 @@ html {
 }
 
 body {
-  background-color: #000;
-  color: #d4d4d4;
+  background-color: #fff;
+  color: #525252;
 }
 
 /* Scrollbar */
@@ -48,9 +66,10 @@ body {
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-serif);
-  color: #fff;
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    color: #171717;
+  }
 }
 
 /* Interactive element transitions */
@@ -79,7 +98,7 @@ select:focus-visible {
 
 .divider {
   height: 1px;
-  background: #1a1a1a;
+  background: #e5e5e5;
 }
 
 .section-padding {

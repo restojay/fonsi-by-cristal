@@ -4,9 +4,10 @@ import { useState } from 'react'
 import { Service } from '@/types'
 import { bookingSchema } from '@/lib/validation'
 import { generateTimeSlots, formatTime } from '@/lib/utils'
-import { format, addDays } from 'date-fns'
+import { format } from 'date-fns'
 import { ChevronRight, ChevronLeft } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Calendar } from '@/components/ui/calendar'
 
 interface BookingWidgetProps {
   services: Service[]
@@ -26,6 +27,7 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
 
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [selectedDate, setSelectedDate] = useState<string>('')
+  const [calendarDate, setCalendarDate] = useState<Date | undefined>(undefined)
   const [selectedTime, setSelectedTime] = useState<string>('')
   const [formData, setFormData] = useState({
     name: '',
@@ -48,8 +50,10 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
     setError(null)
   }
 
-  const handleDateChange = async (dateStr: string) => {
-    setSelectedDate(dateStr)
+  const handleDateChange = (date: Date | undefined) => {
+    if (!date) return
+    setCalendarDate(date)
+    setSelectedDate(format(date, 'yyyy-MM-dd'))
     setSelectedTime('')
     const slots = generateTimeSlots('10:00', '18:30', 30)
     setAvailableTimeSlots(slots)
@@ -116,6 +120,7 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
         goToStep('service')
         setSelectedService(null)
         setSelectedDate('')
+        setCalendarDate(undefined)
         setSelectedTime('')
         setFormData({ name: '', email: '', phone: '', notes: '' })
         setSuccess(null)
@@ -128,18 +133,11 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
     }
   }
 
-  const generateAvailableDates = () => {
-    const dates: string[] = []
-    for (let i = 0; i < 90; i++) {
-      const date = addDays(new Date(), i)
-      const dayOfWeek = date.getDay()
-      if (dayOfWeek >= 2 && dayOfWeek <= 6) {
-        dates.push(format(date, 'yyyy-MM-dd'))
-        if (dates.length === 30) break
-      }
-    }
-    return dates
-  }
+  // Disable Sundays, Mondays, and past dates
+  const disabledDays = [
+    { dayOfWeek: [0, 1] },
+    { before: new Date() },
+  ]
 
   const groupedServices = services.reduce(
     (acc, service) => {
@@ -167,10 +165,10 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
             <div
               className={`w-8 h-8 flex items-center justify-center font-sans text-xs font-medium ${
                 step === s
-                  ? 'bg-white text-black'
+                  ? 'bg-black text-white'
                   : steps.indexOf(step) > idx
-                    ? 'bg-neutral-700 text-neutral-300'
-                    : 'bg-neutral-900 text-neutral-600'
+                    ? 'bg-neutral-300 text-neutral-700'
+                    : 'bg-neutral-100 text-neutral-400'
               }`}
             >
               {idx + 1}
@@ -178,7 +176,7 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
             {idx < 3 && (
               <div
                 className={`flex-1 h-px mx-2 ${
-                  steps.indexOf(step) > idx ? 'bg-neutral-700' : 'bg-neutral-900'
+                  steps.indexOf(step) > idx ? 'bg-neutral-300' : 'bg-neutral-200'
                 }`}
               />
             )}
@@ -187,7 +185,7 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
       </div>
 
       {success && (
-        <div className="mb-8 p-4 border border-neutral-700 text-neutral-300 text-sm font-sans">
+        <div className="mb-8 p-4 border border-neutral-300 text-neutral-700 text-sm font-sans">
           {success}
         </div>
       )}
@@ -210,7 +208,7 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
             exit="exit"
             transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <h2 className="text-2xl font-serif font-bold text-white mb-8">Select a Service</h2>
+            <h2 className="text-2xl font-serif font-bold text-neutral-900 mb-8">Select a Service</h2>
             <div className="space-y-8">
               {categories.map((category) => (
                 <div key={category}>
@@ -222,17 +220,17 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
                       <button
                         key={service.id}
                         onClick={() => handleServiceSelect(service)}
-                        className="w-full text-left py-4 px-4 border border-neutral-900 hover:border-neutral-700 hover:bg-neutral-950 group flex items-center justify-between"
+                        className="w-full text-left py-4 px-4 border border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50 group flex items-center justify-between"
                       >
                         <div>
-                          <p className="font-sans text-sm text-white group-hover:text-neutral-200">
+                          <p className="font-sans text-sm text-neutral-900 group-hover:text-neutral-700">
                             {service.name}
                           </p>
-                          <p className="text-neutral-600 text-xs font-sans mt-0.5">
+                          <p className="text-neutral-400 text-xs font-sans mt-0.5">
                             {service.duration} min
                           </p>
                         </div>
-                        <p className="text-neutral-400 text-sm font-sans">
+                        <p className="text-neutral-500 text-sm font-sans">
                           ${service.priceMin} &ndash; ${service.priceMax}
                         </p>
                       </button>
@@ -255,41 +253,30 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
             exit="exit"
             transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <h2 className="text-2xl font-serif font-bold text-white mb-2">
+            <h2 className="text-2xl font-serif font-bold text-neutral-900 mb-2">
               {selectedService.name}
             </h2>
-            <p className="text-neutral-500 font-sans text-sm mb-8">
+            <p className="text-neutral-400 font-sans text-sm mb-8">
               Select your preferred date and time
             </p>
 
             <div className="space-y-8">
               <div>
-                <label className="block text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans mb-4">
+                <label className="block text-xs uppercase tracking-[0.15em] text-neutral-500 font-sans mb-4">
                   Date
                 </label>
-                <div className="grid grid-cols-5 md:grid-cols-7 gap-2">
-                  {generateAvailableDates().map((date) => (
-                    <button
-                      key={date}
-                      onClick={() => handleDateChange(date)}
-                      className={`p-2 text-center font-sans text-xs ${
-                        selectedDate === date
-                          ? 'bg-white text-black'
-                          : 'bg-neutral-950 border border-neutral-900 text-neutral-400 hover:border-neutral-700'
-                      }`}
-                    >
-                      <div className="text-[10px] opacity-60 mb-0.5">
-                        {format(new Date(date), 'EEE')}
-                      </div>
-                      <div className="font-medium">{format(new Date(date), 'd')}</div>
-                    </button>
-                  ))}
-                </div>
+                <Calendar
+                  mode="single"
+                  selected={calendarDate}
+                  onSelect={handleDateChange}
+                  disabled={disabledDays}
+                  className="rounded-lg border border-neutral-200 shadow-sm bg-white p-3 w-full [&_.rdp-month]:w-full"
+                />
               </div>
 
               {selectedDate && (
                 <div>
-                  <label className="block text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans mb-4">
+                  <label className="block text-xs uppercase tracking-[0.15em] text-neutral-500 font-sans mb-4">
                     Time
                   </label>
                   <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
@@ -299,8 +286,8 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
                         onClick={() => setSelectedTime(time)}
                         className={`p-2 text-center font-sans text-xs font-medium ${
                           selectedTime === time
-                            ? 'bg-white text-black'
-                            : 'bg-neutral-950 border border-neutral-900 text-neutral-400 hover:border-neutral-700'
+                            ? 'bg-black text-white'
+                            : 'bg-white border border-neutral-200 text-neutral-500 hover:border-neutral-300'
                         }`}
                       >
                         {formatTime(time)}
@@ -314,7 +301,7 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
             <div className="flex gap-4 mt-10">
               <button
                 onClick={() => goToStep('service')}
-                className="flex items-center gap-2 px-5 py-3 border border-neutral-800 text-neutral-400 font-sans text-sm hover:text-white hover:border-neutral-600"
+                className="flex items-center gap-2 px-5 py-3 border border-neutral-200 text-neutral-500 font-sans text-sm hover:text-neutral-900 hover:border-neutral-400"
               >
                 <ChevronLeft size={14} />
                 Back
@@ -322,7 +309,7 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
               <button
                 onClick={handleContinueToInfo}
                 disabled={!selectedDate || !selectedTime}
-                className="flex items-center gap-2 px-6 py-3 bg-white text-black font-sans text-sm font-medium hover:bg-neutral-200 disabled:opacity-30 disabled:cursor-not-allowed ml-auto"
+                className="flex items-center gap-2 px-6 py-3 bg-black text-white font-sans text-sm font-medium hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed ml-auto"
               >
                 Continue
                 <ChevronRight size={14} />
@@ -342,11 +329,11 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
             exit="exit"
             transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <h2 className="text-2xl font-serif font-bold text-white mb-8">Your Information</h2>
+            <h2 className="text-2xl font-serif font-bold text-neutral-900 mb-8">Your Information</h2>
 
             <form className="space-y-6">
               <div>
-                <label className="block text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans mb-2">
+                <label className="block text-xs uppercase tracking-[0.15em] text-neutral-500 font-sans mb-2">
                   Full Name *
                 </label>
                 <input
@@ -354,13 +341,13 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
                   name="name"
                   value={formData.name}
                   onChange={handleInfoChange}
-                  className="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 text-white font-sans text-sm focus:outline-none focus:border-neutral-500 placeholder:text-neutral-700"
+                  className="w-full px-4 py-3 bg-white border border-neutral-200 text-neutral-900 font-sans text-sm focus:outline-none focus:border-neutral-400 placeholder:text-neutral-400"
                   placeholder="Your name"
                 />
               </div>
 
               <div>
-                <label className="block text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans mb-2">
+                <label className="block text-xs uppercase tracking-[0.15em] text-neutral-500 font-sans mb-2">
                   Email *
                 </label>
                 <input
@@ -368,13 +355,13 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
                   name="email"
                   value={formData.email}
                   onChange={handleInfoChange}
-                  className="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 text-white font-sans text-sm focus:outline-none focus:border-neutral-500 placeholder:text-neutral-700"
+                  className="w-full px-4 py-3 bg-white border border-neutral-200 text-neutral-900 font-sans text-sm focus:outline-none focus:border-neutral-400 placeholder:text-neutral-400"
                   placeholder="your@email.com"
                 />
               </div>
 
               <div>
-                <label className="block text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans mb-2">
+                <label className="block text-xs uppercase tracking-[0.15em] text-neutral-500 font-sans mb-2">
                   Phone *
                 </label>
                 <input
@@ -382,20 +369,20 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
                   name="phone"
                   value={formData.phone}
                   onChange={handleInfoChange}
-                  className="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 text-white font-sans text-sm focus:outline-none focus:border-neutral-500 placeholder:text-neutral-700"
+                  className="w-full px-4 py-3 bg-white border border-neutral-200 text-neutral-900 font-sans text-sm focus:outline-none focus:border-neutral-400 placeholder:text-neutral-400"
                   placeholder="(210) 555-0000"
                 />
               </div>
 
               <div>
-                <label className="block text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans mb-2">
+                <label className="block text-xs uppercase tracking-[0.15em] text-neutral-500 font-sans mb-2">
                   Notes (optional)
                 </label>
                 <textarea
                   name="notes"
                   value={formData.notes}
                   onChange={handleInfoChange}
-                  className="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 text-white font-sans text-sm focus:outline-none focus:border-neutral-500 placeholder:text-neutral-700"
+                  className="w-full px-4 py-3 bg-white border border-neutral-200 text-neutral-900 font-sans text-sm focus:outline-none focus:border-neutral-400 placeholder:text-neutral-400"
                   placeholder="Any special requests or preferences?"
                   rows={4}
                 />
@@ -405,14 +392,14 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
             <div className="flex gap-4 mt-10">
               <button
                 onClick={() => goToStep('datetime')}
-                className="flex items-center gap-2 px-5 py-3 border border-neutral-800 text-neutral-400 font-sans text-sm hover:text-white hover:border-neutral-600"
+                className="flex items-center gap-2 px-5 py-3 border border-neutral-200 text-neutral-500 font-sans text-sm hover:text-neutral-900 hover:border-neutral-400"
               >
                 <ChevronLeft size={14} />
                 Back
               </button>
               <button
                 onClick={handleContinueToConfirm}
-                className="flex items-center gap-2 px-6 py-3 bg-white text-black font-sans text-sm font-medium hover:bg-neutral-200 ml-auto"
+                className="flex items-center gap-2 px-6 py-3 bg-black text-white font-sans text-sm font-medium hover:bg-neutral-800 ml-auto"
               >
                 Review Booking
                 <ChevronRight size={14} />
@@ -432,9 +419,9 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
             exit="exit"
             transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <h2 className="text-2xl font-serif font-bold text-white mb-8">Confirm Booking</h2>
+            <h2 className="text-2xl font-serif font-bold text-neutral-900 mb-8">Confirm Booking</h2>
 
-            <div className="border border-neutral-800 divide-y divide-neutral-900">
+            <div className="border border-neutral-200 divide-y divide-neutral-100">
               {[
                 { label: 'Service', value: selectedService.name },
                 { label: 'Date', value: format(new Date(selectedDate), 'MMMM d, yyyy') },
@@ -446,22 +433,22 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
                 { label: 'Phone', value: formData.phone },
               ].map((row) => (
                 <div key={row.label} className="flex justify-between items-center px-5 py-4">
-                  <span className="text-neutral-500 font-sans text-sm">{row.label}</span>
-                  <span className="text-white font-sans text-sm">{row.value}</span>
+                  <span className="text-neutral-400 font-sans text-sm">{row.label}</span>
+                  <span className="text-neutral-900 font-sans text-sm">{row.value}</span>
                 </div>
               ))}
             </div>
 
-            <div className="mt-6 p-4 border border-neutral-800 bg-neutral-950">
-              <p className="text-neutral-500 text-xs font-sans">
-                <span className="text-neutral-300">Cancellation Policy:</span> 24-hour notice required. 50% charge for cancellations within 24 hours.
+            <div className="mt-6 p-4 border border-neutral-200 bg-neutral-50">
+              <p className="text-neutral-400 text-xs font-sans">
+                <span className="text-neutral-700">Cancellation Policy:</span> 24-hour notice required. 50% charge for cancellations within 24 hours.
               </p>
             </div>
 
             <div className="flex gap-4 mt-10">
               <button
                 onClick={() => goToStep('info')}
-                className="flex items-center gap-2 px-5 py-3 border border-neutral-800 text-neutral-400 font-sans text-sm hover:text-white hover:border-neutral-600"
+                className="flex items-center gap-2 px-5 py-3 border border-neutral-200 text-neutral-500 font-sans text-sm hover:text-neutral-900 hover:border-neutral-400"
               >
                 <ChevronLeft size={14} />
                 Back
@@ -469,7 +456,7 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
               <button
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className="flex items-center gap-2 px-8 py-3 bg-white text-black font-sans text-sm font-medium hover:bg-neutral-200 disabled:opacity-30 disabled:cursor-not-allowed ml-auto"
+                className="flex items-center gap-2 px-8 py-3 bg-black text-white font-sans text-sm font-medium hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed ml-auto"
               >
                 {isLoading ? 'Booking...' : 'Complete Booking'}
               </button>

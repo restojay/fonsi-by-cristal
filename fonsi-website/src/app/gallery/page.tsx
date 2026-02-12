@@ -1,88 +1,83 @@
 'use client'
 
+import Link from 'next/link'
 import { Instagram } from 'lucide-react'
 import ScrollReveal from '@/components/ScrollReveal'
+import { HoverBorderGradient } from '@/components/ui/hover-border-gradient'
 
 export default function GalleryPage() {
   return (
     <>
       {/* Header */}
-      <section className="pt-16 md:pt-24 pb-12 md:pb-16">
+      <section className="pt-28 md:pt-36 pb-6 md:pb-8 bg-black">
         <div className="container-custom">
-          <ScrollReveal>
-            <p className="text-xs uppercase tracking-[0.3em] text-neutral-500 font-sans mb-6">
-              Our Work
-            </p>
-            <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6">
-              Gallery
-            </h1>
-            <p className="text-neutral-400 font-sans max-w-lg leading-relaxed">
-              See the transformations our clients have experienced. Follow us on Instagram
-              for our latest work.
-            </p>
-          </ScrollReveal>
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-10">
+            <ScrollReveal>
+              <p className="text-xs uppercase tracking-[0.3em] text-neutral-400 font-sans mb-6">
+                Our Work
+              </p>
+              <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6">
+                Gallery
+              </h1>
+              <p className="text-neutral-400 font-sans max-w-lg leading-relaxed">
+                See the transformations our clients have experienced. Follow us on Instagram
+                for our latest work.
+              </p>
+            </ScrollReveal>
+
+            <ScrollReveal direction="right">
+              <div className="flex flex-col items-start md:items-end gap-4 md:pb-1">
+                <div className="flex items-center gap-3">
+                  <Instagram size={20} className="text-neutral-400" />
+                  <p className="text-neutral-400 font-sans text-sm">
+                    Follow along for the latest
+                  </p>
+                </div>
+                <div className="flex flex-row gap-4">
+                  <HoverBorderGradient
+                    as="a"
+                    href="https://www.instagram.com/fonsi_by_cristal/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    containerClassName="rounded-full"
+                    className="bg-black text-white px-6 py-2.5 font-sans text-sm uppercase tracking-[0.15em] font-medium inline-flex items-center justify-center gap-2"
+                  >
+                    <Instagram size={14} />
+                    @fonsi_by_cristal
+                  </HoverBorderGradient>
+                  <Link href="/booking">
+                    <HoverBorderGradient
+                      as="div"
+                      containerClassName="rounded-full"
+                      className="bg-black text-white px-6 py-2.5 font-sans text-sm uppercase tracking-[0.15em] font-medium"
+                    >
+                      Book Now
+                    </HoverBorderGradient>
+                  </Link>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
         </div>
       </section>
-
-      <div className="divider" />
 
       {/* Gallery Grid */}
-      <section className="section-padding">
+      <section className="pt-10 md:pt-14 pb-16 md:pb-20">
         <div className="container-custom">
           <ScrollReveal>
-            <div className="columns-2 md:columns-3 gap-3 md:gap-4">
-              {Array.from({ length: 9 }).map((_, i) => (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
                 <div
                   key={i}
-                  className="mb-3 md:mb-4 break-inside-avoid"
+                  className="aspect-[3/4] overflow-hidden rounded-lg"
                 >
-                  <div
-                    className={`bg-neutral-900 w-full flex items-center justify-center ${
-                      i % 3 === 0
-                        ? 'aspect-[3/4]'
-                        : i % 3 === 1
-                          ? 'aspect-square'
-                          : 'aspect-[4/5]'
-                    }`}
-                  >
-                    <p className="text-neutral-700 font-sans text-xs">Photo {i + 1}</p>
-                  </div>
+                  <img
+                    src={`/images/image${i}.jpg`}
+                    alt={`Gallery photo ${i}`}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               ))}
-            </div>
-          </ScrollReveal>
-        </div>
-      </section>
-
-      <div className="divider" />
-
-      {/* Instagram CTA */}
-      <section className="section-padding">
-        <div className="container-custom text-center max-w-xl">
-          <ScrollReveal>
-            <Instagram size={24} className="text-neutral-400 mx-auto mb-6" />
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mb-4">
-              Follow along
-            </h2>
-            <p className="text-neutral-500 font-sans text-sm mb-8 leading-relaxed">
-              See our latest transformations and behind-the-scenes on Instagram
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="https://www.instagram.com/fonsi_by_cristal/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-white text-black px-8 py-4 font-sans text-sm uppercase tracking-[0.15em] font-medium hover:bg-neutral-200 inline-flex items-center justify-center gap-2"
-              >
-                <Instagram size={16} />
-                @fonsi_by_cristal
-              </a>
-              <a
-                href="/booking"
-                className="border border-neutral-700 text-neutral-300 px-8 py-4 font-sans text-sm uppercase tracking-[0.15em] font-medium hover:border-white hover:text-white"
-              >
-                Book Now
-              </a>
             </div>
           </ScrollReveal>
         </div>

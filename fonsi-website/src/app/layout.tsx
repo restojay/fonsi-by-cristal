@@ -1,7 +1,12 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1.0,
+}
 
 export const metadata: Metadata = {
   title: 'Fonsi by Cristal | Hair Salon & Makeup Studio San Antonio',
@@ -10,7 +15,6 @@ export const metadata: Metadata = {
   keywords:
     'hair salon, makeup studio, hair color, bridal services, San Antonio, Texas',
   authors: [{ name: 'Fonsi by Cristal' }],
-  viewport: 'width=device-width, initial-scale=1.0',
   robots: 'index, follow',
   openGraph: {
     title: 'Fonsi by Cristal | Hair Salon & Makeup Studio',
@@ -40,11 +44,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Montserrat:wght@300;400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Montserrat:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className="bg-black text-neutral-300 font-sans antialiased">
+      <body className="bg-white text-neutral-600 font-sans antialiased">
         <Navbar />
         <main className="min-h-screen">{children}</main>
         <Footer />
