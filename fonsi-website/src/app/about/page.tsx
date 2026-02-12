@@ -1,67 +1,82 @@
 'use client'
 
-import { Award, Heart, Sparkles } from 'lucide-react'
-import AnimatedText from '@/components/AnimatedText'
+import Link from 'next/link'
 import ScrollReveal from '@/components/ScrollReveal'
-import { StaggerContainer, StaggerItem } from '@/components/ScrollReveal'
+import { ArrowRight } from 'lucide-react'
+import { HoverBorderGradient } from '@/components/ui/hover-border-gradient'
 
 export default function AboutPage() {
   return (
     <>
-      {/* Hero Section */}
-      <section className="py-12 md:py-20 bg-gradient-to-br from-dark-800 to-dark-900 border-b border-gold-500/20">
-        <div className="container-custom text-center">
-          <h1 className="text-5xl md:text-6xl font-serif font-bold text-gold-500 mb-4">
-            <AnimatedText text="About Cristal" />
-          </h1>
-          <ScrollReveal delay={0.3}>
-            <p className="text-gray-300 font-sans text-lg max-w-2xl mx-auto">
-              The passion and expertise behind Fonsi
+      {/* Header */}
+      <section className="pt-16 md:pt-24 pb-6 bg-black">
+        <div className="container-custom">
+          <ScrollReveal>
+            <p className="text-xs uppercase tracking-[0.3em] text-neutral-400 font-sans mb-6">
+              The Artist
             </p>
+            <h1 className="text-5xl md:text-7xl font-serif font-bold text-white">
+              Meet Cristal
+            </h1>
           </ScrollReveal>
         </div>
       </section>
 
-      {/* Main Content */}
-      <section className="section-padding">
+      {/* Story */}
+      <section className="pt-6 pb-16 md:pb-24">
         <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-12">
-            {/* Image Placeholder */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             <ScrollReveal direction="left">
-              <div className="relative h-96 bg-gradient-to-br from-gold-500/20 to-gold-500/5 rounded-lg overflow-hidden border border-gold-500/30">
-                <div className="absolute inset-0 bg-gradient-to-br from-gold-500/20 to-transparent" />
-                <div className="h-full w-full flex items-center justify-center">
-                  <div className="text-center">
-                    <Sparkles className="text-gold-500 mx-auto mb-4" size={48} />
-                    <p className="text-gray-400 font-sans">Photo of Cristal</p>
-                  </div>
-                </div>
+              <div className="aspect-[3/4] bg-neutral-200 overflow-hidden rounded-2xl sticky top-24">
+                <img
+                  src="/images/cristal-headshot.jpg"
+                  alt="Cristal - Hair Stylist & Makeup Artist"
+                  className="w-full h-full object-cover"
+                />
               </div>
             </ScrollReveal>
 
-            {/* Content */}
             <ScrollReveal direction="right">
               <div>
-                <h2 className="text-4xl font-serif font-bold text-gold-500 mb-6">
-                  Cristal&apos;s Story
-                </h2>
-                <div className="space-y-4 text-gray-300 font-sans text-lg mb-8">
-                  <p>
-                    With over a decade of experience in the beauty industry, Cristal has built
-                    Fonsi into one of San Antonio&apos;s premier luxury beauty destinations. Her passion
-                    for hair artistry and makeup begins with understanding each client&apos;s unique vision
-                    and bringing it to life.
+                <div className="space-y-6 text-neutral-500 font-sans leading-relaxed">
+                  <p className="text-lg text-neutral-700">
+                    &ldquo;You know you&apos;ve gotten a really superb service when strangers stop
+                    you and ask you who your stylist is.&rdquo;
                   </p>
+
                   <p>
-                    What started as a dream to create a space where clients feel pampered, confident,
-                    and beautiful has become a thriving studio beloved by the San Antonio community.
-                    Cristal&apos;s commitment to excellence and continuous learning ensures that every
-                    client receives the highest quality service.
+                    With over a decade of experience as a licensed cosmetologist, Cristal has
+                    built Fonsi into one of San Antonio&apos;s trusted destinations for professional
+                    beauty services. Working across salon and studio settings for diverse occasions
+                    including bridal events, pageants, and runway work, she brings depth and
+                    versatility to every appointment.
                   </p>
+
                   <p>
-                    From bridal transformations to everyday glam, color corrections to special occasion
-                    styling, Cristal&apos;s expertise spans the full spectrum of beauty services.
+                    What started as a passion for making people feel confident has grown into a
+                    thriving studio beloved by the San Antonio community. Every client receives
+                    personalized attention and care, from the initial consultation to the final look.
                   </p>
+
+                  <p>
+                    From bridal transformations to everyday styling, color corrections to
+                    special occasion looks, Cristal&apos;s expertise spans the full spectrum
+                    of beauty services.
+                  </p>
+                </div>
+
+                {/* Credentials */}
+                <div className="mt-10">
+                  <h3 className="text-sm uppercase tracking-[0.2em] text-neutral-500 font-sans mb-4">
+                    Training & Certifications
+                  </h3>
+                  <div className="space-y-1 text-sm font-sans text-neutral-500">
+                    <p>MAC Pro certified (multiple states)</p>
+                    <p>OLAPLEX certified</p>
+                    <p>Wella Professional</p>
+                    <p>MOROCCANOIL certified</p>
+                    <p>Licensed Cosmetologist, 10+ years</p>
+                  </div>
                 </div>
               </div>
             </ScrollReveal>
@@ -69,126 +84,136 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <div className="gradient-divider" />
+      <div className="divider" />
 
-      {/* Values Section */}
-      <section className="section-padding bg-dark-800">
+      {/* Values */}
+      <section className="section-padding">
         <div className="container-custom">
           <ScrollReveal>
-            <h2 className="text-4xl font-serif font-bold text-gold-500 mb-12 text-center">
-              Our Values
+            <p className="text-xs uppercase tracking-[0.3em] text-neutral-500 font-sans mb-6">
+              How We Work
+            </p>
+            <h2 className="text-4xl md:text-5xl font-serif font-bold text-neutral-900 mb-16">
+              Our Approach
             </h2>
           </ScrollReveal>
 
-          <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <StaggerItem>
-              <div className="bg-dark-700 border border-gold-500/30 rounded-lg p-8 hover:border-gold-500/60 card-hover">
-                <div className="inline-block p-4 bg-gold-500/10 rounded-lg mb-4">
-                  <Heart className="text-gold-500" size={32} />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-neutral-200">
+            {[
+              {
+                title: 'Client Care',
+                desc: 'Every client is treated like family. We listen to your needs and work with you to create the look that makes you feel your best.',
+              },
+              {
+                title: 'Excellence',
+                desc: 'We use only premium products and the latest techniques. Continuous learning ensures you receive the highest quality service.',
+              },
+              {
+                title: 'Artistry',
+                desc: 'Beauty is an art form. We bring creativity, skill, and passion to every service, creating results that inspire confidence.',
+              },
+            ].map((value, i) => (
+              <ScrollReveal key={value.title} delay={i * 0.1}>
+                <div className="bg-neutral-50 p-10 md:p-12">
+                  <span className="text-neutral-300 font-sans text-xs block mb-6">
+                    0{i + 1}
+                  </span>
+                  <h3 className="text-xl font-serif font-bold text-neutral-900 mb-4">
+                    {value.title}
+                  </h3>
+                  <p className="text-neutral-500 font-sans text-sm leading-relaxed">
+                    {value.desc}
+                  </p>
                 </div>
-                <h3 className="text-2xl font-serif font-bold text-gold-500 mb-3">Client Care</h3>
-                <p className="text-gray-300 font-sans">
-                  Every client is treated like family. We listen to your needs and work with you
-                  to create the perfect look that makes you feel confident and beautiful.
-                </p>
-              </div>
-            </StaggerItem>
-
-            <StaggerItem>
-              <div className="bg-dark-700 border border-gold-500/30 rounded-lg p-8 hover:border-gold-500/60 card-hover">
-                <div className="inline-block p-4 bg-gold-500/10 rounded-lg mb-4">
-                  <Award className="text-gold-500" size={32} />
-                </div>
-                <h3 className="text-2xl font-serif font-bold text-gold-500 mb-3">Excellence</h3>
-                <p className="text-gray-300 font-sans">
-                  We&apos;re committed to using only premium products and the latest techniques.
-                  Your satisfaction is our priority.
-                </p>
-              </div>
-            </StaggerItem>
-
-            <StaggerItem>
-              <div className="bg-dark-700 border border-gold-500/30 rounded-lg p-8 hover:border-gold-500/60 card-hover">
-                <div className="inline-block p-4 bg-gold-500/10 rounded-lg mb-4">
-                  <Sparkles className="text-gold-500" size={32} />
-                </div>
-                <h3 className="text-2xl font-serif font-bold text-gold-500 mb-3">Artistry</h3>
-                <p className="text-gray-300 font-sans">
-                  Beauty is an art form. We bring creativity, skill, and passion to every
-                  service, creating transformations that inspire.
-                </p>
-              </div>
-            </StaggerItem>
-          </StaggerContainer>
+              </ScrollReveal>
+            ))}
+          </div>
         </div>
       </section>
 
-      <div className="gradient-divider" />
+      <div className="divider" />
 
       {/* Specializations */}
       <section className="section-padding">
         <div className="container-custom">
           <ScrollReveal>
-            <h2 className="text-4xl font-serif font-bold text-gold-500 mb-12 text-center">
+            <h2 className="text-4xl md:text-5xl font-serif font-bold text-neutral-900 mb-12">
               Specializations
             </h2>
           </ScrollReveal>
 
-          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <StaggerItem>
-              <div className="bg-dark-800 border border-gold-500/30 rounded-lg p-6 card-hover">
-                <h3 className="text-xl font-serif font-bold text-gold-500 mb-3">Hair Services</h3>
-                <p className="text-gray-300 font-sans mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <ScrollReveal>
+              <div>
+                <h3 className="text-lg font-serif font-semibold text-neutral-900 mb-4">
+                  Hair Services
+                </h3>
+                <p className="text-neutral-500 font-sans text-sm leading-relaxed mb-4">
                   Expert cuts, color, styling, and treatments including keratin and Olaplex.
                 </p>
-                <ul className="text-gray-400 font-sans text-sm space-y-2">
-                  <li>&bull; Color correction and transformation</li>
-                  <li>&bull; Bridal and special occasion styling</li>
-                  <li>&bull; Advanced coloring techniques</li>
-                  <li>&bull; Hair health treatments</li>
+                <ul className="text-neutral-500 font-sans text-sm space-y-2">
+                  <li className="flex items-center gap-3">
+                    <span className="w-1 h-1 bg-neutral-300 rounded-full" />
+                    Color correction and transformation
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <span className="w-1 h-1 bg-neutral-300 rounded-full" />
+                    Bridal and special occasion styling
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <span className="w-1 h-1 bg-neutral-300 rounded-full" />
+                    Advanced coloring techniques
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <span className="w-1 h-1 bg-neutral-300 rounded-full" />
+                    Hair health treatments
+                  </li>
                 </ul>
               </div>
-            </StaggerItem>
+            </ScrollReveal>
 
-            <StaggerItem>
-              <div className="bg-dark-800 border border-gold-500/30 rounded-lg p-6 card-hover">
-                <h3 className="text-xl font-serif font-bold text-gold-500 mb-3">Makeup & Beauty</h3>
-                <p className="text-gray-300 font-sans mb-4">
+            <ScrollReveal>
+              <div>
+                <h3 className="text-lg font-serif font-semibold text-neutral-900 mb-4">
+                  Makeup & Beauty
+                </h3>
+                <p className="text-neutral-500 font-sans text-sm leading-relaxed mb-4">
                   Professional makeup application and beauty services for any occasion.
                 </p>
-                <ul className="text-gray-400 font-sans text-sm space-y-2">
-                  <li>&bull; Bridal makeup and styling</li>
-                  <li>&bull; Professional makeup application</li>
-                  <li>&bull; MAC cosmetics expertise</li>
-                  <li>&bull; On-site services available</li>
+                <ul className="text-neutral-500 font-sans text-sm space-y-2">
+                  <li className="flex items-center gap-3">
+                    <span className="w-1 h-1 bg-neutral-300 rounded-full" />
+                    Bridal makeup and styling
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <span className="w-1 h-1 bg-neutral-300 rounded-full" />
+                    Professional MAC cosmetics application
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <span className="w-1 h-1 bg-neutral-300 rounded-full" />
+                    On-site services available
+                  </li>
                 </ul>
               </div>
-            </StaggerItem>
-          </StaggerContainer>
+            </ScrollReveal>
+          </div>
+
+          <ScrollReveal>
+            <div className="mt-16">
+              <Link href="/booking">
+                <HoverBorderGradient
+                  as="div"
+                  containerClassName="rounded-full"
+                  className="bg-black text-white px-8 py-3 font-sans text-sm uppercase tracking-[0.15em] font-medium inline-flex items-center gap-3"
+                >
+                  Book your appointment
+                  <ArrowRight size={14} />
+                </HoverBorderGradient>
+              </Link>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
-
-      <div className="gradient-divider" />
-
-      {/* CTA Section */}
-      <ScrollReveal>
-        <section className="section-padding bg-dark-800">
-          <div className="container-custom text-center">
-            <h2 className="text-3xl font-serif font-bold text-gold-500 mb-4">
-              Experience the Difference
-            </h2>
-            <p className="text-gray-300 font-sans text-lg mb-8 max-w-2xl mx-auto">
-              Schedule your appointment with Cristal today and discover why clients keep coming back
-            </p>
-            <a
-              href="/booking"
-              className="bg-gold-500 text-dark-900 px-8 py-4 rounded-lg font-sans font-semibold hover:bg-gold-400 inline-block btn-premium"
-            >
-              Book Your Appointment
-            </a>
-          </div>
-        </section>
-      </ScrollReveal>
     </>
   )
 }

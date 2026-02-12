@@ -1,84 +1,87 @@
 'use client'
 
+import Link from 'next/link'
 import { Instagram } from 'lucide-react'
 import ScrollReveal from '@/components/ScrollReveal'
-import InstagramEmbed from '@/components/InstagramEmbed'
-
-const instagramPosts = [
-  'https://www.instagram.com/p/fonsi_by_cristal/',
-  // Add real post URLs here as they become available
-]
+import { HoverBorderGradient } from '@/components/ui/hover-border-gradient'
 
 export default function GalleryPage() {
   return (
     <>
-      {/* Hero Section */}
-      <section className="py-12 md:py-20 bg-gradient-to-br from-dark-800 to-dark-900 border-b border-gold-500/20">
-        <ScrollReveal>
-          <div className="container-custom text-center">
-            <h1 className="text-5xl md:text-6xl font-serif font-bold text-gold-500 mb-4">
-              Gallery
-            </h1>
-            <p className="text-gray-300 font-sans text-lg max-w-2xl mx-auto">
-              See the beautiful transformations our clients have experienced
-            </p>
-          </div>
-        </ScrollReveal>
-      </section>
-
-      {/* Instagram Gallery Section */}
-      <section className="section-padding">
+      {/* Header */}
+      <section className="pt-28 md:pt-36 pb-6 md:pb-8 bg-black">
         <div className="container-custom">
-          <ScrollReveal>
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 text-gold-500 mb-4">
-                <Instagram size={24} />
-                <span className="font-sans font-semibold text-lg">@fonsi_by_cristal</span>
-              </div>
-              <p className="text-gray-400 font-sans max-w-xl mx-auto">
-                Follow us on Instagram to see our latest work and transformations
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-10">
+            <ScrollReveal>
+              <p className="text-xs uppercase tracking-[0.3em] text-neutral-400 font-sans mb-6">
+                Our Work
               </p>
-            </div>
-          </ScrollReveal>
+              <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6">
+                Gallery
+              </h1>
+              <p className="text-neutral-400 font-sans max-w-lg leading-relaxed">
+                See the transformations our clients have experienced. Follow us on Instagram
+                for our latest work.
+              </p>
+            </ScrollReveal>
 
-          <ScrollReveal delay={0.2}>
-            <InstagramEmbed postUrls={instagramPosts} />
-          </ScrollReveal>
+            <ScrollReveal direction="right">
+              <div className="flex flex-col items-start md:items-end gap-4 md:pb-1">
+                <div className="flex items-center gap-3">
+                  <Instagram size={20} className="text-neutral-400" />
+                  <p className="text-neutral-400 font-sans text-sm">
+                    Follow along for the latest
+                  </p>
+                </div>
+                <div className="flex flex-row gap-4">
+                  <HoverBorderGradient
+                    as="a"
+                    href="https://www.instagram.com/fonsi_by_cristal/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    containerClassName="rounded-full"
+                    className="bg-black text-white px-6 py-2.5 font-sans text-sm uppercase tracking-[0.15em] font-medium inline-flex items-center justify-center gap-2"
+                  >
+                    <Instagram size={14} />
+                    @fonsi_by_cristal
+                  </HoverBorderGradient>
+                  <Link href="/booking">
+                    <HoverBorderGradient
+                      as="div"
+                      containerClassName="rounded-full"
+                      className="bg-black text-white px-6 py-2.5 font-sans text-sm uppercase tracking-[0.15em] font-medium"
+                    >
+                      Book Now
+                    </HoverBorderGradient>
+                  </Link>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
         </div>
       </section>
 
-      <div className="gradient-divider" />
-
-      {/* CTA Section */}
-      <ScrollReveal>
-        <section className="section-padding bg-dark-800">
-          <div className="container-custom text-center">
-            <h2 className="text-3xl font-serif font-bold text-gold-500 mb-4">
-              Follow Us on Instagram
-            </h2>
-            <p className="text-gray-300 font-sans text-lg mb-8 max-w-2xl mx-auto">
-              Stay up to date with our latest work and book your appointment today
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="https://www.instagram.com/fonsi_by_cristal/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-gold-500 text-dark-900 px-8 py-4 rounded-lg font-sans font-semibold hover:bg-gold-400 inline-flex items-center justify-center gap-2 btn-premium"
-              >
-                <Instagram size={20} />
-                Follow on Instagram
-              </a>
-              <a
-                href="/booking"
-                className="border-2 border-gold-500 text-gold-500 px-8 py-4 rounded-lg font-sans font-semibold hover:bg-gold-500/10"
-              >
-                Book Now
-              </a>
+      {/* Gallery Grid */}
+      <section className="pt-10 md:pt-14 pb-16 md:pb-20">
+        <div className="container-custom">
+          <ScrollReveal>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
+                <div
+                  key={i}
+                  className="aspect-[3/4] overflow-hidden rounded-lg"
+                >
+                  <img
+                    src={`/images/image${i}.jpg`}
+                    alt={`Gallery photo ${i}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
             </div>
-          </div>
-        </section>
-      </ScrollReveal>
+          </ScrollReveal>
+        </div>
+      </section>
     </>
   )
 }
