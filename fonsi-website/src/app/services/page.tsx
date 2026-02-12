@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { Service } from '@/types'
-import ServiceCard from '@/components/ServiceCard'
+import { formatPrice } from '@/lib/utils'
+import Link from 'next/link'
 import { Loader } from 'lucide-react'
 import { motion } from 'framer-motion'
 import ScrollReveal from '@/components/ScrollReveal'
-import { StaggerContainer, StaggerItem } from '@/components/ScrollReveal'
 
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([])
@@ -45,39 +45,45 @@ export default function ServicesPage() {
 
   return (
     <>
-      {/* Hero Section */}
-      <section className="py-12 md:py-20 bg-gradient-to-br from-dark-800 to-dark-900 border-b border-gold-500/20">
-        <ScrollReveal>
-          <div className="container-custom text-center">
-            <h1 className="text-5xl md:text-6xl font-serif font-bold text-gold-500 mb-4">
-              Our Services
-            </h1>
-            <p className="text-gray-300 font-sans text-lg max-w-2xl mx-auto">
-              Comprehensive beauty services from professional stylists and makeup artists
+      {/* Header */}
+      <section className="pt-16 md:pt-24 pb-12 md:pb-16">
+        <div className="container-custom">
+          <ScrollReveal>
+            <p className="text-xs uppercase tracking-[0.3em] text-neutral-500 font-sans mb-6">
+              What We Offer
             </p>
-          </div>
-        </ScrollReveal>
+            <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6">
+              Services
+            </h1>
+            <p className="text-neutral-400 font-sans max-w-lg leading-relaxed">
+              Prices vary based on hair type, length, density, and complexity.
+              All services by appointment only.
+            </p>
+          </ScrollReveal>
+        </div>
       </section>
 
-      {/* Services Section */}
-      <section className="section-padding">
+      <div className="divider" />
+
+      {/* Category Tabs */}
+      <section className="py-8 border-b border-neutral-900">
         <div className="container-custom">
-          {/* Category Tabs */}
-          <div className="flex flex-wrap justify-center gap-2 mb-12">
+          <div className="flex gap-1">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`relative px-6 py-3 rounded-lg font-sans font-semibold ${
+                className={`relative px-6 py-3 font-sans text-sm tracking-wide ${
                   selectedCategory === category
-                    ? 'text-dark-900'
-                    : 'bg-dark-800 text-gray-300 border border-gold-500/30 hover:border-gold-500/60'
+                    ? 'text-white'
+                    : 'text-neutral-500 hover:text-neutral-300'
                 }`}
               >
                 {selectedCategory === category && (
                   <motion.div
                     layoutId="tab-indicator"
-                    className="absolute inset-0 bg-gold-500 rounded-lg"
+                    className="absolute inset-0 bg-neutral-900"
+                    style={{ borderRadius: 0 }}
                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -85,26 +91,52 @@ export default function ServicesPage() {
               </button>
             ))}
           </div>
+        </div>
+      </section>
 
-          {/* Services Grid */}
+      {/* Services List */}
+      <section className="section-padding">
+        <div className="container-custom">
           {isLoading ? (
-            <div className="flex justify-center items-center py-12">
-              <Loader className="animate-spin text-gold-500" size={40} />
+            <div className="flex justify-center items-center py-16">
+              <Loader className="animate-spin text-neutral-500" size={24} />
             </div>
           ) : displayedServices.length > 0 ? (
-            <StaggerContainer
-              key={selectedCategory}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            >
-              {displayedServices.map((service) => (
-                <StaggerItem key={service.id}>
-                  <ServiceCard service={service} />
-                </StaggerItem>
+            <div className="max-w-3xl">
+              {displayedServices.map((service, i) => (
+                <motion.div
+                  key={service.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: i * 0.05 }}
+                  className="group border-b border-neutral-900 py-6 md:py-8"
+                >
+                  <div className="flex items-start justify-between gap-8">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-serif font-semibold text-white mb-1 group-hover:text-neutral-200">
+                        {service.name}
+                      </h3>
+                      {service.description && (
+                        <p className="text-neutral-500 font-sans text-sm">
+                          {service.description}
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-white font-sans text-sm font-medium">
+                        {formatPrice(service.priceMin, service.priceMax)}
+                      </p>
+                      <p className="text-neutral-600 font-sans text-xs mt-1">
+                        {service.duration} min
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
               ))}
-            </StaggerContainer>
+            </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-400 font-sans text-lg">
+            <div className="py-16">
+              <p className="text-neutral-500 font-sans">
                 No services available in this category.
               </p>
             </div>
@@ -112,59 +144,60 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <div className="gradient-divider" />
+      <div className="divider" />
 
-      {/* Additional Info */}
-      <section className="section-padding bg-dark-800">
-        <div className="container-custom">
-          <div className="max-w-3xl mx-auto">
-            <ScrollReveal>
-              <h2 className="text-3xl font-serif font-bold text-gold-500 mb-6 text-center">
-                Service Information
-              </h2>
-            </ScrollReveal>
+      {/* Info */}
+      <section className="section-padding">
+        <div className="container-custom max-w-3xl">
+          <ScrollReveal>
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-sm font-sans font-medium text-white uppercase tracking-[0.1em] mb-3">
+                  Consultations
+                </h3>
+                <p className="text-neutral-500 font-sans text-sm leading-relaxed">
+                  For services like color correction, keratin treatments, and on-site services,
+                  a consultation may be required. We&apos;ll contact you to discuss your needs.
+                </p>
+              </div>
 
-            <StaggerContainer className="space-y-6">
-              <StaggerItem>
-                <div className="bg-dark-700 border border-gold-500/30 rounded-lg p-6 card-hover">
-                  <h3 className="text-lg font-serif font-bold text-gold-500 mb-2">
-                    Consultations
-                  </h3>
-                  <p className="text-gray-300 font-sans">
-                    For services like color correction, keratin treatments, and on-site services,
-                    a consultation may be required. We&apos;ll contact you to discuss your needs.
-                  </p>
-                </div>
-              </StaggerItem>
+              <div className="h-px bg-neutral-900" />
 
-              <StaggerItem>
-                <div className="bg-dark-700 border border-gold-500/30 rounded-lg p-6 card-hover">
-                  <h3 className="text-lg font-serif font-bold text-gold-500 mb-2">
-                    Custom Pricing
-                  </h3>
-                  <p className="text-gray-300 font-sans">
-                    Prices shown are estimates and may vary based on hair length, density, and
-                    complexity of the service. Final pricing will be discussed at your consultation.
-                  </p>
-                </div>
-              </StaggerItem>
+              <div>
+                <h3 className="text-sm font-sans font-medium text-white uppercase tracking-[0.1em] mb-3">
+                  Custom Pricing
+                </h3>
+                <p className="text-neutral-500 font-sans text-sm leading-relaxed">
+                  Prices shown are estimates and may vary based on hair length, density, and
+                  complexity. Final pricing will be discussed at your consultation.
+                </p>
+              </div>
 
-              <StaggerItem>
-                <div className="bg-dark-700 border border-gold-500/30 rounded-lg p-6 card-hover">
-                  <h3 className="text-lg font-serif font-bold text-gold-500 mb-2">
-                    Appointment Policy
-                  </h3>
-                  <p className="text-gray-300 font-sans mb-3">
-                    By appointment only. Walk-ins are not accepted.
-                  </p>
-                  <p className="text-gray-300 font-sans">
-                    <strong className="text-gold-500">Cancellation Policy:</strong> 24-hour notice
-                    required. 50% charge applies for cancellations within 24 hours.
-                  </p>
-                </div>
-              </StaggerItem>
-            </StaggerContainer>
-          </div>
+              <div className="h-px bg-neutral-900" />
+
+              <div>
+                <h3 className="text-sm font-sans font-medium text-white uppercase tracking-[0.1em] mb-3">
+                  Cancellation Policy
+                </h3>
+                <p className="text-neutral-500 font-sans text-sm leading-relaxed">
+                  By appointment only. Walk-ins are not accepted.
+                  24-hour notice required for cancellations. A 50% charge applies for
+                  cancellations within 24 hours.
+                </p>
+              </div>
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal>
+            <div className="mt-16">
+              <Link
+                href="/booking"
+                className="bg-white text-black px-8 py-4 font-sans text-sm uppercase tracking-[0.15em] font-medium hover:bg-neutral-200 inline-block"
+              >
+                Book Appointment
+              </Link>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
     </>

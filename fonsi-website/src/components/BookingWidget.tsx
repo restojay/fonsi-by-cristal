@@ -19,12 +19,11 @@ const steps: BookingStep[] = ['service', 'datetime', 'info', 'confirm']
 
 export default function BookingWidget({ services, onSuccess }: BookingWidgetProps) {
   const [step, setStep] = useState<BookingStep>('service')
-  const [direction, setDirection] = useState(1) // 1 = forward, -1 = backward
+  const [direction, setDirection] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
-  // Form state
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [selectedDate, setSelectedDate] = useState<string>('')
   const [selectedTime, setSelectedTime] = useState<string>('')
@@ -52,8 +51,6 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
   const handleDateChange = async (dateStr: string) => {
     setSelectedDate(dateStr)
     setSelectedTime('')
-
-    // Generate time slots (10am-6:30pm, 30-min intervals)
     const slots = generateTimeSlots('10:00', '18:30', 30)
     setAvailableTimeSlots(slots)
   }
@@ -99,7 +96,6 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
         notes: formData.notes,
       }
 
-      // Validate with Zod schema
       const validated = bookingSchema.parse(bookingData)
 
       const response = await fetch('/api/appointments', {
@@ -114,9 +110,8 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
       }
 
       const result = await response.json()
-      setSuccess(`Appointment booked successfully! Confirmation email sent to ${formData.email}`)
+      setSuccess(`Appointment booked. Confirmation email sent to ${formData.email}`)
 
-      // Reset form
       setTimeout(() => {
         goToStep('service')
         setSelectedService(null)
@@ -133,13 +128,11 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
     }
   }
 
-  // Get next 30 days, only Tuesday-Saturday
   const generateAvailableDates = () => {
     const dates: string[] = []
     for (let i = 0; i < 90; i++) {
       const date = addDays(new Date(), i)
       const dayOfWeek = date.getDay()
-      // Tuesday (2) - Saturday (6)
       if (dayOfWeek >= 2 && dayOfWeek <= 6) {
         dates.push(format(date, 'yyyy-MM-dd'))
         if (dates.length === 30) break
@@ -160,32 +153,32 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
   const categories = Object.keys(groupedServices).sort()
 
   const slideVariants = {
-    enter: (dir: number) => ({ x: dir > 0 ? 80 : -80, opacity: 0 }),
+    enter: (dir: number) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
     center: { x: 0, opacity: 1 },
-    exit: (dir: number) => ({ x: dir > 0 ? -80 : 80, opacity: 0 }),
+    exit: (dir: number) => ({ x: dir > 0 ? -60 : 60, opacity: 0 }),
   }
 
   return (
-    <div className="bg-dark-800 border border-gold-500/30 rounded-lg p-8">
-      {/* Progress Indicator */}
-      <div className="flex justify-between mb-8">
+    <div>
+      {/* Progress */}
+      <div className="flex items-center mb-12">
         {steps.map((s, idx) => (
           <div key={s} className="flex-1 flex items-center">
             <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center font-sans font-semibold transition-colors duration-300 ${
+              className={`w-8 h-8 flex items-center justify-center font-sans text-xs font-medium ${
                 step === s
-                  ? 'bg-gold-500 text-dark-900'
+                  ? 'bg-white text-black'
                   : steps.indexOf(step) > idx
-                    ? 'bg-gold-500/50 text-gold-500'
-                    : 'bg-dark-700 text-gray-500'
+                    ? 'bg-neutral-700 text-neutral-300'
+                    : 'bg-neutral-900 text-neutral-600'
               }`}
             >
               {idx + 1}
             </div>
             {idx < 3 && (
               <div
-                className={`flex-1 h-1 mx-2 transition-colors duration-300 ${
-                  steps.indexOf(step) > idx ? 'bg-gold-500/50' : 'bg-dark-700'
+                className={`flex-1 h-px mx-2 ${
+                  steps.indexOf(step) > idx ? 'bg-neutral-700' : 'bg-neutral-900'
                 }`}
               />
             )}
@@ -194,19 +187,19 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
       </div>
 
       {success && (
-        <div className="mb-6 p-4 bg-green-900/30 border border-green-500 rounded text-green-400 text-sm font-sans">
+        <div className="mb-8 p-4 border border-neutral-700 text-neutral-300 text-sm font-sans">
           {success}
         </div>
       )}
 
       {error && (
-        <div className="mb-6 p-4 bg-red-900/30 border border-red-500 rounded text-red-400 text-sm font-sans">
+        <div className="mb-8 p-4 border border-red-900 text-red-400 text-sm font-sans">
           {error}
         </div>
       )}
 
       <AnimatePresence mode="wait" custom={direction}>
-        {/* Step 1: Service Selection */}
+        {/* Step 1: Service */}
         {step === 'service' && (
           <motion.div
             key="service"
@@ -215,27 +208,33 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+            transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <h2 className="text-3xl font-serif font-bold text-gold-500 mb-6">Select a Service</h2>
-            <div className="space-y-6">
+            <h2 className="text-2xl font-serif font-bold text-white mb-8">Select a Service</h2>
+            <div className="space-y-8">
               {categories.map((category) => (
                 <div key={category}>
-                  <h3 className="text-lg font-serif font-semibold text-gold-400 mb-3">{category}</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <h3 className="text-xs uppercase tracking-[0.15em] text-neutral-500 font-sans mb-4">
+                    {category}
+                  </h3>
+                  <div className="space-y-1">
                     {groupedServices[category].map((service) => (
                       <button
                         key={service.id}
                         onClick={() => handleServiceSelect(service)}
-                        className="text-left p-4 bg-dark-700 border border-gold-500/30 rounded hover:border-gold-500/60 group card-hover"
+                        className="w-full text-left py-4 px-4 border border-neutral-900 hover:border-neutral-700 hover:bg-neutral-950 group flex items-center justify-between"
                       >
-                        <p className="font-sans font-semibold text-gray-100 group-hover:text-gold-400 transition-colors">
-                          {service.name}
+                        <div>
+                          <p className="font-sans text-sm text-white group-hover:text-neutral-200">
+                            {service.name}
+                          </p>
+                          <p className="text-neutral-600 text-xs font-sans mt-0.5">
+                            {service.duration} min
+                          </p>
+                        </div>
+                        <p className="text-neutral-400 text-sm font-sans">
+                          ${service.priceMin} &ndash; ${service.priceMax}
                         </p>
-                        <p className="text-gold-500 text-sm font-sans mt-1">
-                          ${service.priceMin} - ${service.priceMax}
-                        </p>
-                        <p className="text-gray-500 text-xs font-sans mt-1">{service.duration} min</p>
                       </button>
                     ))}
                   </div>
@@ -245,7 +244,7 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
           </motion.div>
         )}
 
-        {/* Step 2: Date & Time Selection */}
+        {/* Step 2: Date & Time */}
         {step === 'datetime' && selectedService && (
           <motion.div
             key="datetime"
@@ -254,52 +253,54 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+            transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <h2 className="text-3xl font-serif font-bold text-gold-500 mb-2">
+            <h2 className="text-2xl font-serif font-bold text-white mb-2">
               {selectedService.name}
             </h2>
-            <p className="text-gray-400 font-sans text-sm mb-6">
+            <p className="text-neutral-500 font-sans text-sm mb-8">
               Select your preferred date and time
             </p>
 
-            <div className="space-y-6">
-              {/* Date Selection */}
+            <div className="space-y-8">
               <div>
-                <label className="block text-gray-300 font-sans font-semibold mb-3">Date</label>
-                <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
+                <label className="block text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans mb-4">
+                  Date
+                </label>
+                <div className="grid grid-cols-5 md:grid-cols-7 gap-2">
                   {generateAvailableDates().map((date) => (
                     <button
                       key={date}
                       onClick={() => handleDateChange(date)}
-                      className={`p-2 rounded text-sm font-sans font-semibold ${
+                      className={`p-2 text-center font-sans text-xs ${
                         selectedDate === date
-                          ? 'bg-gold-500 text-dark-900'
-                          : 'bg-dark-700 text-gray-300 hover:bg-dark-600 border border-gold-500/20'
+                          ? 'bg-white text-black'
+                          : 'bg-neutral-950 border border-neutral-900 text-neutral-400 hover:border-neutral-700'
                       }`}
                     >
-                      <div className="text-xs opacity-75">
+                      <div className="text-[10px] opacity-60 mb-0.5">
                         {format(new Date(date), 'EEE')}
                       </div>
-                      <div>{format(new Date(date), 'd')}</div>
+                      <div className="font-medium">{format(new Date(date), 'd')}</div>
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Time Selection */}
               {selectedDate && (
                 <div>
-                  <label className="block text-gray-300 font-sans font-semibold mb-3">Time</label>
+                  <label className="block text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans mb-4">
+                    Time
+                  </label>
                   <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
                     {availableTimeSlots.map((time) => (
                       <button
                         key={time}
                         onClick={() => setSelectedTime(time)}
-                        className={`p-2 rounded text-sm font-sans font-semibold ${
+                        className={`p-2 text-center font-sans text-xs font-medium ${
                           selectedTime === time
-                            ? 'bg-gold-500 text-dark-900'
-                            : 'bg-dark-700 text-gray-300 hover:bg-dark-600 border border-gold-500/20'
+                            ? 'bg-white text-black'
+                            : 'bg-neutral-950 border border-neutral-900 text-neutral-400 hover:border-neutral-700'
                         }`}
                       >
                         {formatTime(time)}
@@ -310,27 +311,27 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
               )}
             </div>
 
-            <div className="flex gap-4 mt-8">
+            <div className="flex gap-4 mt-10">
               <button
                 onClick={() => goToStep('service')}
-                className="flex items-center gap-2 px-6 py-3 bg-dark-700 text-gray-300 rounded font-sans font-semibold hover:text-gold-500"
+                className="flex items-center gap-2 px-5 py-3 border border-neutral-800 text-neutral-400 font-sans text-sm hover:text-white hover:border-neutral-600"
               >
-                <ChevronLeft size={18} />
+                <ChevronLeft size={14} />
                 Back
               </button>
               <button
                 onClick={handleContinueToInfo}
                 disabled={!selectedDate || !selectedTime}
-                className="flex items-center gap-2 px-6 py-3 bg-gold-500 text-dark-900 rounded font-sans font-semibold hover:bg-gold-400 disabled:opacity-50 disabled:cursor-not-allowed ml-auto btn-premium"
+                className="flex items-center gap-2 px-6 py-3 bg-white text-black font-sans text-sm font-medium hover:bg-neutral-200 disabled:opacity-30 disabled:cursor-not-allowed ml-auto"
               >
                 Continue
-                <ChevronRight size={18} />
+                <ChevronRight size={14} />
               </button>
             </div>
           </motion.div>
         )}
 
-        {/* Step 3: Personal Information */}
+        {/* Step 3: Info */}
         {step === 'info' && selectedService && (
           <motion.div
             key="info"
@@ -339,80 +340,88 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+            transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <h2 className="text-3xl font-serif font-bold text-gold-500 mb-6">Your Information</h2>
+            <h2 className="text-2xl font-serif font-bold text-white mb-8">Your Information</h2>
 
-            <form className="space-y-4">
+            <form className="space-y-6">
               <div>
-                <label className="block text-gray-300 font-sans font-semibold mb-2">Full Name *</label>
+                <label className="block text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans mb-2">
+                  Full Name *
+                </label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleInfoChange}
-                  className="w-full px-4 py-2 bg-dark-700 border border-gold-500/30 text-white rounded font-sans focus:outline-none focus:border-gold-500"
+                  className="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 text-white font-sans text-sm focus:outline-none focus:border-neutral-500 placeholder:text-neutral-700"
                   placeholder="Your name"
                 />
               </div>
 
               <div>
-                <label className="block text-gray-300 font-sans font-semibold mb-2">Email *</label>
+                <label className="block text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans mb-2">
+                  Email *
+                </label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleInfoChange}
-                  className="w-full px-4 py-2 bg-dark-700 border border-gold-500/30 text-white rounded font-sans focus:outline-none focus:border-gold-500"
+                  className="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 text-white font-sans text-sm focus:outline-none focus:border-neutral-500 placeholder:text-neutral-700"
                   placeholder="your@email.com"
                 />
               </div>
 
               <div>
-                <label className="block text-gray-300 font-sans font-semibold mb-2">Phone *</label>
+                <label className="block text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans mb-2">
+                  Phone *
+                </label>
                 <input
                   type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleInfoChange}
-                  className="w-full px-4 py-2 bg-dark-700 border border-gold-500/30 text-white rounded font-sans focus:outline-none focus:border-gold-500"
+                  className="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 text-white font-sans text-sm focus:outline-none focus:border-neutral-500 placeholder:text-neutral-700"
                   placeholder="(210) 555-0000"
                 />
               </div>
 
               <div>
-                <label className="block text-gray-300 font-sans font-semibold mb-2">Notes (optional)</label>
+                <label className="block text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans mb-2">
+                  Notes (optional)
+                </label>
                 <textarea
                   name="notes"
                   value={formData.notes}
                   onChange={handleInfoChange}
-                  className="w-full px-4 py-2 bg-dark-700 border border-gold-500/30 text-white rounded font-sans focus:outline-none focus:border-gold-500"
+                  className="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 text-white font-sans text-sm focus:outline-none focus:border-neutral-500 placeholder:text-neutral-700"
                   placeholder="Any special requests or preferences?"
                   rows={4}
                 />
               </div>
             </form>
 
-            <div className="flex gap-4 mt-8">
+            <div className="flex gap-4 mt-10">
               <button
                 onClick={() => goToStep('datetime')}
-                className="flex items-center gap-2 px-6 py-3 bg-dark-700 text-gray-300 rounded font-sans font-semibold hover:text-gold-500"
+                className="flex items-center gap-2 px-5 py-3 border border-neutral-800 text-neutral-400 font-sans text-sm hover:text-white hover:border-neutral-600"
               >
-                <ChevronLeft size={18} />
+                <ChevronLeft size={14} />
                 Back
               </button>
               <button
                 onClick={handleContinueToConfirm}
-                className="flex items-center gap-2 px-6 py-3 bg-gold-500 text-dark-900 rounded font-sans font-semibold hover:bg-gold-400 ml-auto btn-premium"
+                className="flex items-center gap-2 px-6 py-3 bg-white text-black font-sans text-sm font-medium hover:bg-neutral-200 ml-auto"
               >
                 Review Booking
-                <ChevronRight size={18} />
+                <ChevronRight size={14} />
               </button>
             </div>
           </motion.div>
         )}
 
-        {/* Step 4: Confirmation */}
+        {/* Step 4: Confirm */}
         {step === 'confirm' && selectedService && (
           <motion.div
             key="confirm"
@@ -421,74 +430,46 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+            transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <h2 className="text-3xl font-serif font-bold text-gold-500 mb-6">Confirm Your Booking</h2>
+            <h2 className="text-2xl font-serif font-bold text-white mb-8">Confirm Booking</h2>
 
-            <div className="bg-dark-700 border border-gold-500/30 rounded-lg p-6 space-y-4 mb-6">
-              <div className="flex justify-between items-start pb-4 border-b border-gold-500/20">
-                <span className="text-gray-400 font-sans">Service</span>
-                <span className="text-white font-sans font-semibold">{selectedService.name}</span>
-              </div>
-
-              <div className="flex justify-between items-start pb-4 border-b border-gold-500/20">
-                <span className="text-gray-400 font-sans">Date</span>
-                <span className="text-white font-sans font-semibold">
-                  {format(new Date(selectedDate), 'MMMM d, yyyy')}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-start pb-4 border-b border-gold-500/20">
-                <span className="text-gray-400 font-sans">Time</span>
-                <span className="text-white font-sans font-semibold">{formatTime(selectedTime)}</span>
-              </div>
-
-              <div className="flex justify-between items-start pb-4 border-b border-gold-500/20">
-                <span className="text-gray-400 font-sans">Duration</span>
-                <span className="text-white font-sans font-semibold">{selectedService.duration} minutes</span>
-              </div>
-
-              <div className="flex justify-between items-start pb-4 border-b border-gold-500/20">
-                <span className="text-gray-400 font-sans">Price</span>
-                <span className="text-gold-500 font-sans font-semibold">
-                  ${selectedService.priceMin} - ${selectedService.priceMax}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-start">
-                <span className="text-gray-400 font-sans">Name</span>
-                <span className="text-white font-sans font-semibold">{formData.name}</span>
-              </div>
-
-              <div className="flex justify-between items-start">
-                <span className="text-gray-400 font-sans">Email</span>
-                <span className="text-white font-sans font-semibold">{formData.email}</span>
-              </div>
-
-              <div className="flex justify-between items-start">
-                <span className="text-gray-400 font-sans">Phone</span>
-                <span className="text-white font-sans font-semibold">{formData.phone}</span>
-              </div>
+            <div className="border border-neutral-800 divide-y divide-neutral-900">
+              {[
+                { label: 'Service', value: selectedService.name },
+                { label: 'Date', value: format(new Date(selectedDate), 'MMMM d, yyyy') },
+                { label: 'Time', value: formatTime(selectedTime) },
+                { label: 'Duration', value: `${selectedService.duration} minutes` },
+                { label: 'Price', value: `$${selectedService.priceMin} – $${selectedService.priceMax}` },
+                { label: 'Name', value: formData.name },
+                { label: 'Email', value: formData.email },
+                { label: 'Phone', value: formData.phone },
+              ].map((row) => (
+                <div key={row.label} className="flex justify-between items-center px-5 py-4">
+                  <span className="text-neutral-500 font-sans text-sm">{row.label}</span>
+                  <span className="text-white font-sans text-sm">{row.value}</span>
+                </div>
+              ))}
             </div>
 
-            <div className="bg-yellow-900/20 border border-yellow-600/50 rounded p-4 mb-6">
-              <p className="text-yellow-200 text-xs font-sans">
-                <strong>Cancellation Policy:</strong> 24-hour cancellation required. 50% charge applies for cancellations within 24 hours.
+            <div className="mt-6 p-4 border border-neutral-800 bg-neutral-950">
+              <p className="text-neutral-500 text-xs font-sans">
+                <span className="text-neutral-300">Cancellation Policy:</span> 24-hour notice required. 50% charge for cancellations within 24 hours.
               </p>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex gap-4 mt-10">
               <button
                 onClick={() => goToStep('info')}
-                className="flex items-center gap-2 px-6 py-3 bg-dark-700 text-gray-300 rounded font-sans font-semibold hover:text-gold-500"
+                className="flex items-center gap-2 px-5 py-3 border border-neutral-800 text-neutral-400 font-sans text-sm hover:text-white hover:border-neutral-600"
               >
-                <ChevronLeft size={18} />
+                <ChevronLeft size={14} />
                 Back
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className="flex items-center gap-2 px-8 py-3 bg-gold-500 text-dark-900 rounded font-sans font-semibold hover:bg-gold-400 disabled:opacity-50 disabled:cursor-not-allowed ml-auto btn-premium"
+                className="flex items-center gap-2 px-8 py-3 bg-white text-black font-sans text-sm font-medium hover:bg-neutral-200 disabled:opacity-30 disabled:cursor-not-allowed ml-auto"
               >
                 {isLoading ? 'Booking...' : 'Complete Booking'}
               </button>

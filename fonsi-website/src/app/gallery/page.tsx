@@ -2,83 +2,91 @@
 
 import { Instagram } from 'lucide-react'
 import ScrollReveal from '@/components/ScrollReveal'
-import InstagramEmbed from '@/components/InstagramEmbed'
-
-const instagramPosts = [
-  'https://www.instagram.com/p/fonsi_by_cristal/',
-  // Add real post URLs here as they become available
-]
 
 export default function GalleryPage() {
   return (
     <>
-      {/* Hero Section */}
-      <section className="py-12 md:py-20 bg-gradient-to-br from-dark-800 to-dark-900 border-b border-gold-500/20">
-        <ScrollReveal>
-          <div className="container-custom text-center">
-            <h1 className="text-5xl md:text-6xl font-serif font-bold text-gold-500 mb-4">
-              Gallery
-            </h1>
-            <p className="text-gray-300 font-sans text-lg max-w-2xl mx-auto">
-              See the beautiful transformations our clients have experienced
-            </p>
-          </div>
-        </ScrollReveal>
-      </section>
-
-      {/* Instagram Gallery Section */}
-      <section className="section-padding">
+      {/* Header */}
+      <section className="pt-16 md:pt-24 pb-12 md:pb-16">
         <div className="container-custom">
           <ScrollReveal>
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 text-gold-500 mb-4">
-                <Instagram size={24} />
-                <span className="font-sans font-semibold text-lg">@fonsi_by_cristal</span>
-              </div>
-              <p className="text-gray-400 font-sans max-w-xl mx-auto">
-                Follow us on Instagram to see our latest work and transformations
-              </p>
-            </div>
-          </ScrollReveal>
-
-          <ScrollReveal delay={0.2}>
-            <InstagramEmbed postUrls={instagramPosts} />
+            <p className="text-xs uppercase tracking-[0.3em] text-neutral-500 font-sans mb-6">
+              Our Work
+            </p>
+            <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6">
+              Gallery
+            </h1>
+            <p className="text-neutral-400 font-sans max-w-lg leading-relaxed">
+              See the transformations our clients have experienced. Follow us on Instagram
+              for our latest work.
+            </p>
           </ScrollReveal>
         </div>
       </section>
 
-      <div className="gradient-divider" />
+      <div className="divider" />
 
-      {/* CTA Section */}
-      <ScrollReveal>
-        <section className="section-padding bg-dark-800">
-          <div className="container-custom text-center">
-            <h2 className="text-3xl font-serif font-bold text-gold-500 mb-4">
-              Follow Us on Instagram
+      {/* Gallery Grid */}
+      <section className="section-padding">
+        <div className="container-custom">
+          <ScrollReveal>
+            <div className="columns-2 md:columns-3 gap-3 md:gap-4">
+              {Array.from({ length: 9 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="mb-3 md:mb-4 break-inside-avoid"
+                >
+                  <div
+                    className={`bg-neutral-900 w-full flex items-center justify-center ${
+                      i % 3 === 0
+                        ? 'aspect-[3/4]'
+                        : i % 3 === 1
+                          ? 'aspect-square'
+                          : 'aspect-[4/5]'
+                    }`}
+                  >
+                    <p className="text-neutral-700 font-sans text-xs">Photo {i + 1}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      <div className="divider" />
+
+      {/* Instagram CTA */}
+      <section className="section-padding">
+        <div className="container-custom text-center max-w-xl">
+          <ScrollReveal>
+            <Instagram size={24} className="text-neutral-400 mx-auto mb-6" />
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mb-4">
+              Follow along
             </h2>
-            <p className="text-gray-300 font-sans text-lg mb-8 max-w-2xl mx-auto">
-              Stay up to date with our latest work and book your appointment today
+            <p className="text-neutral-500 font-sans text-sm mb-8 leading-relaxed">
+              See our latest transformations and behind-the-scenes on Instagram
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="https://www.instagram.com/fonsi_by_cristal/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-gold-500 text-dark-900 px-8 py-4 rounded-lg font-sans font-semibold hover:bg-gold-400 inline-flex items-center justify-center gap-2 btn-premium"
+                className="bg-white text-black px-8 py-4 font-sans text-sm uppercase tracking-[0.15em] font-medium hover:bg-neutral-200 inline-flex items-center justify-center gap-2"
               >
-                <Instagram size={20} />
-                Follow on Instagram
+                <Instagram size={16} />
+                @fonsi_by_cristal
               </a>
               <a
                 href="/booking"
-                className="border-2 border-gold-500 text-gold-500 px-8 py-4 rounded-lg font-sans font-semibold hover:bg-gold-500/10"
+                className="border border-neutral-700 text-neutral-300 px-8 py-4 font-sans text-sm uppercase tracking-[0.15em] font-medium hover:border-white hover:text-white"
               >
                 Book Now
               </a>
             </div>
-          </div>
-        </section>
-      </ScrollReveal>
+          </ScrollReveal>
+        </div>
+      </section>
     </>
   )
 }

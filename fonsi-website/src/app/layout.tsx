@@ -6,7 +6,7 @@ import Footer from '@/components/Footer'
 export const metadata: Metadata = {
   title: 'Fonsi by Cristal | Hair Salon & Makeup Studio San Antonio',
   description:
-    'Luxury hair salon and makeup studio in San Antonio, TX. Book your appointment for hair cuts, color, styling, bridal services, and makeup. By appointment only.',
+    'Hair salon and makeup studio in San Antonio, TX. Professional hair cuts, color, styling, bridal services, and makeup. By appointment only.',
   keywords:
     'hair salon, makeup studio, hair color, bridal services, San Antonio, Texas',
   authors: [{ name: 'Fonsi by Cristal' }],
@@ -15,8 +15,8 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Fonsi by Cristal | Hair Salon & Makeup Studio',
     description:
-      'Luxury hair salon and makeup studio offering professional hair services and makeup in San Antonio, TX.',
-    url: 'https://fonsi-by-cristal.com',
+      'Hair salon and makeup studio offering professional hair services and makeup in San Antonio, TX.',
+    url: 'https://fonsibycristal.com',
     type: 'website',
     images: [
       {
@@ -40,12 +40,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Montserrat:wght@400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Montserrat:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
         />
-        <script async src="https://www.instagram.com/embed.js" />
       </head>
-      <body className="bg-dark-900 text-gray-100 font-sans bg-noise">
+      <body className="bg-black text-neutral-300 font-sans antialiased">
         <Navbar />
         <main className="min-h-screen">{children}</main>
         <Footer />

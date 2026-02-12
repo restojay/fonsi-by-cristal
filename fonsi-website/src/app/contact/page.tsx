@@ -1,10 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { MapPin, Phone, Clock, AlertCircle, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ScrollReveal from '@/components/ScrollReveal'
-import { StaggerContainer, StaggerItem } from '@/components/ScrollReveal'
 
 const faqs = [
   {
@@ -38,18 +37,18 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <div className="bg-dark-700 border border-gold-500/30 rounded-lg overflow-hidden card-hover">
+    <div className="border-b border-neutral-900">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full text-left p-6 flex items-center justify-between gap-4"
+        className="w-full text-left py-6 flex items-center justify-between gap-6"
       >
-        <span className="font-serif font-bold text-gold-500 text-lg">{question}</span>
+        <span className="font-sans text-sm text-white">{question}</span>
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.2 }}
           className="flex-shrink-0"
         >
-          <ChevronDown className="text-gold-500" size={20} />
+          <ChevronDown className="text-neutral-500" size={16} />
         </motion.div>
       </button>
       <AnimatePresence>
@@ -58,12 +57,12 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+            transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
             className="overflow-hidden"
           >
-            <div className="px-6 pb-6">
-              <p className="text-gray-300 font-sans">{answer}</p>
-            </div>
+            <p className="text-neutral-500 font-sans text-sm leading-relaxed pb-6">
+              {answer}
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -74,173 +73,153 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
 export default function ContactPage() {
   return (
     <>
-      {/* Hero Section */}
-      <section className="py-12 md:py-20 bg-gradient-to-br from-dark-800 to-dark-900 border-b border-gold-500/20">
-        <ScrollReveal>
-          <div className="container-custom text-center">
-            <h1 className="text-5xl md:text-6xl font-serif font-bold text-gold-500 mb-4">
-              Contact Us
-            </h1>
-            <p className="text-gray-300 font-sans text-lg max-w-2xl mx-auto">
-              Reach out to Fonsi by Cristal. By appointment only.
+      {/* Header */}
+      <section className="pt-16 md:pt-24 pb-12 md:pb-16">
+        <div className="container-custom">
+          <ScrollReveal>
+            <p className="text-xs uppercase tracking-[0.3em] text-neutral-500 font-sans mb-6">
+              Get in Touch
             </p>
-          </div>
-        </ScrollReveal>
+            <h1 className="text-5xl md:text-7xl font-serif font-bold text-white">
+              Contact
+            </h1>
+          </ScrollReveal>
+        </div>
       </section>
 
-      {/* Contact Section */}
+      <div className="divider" />
+
+      {/* Contact Info */}
       <section className="section-padding">
         <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Contact Info */}
-            <div>
-              <ScrollReveal>
-                <h2 className="text-4xl font-serif font-bold text-gold-500 mb-8">
-                  Get in Touch
-                </h2>
-              </ScrollReveal>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8">
+            <ScrollReveal delay={0}>
+              <div>
+                <h3 className="text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans font-medium mb-4">
+                  Address
+                </h3>
+                <p className="text-neutral-300 font-sans text-sm leading-relaxed">
+                  6626 West Loop 1604 North<br />
+                  Suite 105<br />
+                  San Antonio, Texas 78254
+                </p>
+                <p className="text-neutral-600 font-sans text-xs mt-2">(Suites 39 & 41)</p>
+              </div>
+            </ScrollReveal>
 
-              <StaggerContainer className="space-y-8">
-                {/* Address */}
-                <StaggerItem>
-                  <div className="flex gap-4">
-                    <MapPin className="text-gold-500 flex-shrink-0 mt-1" size={24} />
-                    <div>
-                      <h3 className="text-lg font-serif font-bold text-gold-500 mb-2">Address</h3>
-                      <p className="text-gray-300 font-sans">
-                        6626 West Loop 1604 North<br />
-                        Suite 105<br />
-                        San Antonio, Texas 78254
-                      </p>
-                      <p className="text-gray-400 font-sans text-sm mt-2">(Suites 39 & 41)</p>
-                    </div>
-                  </div>
-                </StaggerItem>
+            <ScrollReveal delay={0.1}>
+              <div>
+                <h3 className="text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans font-medium mb-4">
+                  Phone
+                </h3>
+                <a
+                  href="tel:2105517742"
+                  className="text-neutral-300 font-sans text-sm hover:text-white"
+                >
+                  (210) 551-7742
+                </a>
+                <p className="text-neutral-600 font-sans text-xs mt-2">
+                  Call to book or modify appointments
+                </p>
+              </div>
+            </ScrollReveal>
 
-                {/* Phone */}
-                <StaggerItem>
-                  <div className="flex gap-4">
-                    <Phone className="text-gold-500 flex-shrink-0 mt-1" size={24} />
-                    <div>
-                      <h3 className="text-lg font-serif font-bold text-gold-500 mb-2">Phone</h3>
-                      <a
-                        href="tel:2105517742"
-                        className="text-gray-300 font-sans text-lg hover:text-gold-500"
-                      >
-                        (210) 551-7742
-                      </a>
-                      <p className="text-gray-400 font-sans text-sm mt-2">
-                        Call to book or modify appointments
-                      </p>
-                    </div>
-                  </div>
-                </StaggerItem>
-
-                {/* Hours */}
-                <StaggerItem>
-                  <div className="flex gap-4">
-                    <Clock className="text-gold-500 flex-shrink-0 mt-1" size={24} />
-                    <div>
-                      <h3 className="text-lg font-serif font-bold text-gold-500 mb-2">Hours</h3>
-                      <div className="text-gray-300 font-sans space-y-1">
-                        <p><strong>Tuesday - Saturday:</strong> 10:00 AM - 6:30 PM</p>
-                        <p><strong>Sunday & Monday:</strong> Closed</p>
-                      </div>
-                      <p className="text-gray-400 font-sans text-sm mt-2">
-                        By appointment only. Walk-ins not accepted.
-                      </p>
-                    </div>
-                  </div>
-                </StaggerItem>
-
-                {/* Policy */}
-                <StaggerItem>
-                  <div className="flex gap-4">
-                    <AlertCircle className="text-gold-500 flex-shrink-0 mt-1" size={24} />
-                    <div>
-                      <h3 className="text-lg font-serif font-bold text-gold-500 mb-2">
-                        Cancellation Policy
-                      </h3>
-                      <p className="text-gray-300 font-sans">
-                        24-hour notice required for cancellations. A 50% service charge applies for
-                        cancellations within 24 hours of your appointment.
-                      </p>
-                    </div>
-                  </div>
-                </StaggerItem>
-              </StaggerContainer>
-            </div>
-
-            {/* Map Placeholder */}
-            <ScrollReveal direction="right">
-              <div className="relative h-96 lg:h-full min-h-[24rem] rounded-lg overflow-hidden border border-gold-500/30">
-                <div className="absolute inset-0 bg-gradient-to-br from-dark-800 to-dark-700" />
-                <div className="h-full w-full flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="text-gold-500 mx-auto mb-4" size={48} />
-                    <p className="text-gray-400 font-sans">Map placeholder</p>
-                    <p className="text-gray-500 font-sans text-sm mt-2">
-                      6626 West Loop 1604 North<br />
-                      San Antonio, TX 78254
-                    </p>
-                  </div>
+            <ScrollReveal delay={0.2}>
+              <div>
+                <h3 className="text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans font-medium mb-4">
+                  Hours
+                </h3>
+                <div className="text-neutral-300 font-sans text-sm space-y-1">
+                  <p>Tuesday &ndash; Saturday</p>
+                  <p className="text-white">10:00 AM &ndash; 6:30 PM</p>
+                  <p className="mt-3 text-neutral-500">Sunday & Monday: Closed</p>
                 </div>
+                <p className="text-neutral-600 font-sans text-xs mt-2">
+                  By appointment only
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={0.3}>
+              <div>
+                <h3 className="text-xs uppercase tracking-[0.15em] text-neutral-400 font-sans font-medium mb-4">
+                  Cancellation Policy
+                </h3>
+                <p className="text-neutral-500 font-sans text-sm leading-relaxed">
+                  24-hour notice required. 50% charge applies for cancellations within 24 hours.
+                </p>
               </div>
             </ScrollReveal>
           </div>
         </div>
       </section>
 
-      <div className="gradient-divider" />
+      <div className="divider" />
 
-      {/* FAQ Section */}
-      <section className="section-padding bg-dark-800">
+      {/* Map placeholder */}
+      <section className="section-padding">
         <div className="container-custom">
           <ScrollReveal>
-            <h2 className="text-4xl font-serif font-bold text-gold-500 mb-12 text-center">
+            <div className="aspect-[16/7] bg-neutral-950 border border-neutral-900 flex items-center justify-center">
+              <div className="text-center">
+                <p className="text-neutral-600 font-sans text-sm">Map</p>
+                <p className="text-neutral-700 font-sans text-xs mt-1">
+                  6626 West Loop 1604 North, San Antonio, TX 78254
+                </p>
+              </div>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      <div className="divider" />
+
+      {/* FAQ */}
+      <section className="section-padding">
+        <div className="container-custom max-w-2xl">
+          <ScrollReveal>
+            <h2 className="text-4xl md:text-5xl font-serif font-bold text-white mb-12">
               Frequently Asked Questions
             </h2>
           </ScrollReveal>
 
-          <StaggerContainer className="max-w-3xl mx-auto space-y-4">
+          <div>
             {faqs.map((faq) => (
-              <StaggerItem key={faq.question}>
-                <FaqItem question={faq.question} answer={faq.answer} />
-              </StaggerItem>
+              <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />
             ))}
-          </StaggerContainer>
+          </div>
         </div>
       </section>
 
-      <div className="gradient-divider" />
+      <div className="divider" />
 
-      {/* CTA Section */}
-      <ScrollReveal>
-        <section className="section-padding">
-          <div className="container-custom text-center">
-            <h2 className="text-3xl font-serif font-bold text-gold-500 mb-4">
-              Ready to Book?
+      {/* CTA */}
+      <section className="section-padding">
+        <div className="container-custom text-center max-w-xl">
+          <ScrollReveal>
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mb-4">
+              Ready to book?
             </h2>
-            <p className="text-gray-300 font-sans text-lg mb-8 max-w-2xl mx-auto">
+            <p className="text-neutral-500 font-sans text-sm mb-8">
               Schedule your appointment online or give us a call
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="/booking"
-                className="bg-gold-500 text-dark-900 px-8 py-4 rounded-lg font-sans font-semibold hover:bg-gold-400 btn-premium"
+                className="bg-white text-black px-8 py-4 font-sans text-sm uppercase tracking-[0.15em] font-medium hover:bg-neutral-200"
               >
                 Book Online
               </a>
               <a
                 href="tel:2105517742"
-                className="border-2 border-gold-500 text-gold-500 px-8 py-4 rounded-lg font-sans font-semibold hover:bg-gold-500/10"
+                className="border border-neutral-700 text-neutral-300 px-8 py-4 font-sans text-sm uppercase tracking-[0.15em] font-medium hover:border-white hover:text-white"
               >
-                Call (210) 551-7742
+                (210) 551-7742
               </a>
             </div>
-          </div>
-        </section>
-      </ScrollReveal>
+          </ScrollReveal>
+        </div>
+      </section>
     </>
   )
 }
