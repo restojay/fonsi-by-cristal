@@ -1,14 +1,17 @@
 /**
  * Zustand store for booking state management
- * Handles: service selection, date, time, client info, and current step
+ * Handles: service selection (including stacking), date, time, client info, and current step
  */
 
 import { create } from 'zustand';
 import { Service, ClientInfo, BookingState } from '@types/index';
 
 interface BookingStoreState extends BookingState {
+  stackedServices: Service[];
   // Actions
   setSelectedService: (service: Service | null) => void;
+  setStackedServices: (services: Service[]) => void;
+  toggleStackedService: (service: Service) => void;
   setSelectedDate: (date: string | null) => void;
   setSelectedTime: (time: string | null) => void;
   setClientInfo: (info: ClientInfo) => void;
@@ -25,8 +28,9 @@ interface BookingStoreState extends BookingState {
   };
 }
 
-const initialState: BookingState = {
+const initialState: BookingState & { stackedServices: Service[] } = {
   selectedService: null,
+  stackedServices: [],
   selectedDate: null,
   selectedTime: null,
   clientInfo: {
@@ -34,6 +38,7 @@ const initialState: BookingState = {
     lastName: '',
     email: '',
     phone: '',
+    notes: '',
   },
   step: 1,
 };
@@ -43,6 +48,20 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
 
   setSelectedService: (service: Service | null) => {
     set({ selectedService: service });
+  },
+
+  setStackedServices: (services: Service[]) => {
+    set({ stackedServices: services });
+  },
+
+  toggleStackedService: (service: Service) => {
+    set((state) => {
+      const exists = state.stackedServices.find((s) => s.id === service.id);
+      if (exists) {
+        return { stackedServices: state.stackedServices.filter((s) => s.id !== service.id) };
+      }
+      return { stackedServices: [...state.stackedServices, service] };
+    });
   },
 
   setSelectedDate: (date: string | null) => {
@@ -79,6 +98,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
     if (step === 1) {
       set({
         selectedService: null,
+        stackedServices: [],
         selectedDate: null,
         selectedTime: null,
         step: 1,

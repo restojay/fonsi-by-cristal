@@ -1,5 +1,5 @@
 /**
- * Custom animated tab bar with Feather icons, gradient background, and gold indicator
+ * Custom animated tab bar with Feather icons, flat background, and dark indicator
  */
 
 import React from 'react';
@@ -13,7 +13,6 @@ import {
   TextStyle,
 } from 'react-native';
 import { Tabs } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import Animated, {
   useSharedValue,
@@ -21,7 +20,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { COLORS, FONTS, SPACING, GRADIENTS, ANIMATION, BORDER_RADIUS } from '@constants/theme';
+import { COLORS, FONTS, SPACING, ANIMATION, BORDER_RADIUS } from '@constants/theme';
 
 type TabIconName = 'home' | 'scissors' | 'calendar' | 'user';
 
@@ -68,12 +67,7 @@ function TabButton({
       style={[styles.tabButton, animatedStyle]}
     >
       {isFocused && (
-        <LinearGradient
-          colors={[...GRADIENTS.goldButton]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.activeIndicator}
-        />
+        <View style={styles.activeIndicator} />
       )}
       <Feather
         name={icon}
@@ -96,8 +90,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
   const insets = useSafeAreaInsets();
 
   return (
-    <LinearGradient
-      colors={[...GRADIENTS.tabBar]}
+    <View
       style={[
         styles.tabBarContainer,
         { paddingBottom: insets.bottom > 0 ? insets.bottom : SPACING.sm },
@@ -134,7 +127,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
           );
         })}
       </View>
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -154,11 +147,14 @@ export default function TabsLayout() {
 
 const styles = StyleSheet.create({
   tabBarContainer: {
+    backgroundColor: '#ffffff',
+    borderTopColor: '#e5e5e5',
+    borderTopWidth: 1,
     paddingTop: SPACING.sm,
   } as ViewStyle,
   tabBarSeparator: {
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: '#e5e5e5',
     position: 'absolute',
     top: 0,
     left: 0,
@@ -182,6 +178,7 @@ const styles = StyleSheet.create({
     height: 3,
     width: 24,
     borderRadius: BORDER_RADIUS.full,
+    backgroundColor: '#171717',
   } as ViewStyle,
   tabLabel: {
     fontSize: 11,

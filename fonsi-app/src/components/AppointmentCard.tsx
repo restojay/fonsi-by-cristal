@@ -1,5 +1,5 @@
 /**
- * Appointment card with gradient wrapper, filled status badges, and Feather icons
+ * Appointment card with monochrome status badges
  */
 
 import React from 'react';
@@ -33,15 +33,15 @@ const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 const getStatusConfig = (status: string) => {
   switch (status) {
     case 'confirmed':
-      return { color: COLORS.success, bg: 'rgba(76, 175, 80, 0.15)', icon: 'check-circle' as const };
+      return { color: '#ffffff', bg: COLORS.primary, icon: 'check-circle' as const };
     case 'pending':
-      return { color: COLORS.warning, bg: 'rgba(255, 152, 0, 0.15)', icon: 'clock' as const };
+      return { color: COLORS.textSecondary, bg: COLORS.bgTertiary, icon: 'clock' as const };
     case 'completed':
-      return { color: COLORS.info, bg: 'rgba(33, 150, 243, 0.15)', icon: 'award' as const };
+      return { color: COLORS.textSecondary, bg: COLORS.bgTertiary, icon: 'award' as const };
     case 'cancelled':
-      return { color: COLORS.error, bg: 'rgba(244, 67, 54, 0.15)', icon: 'x-circle' as const };
+      return { color: COLORS.textMuted, bg: COLORS.borderColor, icon: 'x-circle' as const };
     default:
-      return { color: COLORS.textMuted, bg: 'rgba(136, 136, 136, 0.15)', icon: 'help-circle' as const };
+      return { color: COLORS.textMuted, bg: COLORS.bgTertiary, icon: 'help-circle' as const };
   }
 };
 
@@ -68,6 +68,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
   const formattedDate = format(appointmentDate, 'EEE, MMM d');
   const formattedTime = format(appointmentDate, 'h:mm a');
   const statusConfig = getStatusConfig(appointment.status);
+  const isCancelled = appointment.status === 'cancelled';
 
   return (
     <AnimatedTouchable
@@ -80,10 +81,10 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
       <GradientCard showAccent={!isPast}>
         <View style={styles.header}>
           <View style={styles.titleSection}>
-            <Text style={styles.serviceName}>{appointment.service.name}</Text>
+            <Text style={[styles.serviceName, isCancelled && styles.cancelledText]}>{appointment.service.name}</Text>
             <View style={styles.dateRow}>
-              <Feather name="calendar" size={13} color={COLORS.primary} />
-              <Text style={styles.dateTime}>
+              <Feather name="calendar" size={13} color={COLORS.textMuted} />
+              <Text style={[styles.dateTime, isCancelled && styles.cancelledText]}>
                 {formattedDate} at {formattedTime}
               </Text>
             </View>
@@ -150,6 +151,10 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.serifSemiBold,
     color: COLORS.textPrimary,
   } as TextStyle,
+  cancelledText: {
+    textDecorationLine: 'line-through',
+    color: COLORS.textMuted,
+  } as TextStyle,
   dateRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -157,7 +162,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   dateTime: {
     fontSize: FONTS.sm,
-    color: COLORS.primary,
+    color: COLORS.textSecondary,
     marginLeft: SPACING.xs + 2,
     fontFamily: FONTS.sansSerif,
   } as TextStyle,
@@ -201,11 +206,11 @@ const styles = StyleSheet.create({
   } as TextStyle,
   priceValue: {
     fontSize: FONTS.sm,
-    color: COLORS.primary,
+    color: COLORS.textPrimary,
     fontFamily: FONTS.sansSerifSemiBold,
   } as TextStyle,
   notesSection: {
-    backgroundColor: COLORS.glassBackground,
+    backgroundColor: COLORS.bgTertiary,
     borderRadius: BORDER_RADIUS.md,
     padding: SPACING.md,
     marginTop: SPACING.sm,

@@ -29,11 +29,12 @@ class ApiClient {
       timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'FonsiByChrytal-Mobile/1.0',
+        'User-Agent': 'FonsiByCristal-Mobile/1.0',
       },
     });
 
-    // Add response interceptor
+    // Response interceptor unwraps response.data automatically
+    // so all methods receive the API payload directly (not AxiosResponse)
     this.client.interceptors.response.use(
       (response) => response.data,
       (error) => {
@@ -48,10 +49,11 @@ class ApiClient {
    */
   async getServices(): Promise<Service[]> {
     try {
+      // Interceptor already unwraps to ApiResponse<GetServicesResponse>
       const response = await this.client.get<ApiResponse<GetServicesResponse>>(
         '/api/services'
       );
-      return response.data?.services || SERVICES;
+      return (response as any)?.services || SERVICES;
     } catch (error) {
       console.warn('Failed to fetch services from API, using fallback', error);
       return SERVICES;
@@ -66,7 +68,7 @@ class ApiClient {
       const response = await this.client.get<ApiResponse<GetServicesResponse>>(
         `/api/services?category=${encodeURIComponent(category)}`
       );
-      return response.data?.services || [];
+      return (response as any)?.services || [];
     } catch (error) {
       console.warn(`Failed to fetch ${category} services`, error);
       return SERVICES.filter((s) => s.category === category);
@@ -81,7 +83,7 @@ class ApiClient {
       const response = await this.client.get<ApiResponse<{ service: Service }>>(
         `/api/services/${serviceId}`
       );
-      return response.data?.service || null;
+      return (response as any)?.service || null;
     } catch (error) {
       console.warn(`Failed to fetch service ${serviceId}`, error);
       return SERVICES.find((s) => s.id === serviceId) || null;
@@ -90,7 +92,7 @@ class ApiClient {
 
   /**
    * Get available time slots for a date and service
-   * Returns 30-minute intervals from 10am to 6:30pm
+   * Returns 30-minute intervals from 10am to dynamic end based on duration
    * Excludes Sundays and Mondays
    */
   async getAvailability(date: string, serviceId: string): Promise<TimeSlot[]> {
@@ -98,7 +100,7 @@ class ApiClient {
       const response = await this.client.get<ApiResponse<GetAvailabilityResponse>>(
         `/api/availability?date=${date}&serviceId=${serviceId}`
       );
-      return response.data?.slots || this.generateDefaultTimeSlots();
+      return (response as any)?.slots || this.generateDefaultTimeSlots();
     } catch (error) {
       console.warn('Failed to fetch availability, using default slots', error);
       return this.generateDefaultTimeSlots();
@@ -107,17 +109,18 @@ class ApiClient {
 
   /**
    * Generate default time slots (fallback)
-   * 30-minute intervals from 10am to 6:30pm
+   * 30-minute intervals from 10am, last slot allows finish by 6pm
    */
-  private generateDefaultTimeSlots(): TimeSlot[] {
+  private generateDefaultTimeSlots(serviceDuration: number = 30): TimeSlot[] {
     const slots: TimeSlot[] = [];
-    const start = 10; // 10am
-    const end = 18.5; // 6:30pm
+    const start = 10 * 60; // 10am in minutes
+    const clampedDuration = Math.min(serviceDuration, 180);
+    const lastSlotMinutes = 18 * 60 - clampedDuration; // finish by 6pm
     let id = 0;
 
-    for (let hour = start; hour < end; hour += 0.5) {
-      const h = Math.floor(hour);
-      const m = (hour - h) * 60;
+    for (let minutes = start; minutes <= lastSlotMinutes; minutes += 30) {
+      const h = Math.floor(minutes / 60);
+      const m = minutes % 60;
       const time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 
       slots.push({
@@ -141,7 +144,7 @@ class ApiClient {
         ApiResponse<CreateAppointmentResponse>
       >('/api/appointments', data);
 
-      return response.data?.appointment || null;
+      return (response as any)?.appointment || null;
     } catch (error) {
       console.error('Failed to create appointment', error);
       throw error;
@@ -156,7 +159,7 @@ class ApiClient {
       const response = await this.client.get<ApiResponse<GetAppointmentsResponse>>(
         `/api/appointments?clientId=${clientId}`
       );
-      return response.data?.appointments || [];
+      return (response as any)?.appointments || [];
     } catch (error) {
       console.warn('Failed to fetch appointments', error);
       return [];
@@ -171,7 +174,7 @@ class ApiClient {
       const response = await this.client.get<ApiResponse<{ appointment: Appointment }>>(
         `/api/appointments/${appointmentId}`
       );
-      return response.data?.appointment || null;
+      return (response as any)?.appointment || null;
     } catch (error) {
       console.warn(`Failed to fetch appointment ${appointmentId}`, error);
       return null;
@@ -190,7 +193,7 @@ class ApiClient {
         `/api/appointments/${appointmentId}`,
         data
       );
-      return response.data?.appointment || null;
+      return (response as any)?.appointment || null;
     } catch (error) {
       console.error(`Failed to update appointment ${appointmentId}`, error);
       throw error;

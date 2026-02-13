@@ -36,6 +36,8 @@ export async function POST(request: NextRequest) {
     // Parse date and time
     const appointmentDate = new Date(`${validated.date}T${validated.time}:00`)
 
+    const fullName = `${validated.firstName} ${validated.lastName}`
+
     // Find or create user
     let user = await prisma.user.findUnique({
       where: { email: validated.email },
@@ -45,7 +47,7 @@ export async function POST(request: NextRequest) {
       user = await prisma.user.create({
         data: {
           email: validated.email,
-          name: validated.name,
+          name: fullName,
           phone: validated.phone,
         },
       })
@@ -70,7 +72,7 @@ export async function POST(request: NextRequest) {
     try {
       await sendConfirmationEmail({
         email: validated.email,
-        name: validated.name,
+        name: fullName,
         serviceName: appointment.service.name,
         date: format(appointmentDate, 'MMMM d, yyyy'),
         time: format(appointmentDate, 'h:mm a'),

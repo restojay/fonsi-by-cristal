@@ -1,6 +1,7 @@
 /**
- * Gold gradient button with press scale animation
- * Variants: primary (gradient fill) and outline (border only)
+ * Flat monochrome button with press scale animation
+ * Primary: dark bg, white text, rounded-full
+ * Outline: white bg, dark border, rounded-full
  */
 
 import React from 'react';
@@ -13,14 +14,13 @@ import {
   TextStyle,
   ActivityIndicator,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated';
 import { Feather } from '@expo/vector-icons';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS, GRADIENTS, ANIMATION, SHADOWS } from '@constants/theme';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS, ANIMATION, SHADOWS } from '@constants/theme';
 
 interface GradientButtonProps {
   title: string;
@@ -89,12 +89,12 @@ export const GradientButton: React.FC<GradientButtonProps> = ({
           <Feather
             name={icon}
             size={iconSize}
-            color={disabled ? COLORS.textMuted : COLORS.primary}
+            color={disabled ? COLORS.textMuted : COLORS.textSecondary}
             style={styles.iconLeft}
           />
         )}
         {loading ? (
-          <ActivityIndicator size="small" color={COLORS.primary} />
+          <ActivityIndicator size="small" color={COLORS.textSecondary} />
         ) : (
           <Text
             style={[
@@ -110,7 +110,7 @@ export const GradientButton: React.FC<GradientButtonProps> = ({
           <Feather
             name={iconRight}
             size={iconSize}
-            color={disabled ? COLORS.textMuted : COLORS.primary}
+            color={disabled ? COLORS.textMuted : COLORS.textSecondary}
             style={styles.iconRight}
           />
         )}
@@ -127,26 +127,21 @@ export const GradientButton: React.FC<GradientButtonProps> = ({
       disabled={disabled || loading}
       style={[animatedStyle, disabled && { opacity: 0.5 }, style]}
     >
-      <LinearGradient
-        colors={disabled ? [COLORS.buttonDisabled, COLORS.buttonDisabled] : [...GRADIENTS.goldButton]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={[styles.gradientButton, sizeStyles[size], !disabled && SHADOWS.gold]}
-      >
+      <View style={[styles.primaryButton, sizeStyles[size], disabled && styles.disabledPrimary, !disabled && SHADOWS.gold]}>
         {icon && (
           <Feather
             name={icon}
             size={iconSize}
-            color={disabled ? COLORS.textMuted : COLORS.bgPrimary}
+            color={disabled ? COLORS.textMuted : '#ffffff'}
             style={styles.iconLeft}
           />
         )}
         {loading ? (
-          <ActivityIndicator size="small" color={COLORS.bgPrimary} />
+          <ActivityIndicator size="small" color="#ffffff" />
         ) : (
           <Text
             style={[
-              styles.gradientText,
+              styles.primaryText,
               { fontSize: fontSizes[size] },
               disabled && { color: COLORS.textMuted },
             ]}
@@ -158,42 +153,47 @@ export const GradientButton: React.FC<GradientButtonProps> = ({
           <Feather
             name={iconRight}
             size={iconSize}
-            color={disabled ? COLORS.textMuted : COLORS.bgPrimary}
+            color={disabled ? COLORS.textMuted : '#ffffff'}
             style={styles.iconRight}
           />
         )}
-      </LinearGradient>
+      </View>
     </AnimatedTouchable>
   );
 };
 
 const styles = StyleSheet.create({
-  gradientButton: {
+  primaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: BORDER_RADIUS.lg,
+    borderRadius: BORDER_RADIUS.full,
+    backgroundColor: COLORS.primary,
   } as ViewStyle,
-  gradientText: {
-    color: COLORS.bgPrimary,
+  primaryText: {
+    color: '#ffffff',
     fontFamily: FONTS.sansSerifSemiBold,
     fontSize: FONTS.base,
   } as TextStyle,
+  disabledPrimary: {
+    backgroundColor: COLORS.buttonDisabled,
+  } as ViewStyle,
   outlineButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: BORDER_RADIUS.lg,
+    borderRadius: BORDER_RADIUS.full,
     borderWidth: 1.5,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.borderColor,
+    backgroundColor: '#ffffff',
   } as ViewStyle,
   outlineText: {
-    color: COLORS.primary,
+    color: COLORS.textSecondary,
     fontFamily: FONTS.sansSerifSemiBold,
     fontSize: FONTS.base,
   } as TextStyle,
   disabledOutline: {
-    borderColor: COLORS.textMuted,
+    borderColor: COLORS.borderColor,
     opacity: 0.5,
   } as ViewStyle,
   disabledOutlineText: {

@@ -1,5 +1,5 @@
 /**
- * Services screen with category icons, gradient active tabs, skeleton loading, and staggered cards
+ * Services screen with category icons, flat active tabs, skeleton loading, and staggered cards
  */
 
 import React, { useEffect, useState } from 'react';
@@ -13,13 +13,12 @@ import {
   TextStyle,
 } from 'react-native';
 import { router } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Header } from '@components/Header';
 import { ServiceCard } from '@components/ServiceCard';
 import { AnimatedSection } from '@components/AnimatedSection';
 import { SkeletonList } from '@components/SkeletonLoader';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS, GRADIENTS } from '@constants/theme';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS } from '@constants/theme';
 import { useBookingStore } from '@store/bookingStore';
 import { apiClient } from '@api/client';
 import { Service } from '@types/index';
@@ -96,12 +95,7 @@ export default function ServicesScreen() {
                   onPress={() => setSelectedCategory(cat.name)}
                   activeOpacity={0.8}
                 >
-                  <LinearGradient
-                    colors={[...GRADIENTS.goldButton]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={styles.categoryTab}
-                  >
+                  <View style={styles.categoryTab}>
                     <MaterialCommunityIcons
                       name={cat.icon as any}
                       size={16}
@@ -113,7 +107,7 @@ export default function ServicesScreen() {
                         <Text style={styles.countBadgeTextActive}>{count}</Text>
                       </View>
                     )}
-                  </LinearGradient>
+                  </View>
                 </TouchableOpacity>
               );
             }
@@ -179,7 +173,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   categoriesSection: {
     paddingVertical: SPACING.md,
-    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+    borderBottomColor: '#e5e5e5',
     borderBottomWidth: 1,
   } as ViewStyle,
   categoriesContent: {
@@ -193,6 +187,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
     borderRadius: BORDER_RADIUS.full,
+    backgroundColor: '#171717',
     gap: SPACING.sm,
   } as ViewStyle,
   categoryTabInactive: {
@@ -201,8 +196,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
     borderRadius: BORDER_RADIUS.full,
-    backgroundColor: COLORS.glassBackground,
-    borderColor: COLORS.glassBorder,
+    backgroundColor: '#f5f5f5',
+    borderColor: '#e5e5e5',
     borderWidth: 1,
     gap: SPACING.sm,
   } as ViewStyle,
@@ -217,7 +212,7 @@ const styles = StyleSheet.create({
     color: COLORS.bgPrimary,
   } as TextStyle,
   countBadge: {
-    backgroundColor: COLORS.glassBackgroundLight,
+    backgroundColor: '#e5e5e5',
     borderRadius: BORDER_RADIUS.full,
     paddingHorizontal: SPACING.sm,
     paddingVertical: 2,
@@ -228,7 +223,7 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
   } as TextStyle,
   countBadgeActive: {
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: 'rgba(255,255,255,0.2)',
     borderRadius: BORDER_RADIUS.full,
     paddingHorizontal: SPACING.sm,
     paddingVertical: 2,

@@ -33,7 +33,8 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
   const [calendarDate, setCalendarDate] = useState<Date | undefined>(undefined)
   const [selectedTime, setSelectedTime] = useState<string>('')
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     notes: '',
@@ -115,7 +116,7 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
   }
 
   const handleContinueToConfirm = () => {
-    if (!formData.name || !formData.email || !formData.phone) {
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone) {
       setError('Please fill in all required fields')
       return
     }
@@ -135,7 +136,8 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
         serviceId: selectedService.id,
         date: selectedDate,
         time: selectedTime,
-        name: formData.name,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
         phone: formData.phone,
         notes: formData.notes,
@@ -164,7 +166,7 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
         setSelectedDate('')
         setCalendarDate(undefined)
         setSelectedTime('')
-        setFormData({ name: '', email: '', phone: '', notes: '' })
+        setFormData({ firstName: '', lastName: '', email: '', phone: '', notes: '' })
         setSuccess(null)
         if (onSuccess) onSuccess(result.id)
       }, 2000)
@@ -364,11 +366,8 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
                     {(groupedServices[selectedCategory] || []).map((service, i) => {
                       const isStacked = selectedCategory === 'Hair' && stackedServices.some((s) => s.id === service.id)
                       return (
-                        <motion.button
+                        <button
                           key={service.id}
-                          initial={{ opacity: 0, y: 12 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.15, delay: i * 0.03 }}
                           onClick={() => handleServiceSelect(service)}
                           className={`group text-left h-full border rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer ${
                             isStacked
@@ -412,7 +411,7 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
                             <Clock size={11} strokeWidth={2} />
                             {service.duration} min
                           </span>
-                        </motion.button>
+                        </button>
                       )
                     })}
                   </motion.div>
@@ -649,18 +648,35 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
                     <div>
                       <label className="flex items-center gap-2 text-xs uppercase tracking-[0.15em] text-neutral-500 font-sans mb-2.5">
                         <User size={12} strokeWidth={2} />
-                        Full Name *
+                        First Name *
                       </label>
                       <input
                         type="text"
-                        name="name"
-                        value={formData.name}
+                        name="firstName"
+                        value={formData.firstName}
                         onChange={handleInfoChange}
                         className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl text-neutral-900 font-sans text-sm focus:outline-none focus:border-neutral-400 placeholder:text-neutral-400 transition-colors"
-                        placeholder="Your name"
+                        placeholder="First name"
                       />
                     </div>
 
+                    <div>
+                      <label className="flex items-center gap-2 text-xs uppercase tracking-[0.15em] text-neutral-500 font-sans mb-2.5">
+                        <User size={12} strokeWidth={2} />
+                        Last Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleInfoChange}
+                        className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl text-neutral-900 font-sans text-sm focus:outline-none focus:border-neutral-400 placeholder:text-neutral-400 transition-colors"
+                        placeholder="Last name"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
                       <label className="flex items-center gap-2 text-xs uppercase tracking-[0.15em] text-neutral-500 font-sans mb-2.5">
                         <Phone size={12} strokeWidth={2} />
@@ -675,21 +691,21 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
                         placeholder="(210) 555-0000"
                       />
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="flex items-center gap-2 text-xs uppercase tracking-[0.15em] text-neutral-500 font-sans mb-2.5">
-                      <Mail size={12} strokeWidth={2} />
-                      Email *
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInfoChange}
-                      className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl text-neutral-900 font-sans text-sm focus:outline-none focus:border-neutral-400 placeholder:text-neutral-400 transition-colors"
-                      placeholder="your@email.com"
-                    />
+                    <div>
+                      <label className="flex items-center gap-2 text-xs uppercase tracking-[0.15em] text-neutral-500 font-sans mb-2.5">
+                        <Mail size={12} strokeWidth={2} />
+                        Email *
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInfoChange}
+                        className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl text-neutral-900 font-sans text-sm focus:outline-none focus:border-neutral-400 placeholder:text-neutral-400 transition-colors"
+                        placeholder="your@email.com"
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -805,7 +821,7 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
                     </div>
                     <div>
                       <p className="text-xs text-neutral-400 font-sans mb-0.5">Name</p>
-                      <p className="text-sm font-semibold text-neutral-900 font-sans">{formData.name}</p>
+                      <p className="text-sm font-semibold text-neutral-900 font-sans">{formData.firstName} {formData.lastName}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">

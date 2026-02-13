@@ -1,5 +1,5 @@
 /**
- * Home screen with hero gradient, animated sections, skeleton loading, and vector icons
+ * Home screen with dark hero header, animated sections, skeleton loading, and vector icons
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
@@ -13,7 +13,6 @@ import {
   TextStyle,
 } from 'react-native';
 import { router } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { Header } from '@components/Header';
 import { AppointmentCard } from '@components/AppointmentCard';
@@ -22,7 +21,7 @@ import { AnimatedSection } from '@components/AnimatedSection';
 import { SkeletonList } from '@components/SkeletonLoader';
 import { GradientButton } from '@components/GradientButton';
 import { GradientCard } from '@components/GradientCard';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS, GRADIENTS } from '@constants/theme';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS } from '@constants/theme';
 import { useAppointmentStore } from '@store/appointmentStore';
 import { useBookingStore } from '@store/bookingStore';
 import { apiClient } from '@api/client';
@@ -85,10 +84,7 @@ export default function HomeScreen() {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Hero Section */}
-      <LinearGradient
-        colors={[...GRADIENTS.heroGold]}
-        style={styles.heroSection}
-      >
+      <View style={styles.heroSection}>
         <Header
           title="Fonsi by Cristal"
           subtitle="Let me help you shine!"
@@ -105,7 +101,7 @@ export default function HomeScreen() {
             size="large"
           />
         </AnimatedSection>
-      </LinearGradient>
+      </View>
 
       {/* Upcoming Appointment */}
       <AnimatedSection delay={200} style={styles.section}>
@@ -137,7 +133,7 @@ export default function HomeScreen() {
             style={styles.seeAllButton}
           >
             <Text style={styles.seeAllLink}>See All</Text>
-            <Feather name="arrow-right" size={14} color={COLORS.primary} />
+            <Feather name="arrow-right" size={14} color={COLORS.textSecondary} />
           </TouchableOpacity>
         </View>
 
@@ -207,6 +203,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgPrimary,
   } as ViewStyle,
   heroSection: {
+    backgroundColor: '#171717',
     paddingBottom: SPACING.lg,
   } as ViewStyle,
   quickBookSection: {
@@ -236,7 +233,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   seeAllLink: {
     fontSize: FONTS.sm,
-    color: COLORS.primary,
+    color: COLORS.textSecondary,
     fontFamily: FONTS.sansSerifSemiBold,
     marginRight: SPACING.xs,
   } as TextStyle,
@@ -305,8 +302,7 @@ const styles = StyleSheet.create({
   footerLine: {
     height: 1,
     width: 60,
-    backgroundColor: COLORS.primary,
-    opacity: 0.3,
+    backgroundColor: COLORS.borderColor,
     marginBottom: SPACING.md,
   } as ViewStyle,
   footerText: {

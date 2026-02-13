@@ -1,5 +1,5 @@
 /**
- * Appointment detail screen with gradient cards, filled status badges, and Feather icons
+ * Appointment detail screen with light cards, monochrome status badges, and Feather icons
  */
 
 import React, { useEffect, useState } from 'react';
@@ -29,15 +29,15 @@ import { SkeletonLoader, SkeletonCard } from '@components/SkeletonLoader';
 const getStatusConfig = (status: string) => {
   switch (status) {
     case 'confirmed':
-      return { color: COLORS.success, bg: 'rgba(76, 175, 80, 0.15)', icon: 'check-circle' as const, label: 'Confirmed' };
+      return { color: '#ffffff', bg: '#171717', icon: 'check-circle' as const, label: 'Confirmed' };
     case 'pending':
-      return { color: COLORS.warning, bg: 'rgba(255, 152, 0, 0.15)', icon: 'clock' as const, label: 'Pending' };
+      return { color: '#525252', bg: '#f5f5f5', icon: 'clock' as const, label: 'Pending' };
     case 'completed':
-      return { color: COLORS.info, bg: 'rgba(33, 150, 243, 0.15)', icon: 'award' as const, label: 'Completed' };
+      return { color: '#525252', bg: '#f5f5f5', icon: 'award' as const, label: 'Completed' };
     case 'cancelled':
-      return { color: COLORS.error, bg: 'rgba(244, 67, 54, 0.15)', icon: 'x-circle' as const, label: 'Cancelled' };
+      return { color: '#a3a3a3', bg: '#e5e5e5', icon: 'x-circle' as const, label: 'Cancelled' };
     default:
-      return { color: COLORS.textMuted, bg: 'rgba(136, 136, 136, 0.15)', icon: 'help-circle' as const, label: 'Unknown' };
+      return { color: COLORS.textMuted, bg: '#f5f5f5', icon: 'help-circle' as const, label: 'Unknown' };
   }
 };
 
@@ -135,7 +135,7 @@ export default function AppointmentDetailScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButtonContainer}>
-            <Feather name="arrow-left" size={20} color={COLORS.primary} />
+            <Feather name="arrow-left" size={20} color={COLORS.textPrimary} />
             <Text style={styles.backText}>Back</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Appointment Details</Text>
@@ -183,7 +183,7 @@ export default function AppointmentDetailScreen() {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButtonContainer}>
-            <Feather name="arrow-left" size={20} color={COLORS.primary} />
+            <Feather name="arrow-left" size={20} color={COLORS.textPrimary} />
             <Text style={styles.backText}>Back</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Appointment Details</Text>
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
-    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+    borderBottomColor: '#e5e5e5',
     borderBottomWidth: 1,
   } as ViewStyle,
   backButtonContainer: {
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
     flex: 1,
   } as ViewStyle,
   backText: {
-    color: COLORS.primary,
+    color: COLORS.textPrimary,
     fontFamily: FONTS.sansSerifSemiBold,
     fontSize: FONTS.base,
     marginLeft: SPACING.xs,
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
   metadata: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.glassBackground,
+    backgroundColor: '#f5f5f5',
     borderRadius: BORDER_RADIUS.md,
     padding: SPACING.md,
     marginBottom: SPACING.lg,
@@ -527,9 +527,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.lg,
-    backgroundColor: COLORS.glassBackground,
+    backgroundColor: '#f5f5f5',
     borderRadius: BORDER_RADIUS.md,
-    borderColor: COLORS.glassBorder,
+    borderColor: '#e5e5e5',
     borderWidth: 1,
   } as ViewStyle,
   contactLinkText: {

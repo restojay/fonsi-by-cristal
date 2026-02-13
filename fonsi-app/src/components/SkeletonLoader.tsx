@@ -1,5 +1,5 @@
 /**
- * Shimmer loading placeholder component
+ * Shimmer loading placeholder - light theme
  */
 
 import React, { useEffect } from 'react';
@@ -51,7 +51,7 @@ const SkeletonItem: React.FC<SkeletonLoaderProps> = ({
           width: width as any,
           height,
           borderRadius,
-          backgroundColor: COLORS.bgSecondary,
+          backgroundColor: '#e5e5e5',
           overflow: 'hidden',
         },
         style,
@@ -65,7 +65,7 @@ const SkeletonItem: React.FC<SkeletonLoaderProps> = ({
         ]}
       >
         <LinearGradient
-          colors={['transparent', COLORS.glassBackgroundLight, 'transparent']}
+          colors={['transparent', '#f5f5f5', 'transparent']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={StyleSheet.absoluteFill}
@@ -105,8 +105,8 @@ export { SkeletonItem as SkeletonLoader };
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: COLORS.cardBg,
-    borderRadius: BORDER_RADIUS.lg,
+    backgroundColor: COLORS.bgSecondary,
+    borderRadius: BORDER_RADIUS.xl,
     borderColor: COLORS.borderColor,
     borderWidth: 1,
     padding: SPACING.lg,

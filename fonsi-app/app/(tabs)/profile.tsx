@@ -1,5 +1,5 @@
 /**
- * Profile screen with gradient avatar, stats row, Feather icons, and glass cards
+ * Profile screen with dark avatar, stats row, Feather icons, and light cards
  */
 
 import React, { useMemo, useState } from 'react';
@@ -14,14 +14,13 @@ import {
   TextStyle,
 } from 'react-native';
 import { router } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { Header } from '@components/Header';
 import { AppointmentCard } from '@components/AppointmentCard';
 import { AnimatedSection } from '@components/AnimatedSection';
 import { GradientButton } from '@components/GradientButton';
 import { GradientCard } from '@components/GradientCard';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS, GRADIENTS } from '@constants/theme';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS } from '@constants/theme';
 import { useBookingStore } from '@store/bookingStore';
 import { useAppointmentStore } from '@store/appointmentStore';
 
@@ -115,14 +114,11 @@ export default function ProfileScreen() {
       <AnimatedSection delay={100} style={styles.section}>
         <GradientCard>
           <View style={styles.profileHeader}>
-            <LinearGradient
-              colors={[...GRADIENTS.goldButton]}
-              style={styles.avatar}
-            >
+            <View style={styles.avatar}>
               <Text style={styles.avatarText}>
                 {clientInfo.firstName ? clientInfo.firstName.charAt(0).toUpperCase() : 'G'}
               </Text>
-            </LinearGradient>
+            </View>
             <View style={styles.profileInfo}>
               <Text style={styles.profileName}>
                 {clientInfo.firstName || 'Guest'} {clientInfo.lastName}
@@ -331,6 +327,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
+    backgroundColor: '#171717',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: SPACING.lg,
@@ -364,8 +361,8 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: COLORS.glassBackground,
-    borderColor: COLORS.glassBorder,
+    backgroundColor: '#f5f5f5',
+    borderColor: '#e5e5e5',
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -388,8 +385,8 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   statCard: {
     flex: 1,
-    backgroundColor: COLORS.glassBackground,
-    borderColor: COLORS.glassBorder,
+    backgroundColor: '#f5f5f5',
+    borderColor: '#e5e5e5',
     borderWidth: 1,
     borderRadius: BORDER_RADIUS.lg,
     paddingVertical: SPACING.lg,
@@ -440,8 +437,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.md,
-    backgroundColor: COLORS.glassBackground,
-    borderColor: COLORS.glassBorder,
+    backgroundColor: '#f5f5f5',
+    borderColor: '#e5e5e5',
     borderWidth: 1,
     borderRadius: BORDER_RADIUS.lg,
     marginBottom: SPACING.sm,
@@ -450,7 +447,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: '#e5e5e5',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: SPACING.md,

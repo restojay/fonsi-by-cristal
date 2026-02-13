@@ -1,6 +1,6 @@
 /**
  * Time slot picker grouped by Morning/Afternoon/Evening
- * Gold gradient selected state, glass-morphism slot cards
+ * Light theme with dark selected state
  */
 
 import React, { useMemo } from 'react';
@@ -12,16 +12,16 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { TimeSlot } from '@types/index';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS, GRADIENTS } from '@constants/theme';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS } from '@constants/theme';
 
 interface TimeSlotPickerProps {
   slots: TimeSlot[];
   selectedTime?: string;
   onSelectTime: (time: string) => void;
   disabled?: boolean;
+  selectedDate?: string;
 }
 
 interface TimeGroup {
@@ -39,7 +39,12 @@ export const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
   selectedTime,
   onSelectTime,
   disabled = false,
+  selectedDate,
 }) => {
+  const now = new Date();
+  const isToday = selectedDate === `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
   const groupedSlots = useMemo((): TimeGroup[] => {
     const morning: TimeSlot[] = [];
     const afternoon: TimeSlot[] = [];
@@ -71,47 +76,42 @@ export const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
     return `${displayHour}:${String(m).padStart(2, '0')} ${period}`;
   };
 
+  const isSlotPast = (time: string): boolean => {
+    if (!isToday) return false;
+    const [h, m] = time.split(':').map(Number);
+    const slotMinutes = h * 60 + m;
+    return slotMinutes <= currentMinutes;
+  };
+
   const renderTimeSlot = (slot: TimeSlot) => {
     const isSelected = selectedTime === slot.time;
     const isAvailable = slot.available;
-
-    if (isSelected) {
-      return (
-        <TouchableOpacity
-          key={slot.id}
-          onPress={() => isAvailable && !disabled && onSelectTime(slot.time)}
-          disabled={!isAvailable || disabled}
-          activeOpacity={0.8}
-          style={styles.slotWrapper}
-        >
-          <LinearGradient
-            colors={[...GRADIENTS.goldButton]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.selectedSlot}
-          >
-            <Feather name="check" size={14} color={COLORS.bgPrimary} style={{ marginRight: 4 }} />
-            <Text style={styles.selectedSlotText}>{formatTimeDisplay(slot.time)}</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      );
-    }
+    const isPast = isSlotPast(slot.time);
+    const isDisabled = !isAvailable || disabled || isPast;
 
     return (
       <TouchableOpacity
         key={slot.id}
-        onPress={() => isAvailable && !disabled && onSelectTime(slot.time)}
-        disabled={!isAvailable || disabled}
-        style={[
-          styles.slotWrapper,
-        ]}
-        activeOpacity={isAvailable ? 0.7 : 1}
+        onPress={() => !isDisabled && onSelectTime(slot.time)}
+        disabled={isDisabled}
+        activeOpacity={isDisabled ? 1 : 0.7}
+        style={styles.slotWrapper}
       >
-        <View style={[styles.slot, !isAvailable && styles.unavailableSlot]}>
+        <View style={[
+          styles.slot,
+          isSelected && styles.selectedSlot,
+          isPast && styles.pastSlot,
+          !isAvailable && !isPast && styles.unavailableSlot,
+        ]}>
+          {isSelected && (
+            <Feather name="check" size={14} color="#ffffff" style={{ marginRight: 4 }} />
+          )}
           <Text
             style={[
               styles.slotText,
-              !isAvailable && styles.unavailableSlotText,
+              isSelected && styles.selectedSlotText,
+              isPast && styles.pastSlotText,
+              !isAvailable && !isPast && styles.unavailableSlotText,
             ]}
           >
             {formatTimeDisplay(slot.time)}
@@ -135,7 +135,7 @@ export const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
       {groupedSlots.map((group) => (
         <View key={group.label} style={styles.groupSection}>
           <View style={styles.groupHeader}>
-            <Feather name={group.icon} size={16} color={COLORS.primary} />
+            <Feather name={group.icon} size={16} color={COLORS.textSecondary} />
             <Text style={styles.groupLabel}>{group.label}</Text>
             <Text style={styles.groupCount}>{group.slots.length}</Text>
           </View>
@@ -183,19 +183,21 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   slot: {
     paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.md,
-    backgroundColor: COLORS.glassBackground,
-    borderColor: COLORS.glassBorder,
+    borderRadius: BORDER_RADIUS.lg,
+    backgroundColor: COLORS.bgSecondary,
+    borderColor: COLORS.borderColor,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    flexDirection: 'row',
   } as ViewStyle,
   selectedSlot: {
-    paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+  } as ViewStyle,
+  pastSlot: {
+    backgroundColor: COLORS.bgSecondary,
+    borderColor: COLORS.borderColor,
   } as ViewStyle,
   unavailableSlot: {
     opacity: 0.4,
@@ -204,12 +206,15 @@ const styles = StyleSheet.create({
   slotText: {
     fontSize: FONTS.sm,
     fontFamily: FONTS.sansSerifMedium,
-    color: COLORS.textPrimary,
+    color: '#404040',
   } as TextStyle,
   selectedSlotText: {
-    color: COLORS.bgPrimary,
+    color: '#ffffff',
     fontFamily: FONTS.sansSerifSemiBold,
-    fontSize: FONTS.sm,
+  } as TextStyle,
+  pastSlotText: {
+    color: '#d4d4d4',
+    textDecorationLine: 'line-through',
   } as TextStyle,
   unavailableSlotText: {
     color: COLORS.textMuted,

@@ -1,68 +1,69 @@
 /**
  * Theme constants matching the Fonsi by Cristal website
- * Monochrome dark aesthetic with white/grey accents
+ * Light monochrome aesthetic with dark accents
  */
 
 export const COLORS = {
-  // Primary colors - monochrome theme
-  primary: '#ffffff', // White accent
-  primaryDark: '#d0d0d0',
-  primaryLight: '#f0f0f0',
+  // Primary colors - dark accent on light bg
+  primary: '#171717', // neutral-900 for buttons/active states
+  primaryDark: '#0a0a0a',
+  primaryLight: '#404040',
 
-  // Background colors
-  bgPrimary: '#0a0a0a', // Nearly black
-  bgSecondary: '#1a1a1a', // Dark gray
-  bgTertiary: '#2a2a2a', // Lighter gray
+  // Background colors - light theme
+  bgPrimary: '#ffffff', // White
+  bgSecondary: '#fafafa', // neutral-50
+  bgTertiary: '#f5f5f5', // neutral-100
 
-  // Text colors
-  textPrimary: '#ffffff', // White
-  textSecondary: '#e0e0e0', // Light gray
-  textMuted: '#888888', // Medium gray
+  // Text colors - dark on light
+  textPrimary: '#171717', // neutral-900
+  textSecondary: '#525252', // neutral-600
+  textMuted: '#a3a3a3', // neutral-400
 
-  // Status colors
-  success: '#4caf50',
-  successDark: '#2e7d32',
-  error: '#f44336',
-  errorDark: '#c62828',
-  warning: '#ff9800',
-  warningDark: '#e65100',
-  info: '#2196f3',
-  infoDark: '#1565c0',
+  // Status colors - muted for light theme
+  success: '#16a34a', // green-600
+  successDark: '#15803d', // green-700
+  error: '#dc2626', // red-600
+  errorDark: '#b91c1c', // red-700
+  warning: '#d97706', // amber-600
+  warningDark: '#b45309', // amber-700
+  info: '#2563eb', // blue-600
+  infoDark: '#1d4ed8', // blue-700
 
   // Borders
-  borderColor: '#333333',
-  borderColorLight: '#444444',
+  borderColor: '#e5e5e5', // neutral-200
+  borderColorLight: '#d4d4d4', // neutral-300
 
   // UI elements
-  tabActive: '#ffffff',
-  tabInactive: '#666666',
-  cardBg: '#151515',
-  inputBg: '#1a1a1a',
-  inputBorder: '#333333',
-  buttonBg: '#ffffff',
-  buttonBgHover: '#e0e0e0',
-  buttonDisabled: '#555555',
+  tabActive: '#171717',
+  tabInactive: '#a3a3a3', // neutral-400
+  cardBg: '#fafafa',
+  inputBg: '#ffffff',
+  inputBorder: '#e5e5e5',
+  buttonBg: '#171717',
+  buttonBgHover: '#404040',
+  buttonDisabled: '#d4d4d4', // neutral-300
 
-  // Glass-morphism
-  glassBackground: 'rgba(255, 255, 255, 0.05)',
-  glassBorder: 'rgba(255, 255, 255, 0.1)',
-  glassBackgroundLight: 'rgba(255, 255, 255, 0.08)',
+  // Light theme equivalents (replacing glass-morphism)
+  glassBackground: '#f5f5f5', // neutral-100
+  glassBorder: '#e5e5e5', // neutral-200
+  glassBackgroundLight: '#fafafa', // neutral-50
 };
 
 export const GRADIENTS = {
-  goldGradient: ['#ffffff', '#e0e0e0', '#ffffff'] as const,
-  goldHorizontal: ['#d0d0d0', '#ffffff', '#f0f0f0'] as const,
-  darkCard: ['#1a1a1a', '#151515'] as const,
-  hero: ['#1a1a1a', '#0a0a0a'] as const,
-  heroGold: ['rgba(255, 255, 255, 0.08)', 'rgba(255, 255, 255, 0.02)', '#0a0a0a'] as const,
-  shimmer: ['#1a1a1a', '#2a2a2a', '#1a1a1a'] as const,
-  tabBar: ['#141414', '#0f0f0f'] as const,
-  headerGold: ['rgba(255, 255, 255, 0.05)', 'rgba(10, 10, 10, 1)'] as const,
-  goldButton: ['#f0f0f0', '#ffffff', '#d0d0d0'] as const,
-  statusSuccess: ['#2e7d32', '#4caf50'] as const,
-  statusWarning: ['#e65100', '#ff9800'] as const,
-  statusInfo: ['#1565c0', '#2196f3'] as const,
-  statusError: ['#c62828', '#f44336'] as const,
+  // Flat monochrome - no gold
+  goldGradient: ['#171717', '#171717', '#171717'] as const,
+  goldHorizontal: ['#171717', '#171717', '#171717'] as const,
+  darkCard: ['#fafafa', '#fafafa'] as const,
+  hero: ['#171717', '#171717'] as const,
+  heroGold: ['#171717', '#171717', '#171717'] as const,
+  shimmer: ['#e5e5e5', '#f5f5f5', '#e5e5e5'] as const,
+  tabBar: ['#ffffff', '#ffffff'] as const,
+  headerGold: ['#171717', '#171717'] as const,
+  goldButton: ['#171717', '#171717', '#171717'] as const,
+  statusSuccess: ['#16a34a', '#16a34a'] as const,
+  statusWarning: ['#d97706', '#d97706'] as const,
+  statusInfo: ['#2563eb', '#2563eb'] as const,
+  statusError: ['#dc2626', '#dc2626'] as const,
 };
 
 export const FONTS = {
@@ -120,37 +121,37 @@ export const SHADOWS = {
   sm: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   md: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
   },
   lg: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
-    elevation: 7,
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 4,
   },
   xl: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35,
-    shadowRadius: 5.46,
-    elevation: 10,
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 6,
   },
   gold: {
-    shadowColor: '#ffffff',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
   },
 };
 

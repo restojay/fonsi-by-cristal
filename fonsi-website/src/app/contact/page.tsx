@@ -193,7 +193,7 @@ export default function ContactPage() {
               Ready to book?
             </h2>
             <p className="text-neutral-600 font-sans text-sm mb-8">
-              Schedule your appointment online or give us a call
+              Schedule your appointment online or give me a call
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Link href="/booking">

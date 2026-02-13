@@ -1,5 +1,5 @@
 /**
- * Booking screen with animated progress bar, gradient step indicators, and smooth transitions
+ * Booking screen with service stacking, dynamic time slots, and light theme
  */
 
 import React, { useEffect, useState, useRef } from 'react';
@@ -18,7 +18,6 @@ import {
 import { format, addDays, isPast, isSunday, isMonday } from 'date-fns';
 import { Calendar } from 'react-native-calendars';
 import { router } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import Animated, {
   useSharedValue,
@@ -38,19 +37,22 @@ import { GradientButton } from '@components/GradientButton';
 import { GradientCard } from '@components/GradientCard';
 import { AnimatedSection } from '@components/AnimatedSection';
 import { SkeletonList, SkeletonLoader } from '@components/SkeletonLoader';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS, GRADIENTS, ANIMATION } from '@constants/theme';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS, ANIMATION } from '@constants/theme';
 import { useBookingStore, useBookingValidation } from '@store/bookingStore';
 import { useAppointmentStore } from '@store/appointmentStore';
 import { apiClient } from '@api/client';
 import { Service, TimeSlot } from '@types/index';
-import { SERVICES } from '@constants/services';
+import { SERVICES, SERVICES_BY_CATEGORY } from '@constants/services';
 
 const STEPS = ['Service', 'Date', 'Time', 'Info', 'Review'];
+
+type ServiceCategory = 'Hair' | 'Bridal' | 'Makeup' | 'Waxing';
 
 export default function BookScreen() {
   const bookingState = useBookingStore();
   const {
     selectedService,
+    stackedServices,
     selectedDate,
     selectedTime,
     clientInfo,
@@ -59,6 +61,8 @@ export default function BookScreen() {
 
   const {
     setSelectedService,
+    setStackedServices,
+    toggleStackedService,
     setSelectedDate,
     setSelectedTime,
     setClientInfo,
@@ -75,6 +79,7 @@ export default function BookScreen() {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  const [selectedCategory, setSelectedCategory] = useState<ServiceCategory>('Hair');
   const progressWidth = useSharedValue(20);
 
   useEffect(() => {
@@ -102,6 +107,27 @@ export default function BookScreen() {
     loadServices();
   }, []);
 
+  // Generate time slots based on service duration
+  const generateDynamicSlots = (duration: number): TimeSlot[] => {
+    const slots: TimeSlot[] = [];
+    const clampedDuration = Math.min(duration, 180);
+    const startMinutes = 10 * 60; // 10am
+    const lastSlotMinutes = 18 * 60 - clampedDuration; // finish by 6pm
+    let id = 0;
+
+    for (let minutes = startMinutes; minutes <= lastSlotMinutes; minutes += 30) {
+      const h = Math.floor(minutes / 60);
+      const m = minutes % 60;
+      const time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+      slots.push({
+        id: `slot-${id++}`,
+        time,
+        available: true,
+      });
+    }
+    return slots;
+  };
+
   useEffect(() => {
     if (selectedDate && selectedService) {
       const loadSlots = async () => {
@@ -111,7 +137,7 @@ export default function BookScreen() {
           setTimeSlots(slots);
         } catch (error) {
           console.error('Failed to load time slots', error);
-          setTimeSlots(generateDefaultSlots());
+          setTimeSlots(generateDynamicSlots(selectedService.duration));
         } finally {
           setIsLoading(false);
         }
@@ -121,29 +147,19 @@ export default function BookScreen() {
     }
   }, [selectedDate, selectedService]);
 
-  const generateDefaultSlots = (): TimeSlot[] => {
-    const slots: TimeSlot[] = [];
-    for (let hour = 10; hour < 18.5; hour += 0.5) {
-      const h = Math.floor(hour);
-      const m = (hour - h) * 60;
-      const time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-      slots.push({
-        id: `slot-${time}`,
-        time,
-        available: true,
-      });
-    }
-    return slots;
-  };
-
   const getDisabledDates = () => {
     const disabled: { [key: string]: { disabled: boolean; disableTouchEvent: boolean } } = {};
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    // Only block today after 5:30 PM
+    const blockToday = hours > 17 || (hours === 17 && minutes >= 30);
 
     for (let i = 0; i < 90; i++) {
       const date = addDays(today, i);
-      if (isSunday(date) || isMonday(date) || i === 0) {
+      if (isSunday(date) || isMonday(date) || (i === 0 && blockToday)) {
         disabled[format(date, 'yyyy-MM-dd')] = {
           disabled: true,
           disableTouchEvent: true,
@@ -153,6 +169,42 @@ export default function BookScreen() {
 
     return disabled;
   };
+
+  const filteredServices = allServices.length > 0
+    ? allServices.filter((s) => s.category === selectedCategory)
+    : SERVICES.filter((s) => s.category === selectedCategory);
+
+  const handleServiceSelect = (service: Service) => {
+    if (selectedCategory === 'Hair') {
+      // Toggle in stack (multi-select for Hair)
+      toggleStackedService(service);
+    } else {
+      // Single-select for non-Hair: auto-advance
+      setSelectedService(service);
+      setStackedServices([]);
+      nextStep();
+    }
+  };
+
+  const handleStackedContinue = () => {
+    if (stackedServices.length === 0) return;
+    // Create combined service
+    const combined: Service = {
+      id: stackedServices.map((s) => s.id).join('+'),
+      name: stackedServices.map((s) => s.name).join(' + '),
+      category: 'Hair',
+      description: stackedServices.map((s) => s.name).join(', '),
+      priceMin: stackedServices.reduce((sum, s) => sum + s.priceMin, 0),
+      priceMax: stackedServices.reduce((sum, s) => sum + s.priceMax, 0),
+      duration: stackedServices.reduce((sum, s) => sum + s.duration, 0),
+    };
+    setSelectedService(combined);
+    nextStep();
+  };
+
+  const totalStackedDuration = stackedServices.reduce((sum, s) => sum + s.duration, 0);
+  const totalStackedMin = stackedServices.reduce((sum, s) => sum + s.priceMin, 0);
+  const totalStackedMax = stackedServices.reduce((sum, s) => sum + s.priceMax, 0);
 
   const validateContactInfo = (): boolean => {
     const errors: { [key: string]: string } = {};
@@ -211,7 +263,7 @@ export default function BookScreen() {
         addAppointment(newAppointment);
         Alert.alert(
           'Success!',
-          'Your appointment has been booked. We will contact you to confirm.',
+          'Your appointment has been booked. I will contact you to confirm.',
           [
             {
               text: 'OK',
@@ -233,6 +285,12 @@ export default function BookScreen() {
     }
   };
 
+  const formatPrice = (min: number, max: number) => {
+    if (min === 0 && max === 0) return 'Consultation';
+    if (min === max) return `$${min}`;
+    return `$${min} - $${max}`;
+  };
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <Header title="Book Appointment" subtitle={`Step ${step} of 5`} showLogo={false} />
@@ -241,12 +299,7 @@ export default function BookScreen() {
       <View style={styles.progressSection}>
         <View style={styles.progressBar}>
           <Animated.View style={[styles.progressFillContainer, progressStyle]}>
-            <LinearGradient
-              colors={[...GRADIENTS.goldButton]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.progressFill}
-            />
+            <View style={styles.progressFill} />
           </Animated.View>
         </View>
         <View style={styles.stepsContainer}>
@@ -257,22 +310,19 @@ export default function BookScreen() {
 
             return (
               <View key={index} style={styles.stepIndicator}>
-                {isActive ? (
-                  <LinearGradient
-                    colors={[...GRADIENTS.goldButton]}
-                    style={styles.stepCircle}
-                  >
-                    {isCompleted ? (
-                      <Feather name="check" size={14} color={COLORS.bgPrimary} />
-                    ) : (
-                      <Text style={styles.stepNumberActive}>{index + 1}</Text>
-                    )}
-                  </LinearGradient>
-                ) : (
-                  <View style={styles.stepCircleInactive}>
-                    <Text style={styles.stepNumber}>{index + 1}</Text>
-                  </View>
-                )}
+                <View style={[
+                  styles.stepCircle,
+                  isActive ? styles.stepCircleActive : styles.stepCircleInactive,
+                ]}>
+                  {isCompleted ? (
+                    <Feather name="check" size={14} color="#ffffff" />
+                  ) : (
+                    <Text style={[
+                      styles.stepNumber,
+                      isActive && styles.stepNumberActive,
+                    ]}>{index + 1}</Text>
+                  )}
+                </View>
                 <Text
                   style={[
                     styles.stepLabel,
@@ -287,23 +337,106 @@ export default function BookScreen() {
         </View>
       </View>
 
-      {/* Step 1: Service Selection */}
+      {/* Step 1: Service Selection with category tabs and stacking */}
       {step === 1 && (
         <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
           <Text style={styles.stepTitle}>Select a Service</Text>
-          {allServices.length === 0 ? (
+
+          {/* Category Tabs */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoriesContent}
+            style={styles.categoriesScroll}
+          >
+            {(['Hair', 'Bridal', 'Makeup', 'Waxing'] as ServiceCategory[]).map((cat) => {
+              const isActive = selectedCategory === cat;
+              const count = (allServices.length > 0 ? allServices : SERVICES).filter((s) => s.category === cat).length;
+              return (
+                <TouchableOpacity
+                  key={cat}
+                  onPress={() => {
+                    setSelectedCategory(cat);
+                    setStackedServices([]);
+                  }}
+                  activeOpacity={0.8}
+                  style={[styles.categoryTab, isActive && styles.categoryTabActive]}
+                >
+                  <Text style={[styles.categoryTabText, isActive && styles.categoryTabTextActive]}>{cat}</Text>
+                  {count > 0 && (
+                    <View style={[styles.countBadge, isActive && styles.countBadgeActive]}>
+                      <Text style={[styles.countBadgeText, isActive && styles.countBadgeTextActive]}>{count}</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
+          {selectedCategory === 'Hair' && (
+            <Text style={styles.stackingHint}>
+              Select one or more services to combine them
+            </Text>
+          )}
+
+          {allServices.length === 0 && SERVICES.length === 0 ? (
             <SkeletonList count={4} />
           ) : (
             <View>
-              {allServices.map((service, index) => (
+              {filteredServices.map((service, index) => (
                 <AnimatedSection key={service.id} index={index}>
                   <ServiceCard
                     service={service}
-                    isSelected={selectedService?.id === service.id}
-                    onPress={() => setSelectedService(service)}
+                    isSelected={
+                      selectedCategory === 'Hair'
+                        ? stackedServices.some((s) => s.id === service.id)
+                        : selectedService?.id === service.id
+                    }
+                    onPress={() => handleServiceSelect(service)}
                   />
                 </AnimatedSection>
               ))}
+            </View>
+          )}
+
+          {/* Order Summary for Hair stacking */}
+          {selectedCategory === 'Hair' && stackedServices.length > 0 && (
+            <View style={styles.orderSummary}>
+              <Text style={styles.orderSummaryTitle}>
+                Order Summary ({stackedServices.length})
+              </Text>
+              {stackedServices.map((s) => (
+                <View key={s.id} style={styles.orderSummaryItem}>
+                  <Text style={styles.orderSummaryItemText}>{s.name}</Text>
+                  <TouchableOpacity onPress={() => toggleStackedService(s)}>
+                    <Feather name="x" size={14} color={COLORS.error} />
+                  </TouchableOpacity>
+                </View>
+              ))}
+              <View style={styles.orderSummaryStats}>
+                <View style={styles.orderSummaryStat}>
+                  <Text style={styles.orderSummaryStatLabel}>Estimate</Text>
+                  <Text style={styles.orderSummaryStatValue}>
+                    {formatPrice(totalStackedMin, totalStackedMax)}
+                  </Text>
+                </View>
+                <View style={styles.orderSummaryStat}>
+                  <Text style={styles.orderSummaryStatLabel}>Duration</Text>
+                  <Text style={styles.orderSummaryStatValue}>
+                    {totalStackedDuration} min
+                  </Text>
+                </View>
+              </View>
+              {totalStackedDuration > 180 && (
+                <Text style={styles.durationWarning}>
+                  This combination exceeds 3 hours — a second appointment may be needed.
+                </Text>
+              )}
+              <GradientButton
+                title="Continue"
+                onPress={handleStackedContinue}
+                iconRight="arrow-right"
+              />
             </View>
           )}
         </Animated.View>
@@ -332,12 +465,12 @@ export default function BookScreen() {
                 textSectionTitleColor: COLORS.textPrimary,
                 textSectionTitleDisabledColor: COLORS.textMuted,
                 selectedDayBackgroundColor: COLORS.primary,
-                selectedDayTextColor: COLORS.bgPrimary,
+                selectedDayTextColor: '#ffffff',
                 todayTextColor: COLORS.primary,
                 dayTextColor: COLORS.textPrimary,
                 textDisabledColor: COLORS.textMuted,
                 dotColor: COLORS.primary,
-                selectedDotColor: COLORS.bgPrimary,
+                selectedDotColor: '#ffffff',
                 monthTextColor: COLORS.textPrimary,
                 arrowColor: COLORS.primary,
                 disabledArrowColor: COLORS.textMuted,
@@ -375,109 +508,100 @@ export default function BookScreen() {
               slots={timeSlots}
               selectedTime={selectedTime || ''}
               onSelectTime={setSelectedTime}
+              selectedDate={selectedDate || undefined}
             />
           )}
         </Animated.View>
       )}
 
-      {/* Step 4: Contact Info */}
+      {/* Step 4: Contact Info + Notes */}
       {step === 4 && (
         <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
           <Text style={styles.stepTitle}>Your Information</Text>
 
           <View style={styles.formGroup}>
             <View style={styles.labelRow}>
-              <Feather name="user" size={14} color={COLORS.primary} />
+              <Feather name="user" size={14} color={COLORS.textSecondary} />
               <Text style={styles.label}>First Name</Text>
             </View>
             <TextInput
-              style={[
-                styles.input,
-                formErrors.firstName && styles.inputError,
-              ]}
+              style={[styles.input, formErrors.firstName && styles.inputError]}
               placeholder="John"
               placeholderTextColor={COLORS.textMuted}
               value={clientInfo.firstName}
-              onChangeText={(text) =>
-                setClientInfo({ ...clientInfo, firstName: text })
-              }
+              onChangeText={(text) => setClientInfo({ ...clientInfo, firstName: text })}
             />
-            {formErrors.firstName && (
-              <Text style={styles.errorText}>{formErrors.firstName}</Text>
-            )}
+            {formErrors.firstName && <Text style={styles.errorText}>{formErrors.firstName}</Text>}
           </View>
 
           <View style={styles.formGroup}>
             <View style={styles.labelRow}>
-              <Feather name="user" size={14} color={COLORS.primary} />
+              <Feather name="user" size={14} color={COLORS.textSecondary} />
               <Text style={styles.label}>Last Name</Text>
             </View>
             <TextInput
-              style={[
-                styles.input,
-                formErrors.lastName && styles.inputError,
-              ]}
+              style={[styles.input, formErrors.lastName && styles.inputError]}
               placeholder="Doe"
               placeholderTextColor={COLORS.textMuted}
               value={clientInfo.lastName}
-              onChangeText={(text) =>
-                setClientInfo({ ...clientInfo, lastName: text })
-              }
+              onChangeText={(text) => setClientInfo({ ...clientInfo, lastName: text })}
             />
-            {formErrors.lastName && (
-              <Text style={styles.errorText}>{formErrors.lastName}</Text>
-            )}
+            {formErrors.lastName && <Text style={styles.errorText}>{formErrors.lastName}</Text>}
           </View>
 
           <View style={styles.formGroup}>
             <View style={styles.labelRow}>
-              <Feather name="mail" size={14} color={COLORS.primary} />
+              <Feather name="mail" size={14} color={COLORS.textSecondary} />
               <Text style={styles.label}>Email</Text>
             </View>
             <TextInput
-              style={[
-                styles.input,
-                formErrors.email && styles.inputError,
-              ]}
+              style={[styles.input, formErrors.email && styles.inputError]}
               placeholder="john@example.com"
               placeholderTextColor={COLORS.textMuted}
               keyboardType="email-address"
               value={clientInfo.email}
-              onChangeText={(text) =>
-                setClientInfo({ ...clientInfo, email: text })
-              }
+              onChangeText={(text) => setClientInfo({ ...clientInfo, email: text })}
             />
-            {formErrors.email && (
-              <Text style={styles.errorText}>{formErrors.email}</Text>
-            )}
+            {formErrors.email && <Text style={styles.errorText}>{formErrors.email}</Text>}
           </View>
 
           <View style={styles.formGroup}>
             <View style={styles.labelRow}>
-              <Feather name="phone" size={14} color={COLORS.primary} />
+              <Feather name="phone" size={14} color={COLORS.textSecondary} />
               <Text style={styles.label}>Phone Number</Text>
             </View>
             <TextInput
-              style={[
-                styles.input,
-                formErrors.phone && styles.inputError,
-              ]}
+              style={[styles.input, formErrors.phone && styles.inputError]}
               placeholder="(210) 555-1234"
               placeholderTextColor={COLORS.textMuted}
               keyboardType="phone-pad"
               value={clientInfo.phone}
-              onChangeText={(text) =>
-                setClientInfo({ ...clientInfo, phone: text })
-              }
+              onChangeText={(text) => setClientInfo({ ...clientInfo, phone: text })}
             />
-            {formErrors.phone && (
-              <Text style={styles.errorText}>{formErrors.phone}</Text>
-            )}
+            {formErrors.phone && <Text style={styles.errorText}>{formErrors.phone}</Text>}
+          </View>
+
+          <View style={styles.formGroup}>
+            <View style={styles.labelRow}>
+              <Feather name="message-square" size={14} color={COLORS.textSecondary} />
+              <Text style={styles.label}>Notes</Text>
+              <Text style={styles.labelOptional}>(optional)</Text>
+            </View>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              placeholder="Any special requests or preferences?"
+              placeholderTextColor={COLORS.textMuted}
+              value={clientInfo.notes || ''}
+              onChangeText={(text) => setClientInfo({ ...clientInfo, notes: text })}
+              multiline
+              numberOfLines={3}
+              textAlignVertical="top"
+            />
           </View>
         </Animated.View>
       )}
 
-      {/* Step 5: Review */}
+      {/* Step 5: Review + Cancellation Policy */}
       {step === 5 && (
         <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
           <Text style={styles.stepTitle}>Confirm Your Booking</Text>
@@ -485,7 +609,7 @@ export default function BookScreen() {
           <GradientCard>
             <View style={styles.reviewSection}>
               <View style={styles.reviewLabelRow}>
-                <Feather name="scissors" size={14} color={COLORS.primary} />
+                <Feather name="scissors" size={14} color={COLORS.textSecondary} />
                 <Text style={styles.reviewLabel}>Service</Text>
               </View>
               <Text style={styles.reviewValue}>
@@ -495,17 +619,27 @@ export default function BookScreen() {
 
             <View style={styles.reviewSection}>
               <View style={styles.reviewLabelRow}>
-                <Feather name="dollar-sign" size={14} color={COLORS.primary} />
+                <Feather name="dollar-sign" size={14} color={COLORS.textSecondary} />
                 <Text style={styles.reviewLabel}>Price Range</Text>
               </View>
               <Text style={styles.reviewValue}>
-                ${selectedService?.priceMin} - ${selectedService?.priceMax}
+                {selectedService ? formatPrice(selectedService.priceMin, selectedService.priceMax) : '—'}
               </Text>
             </View>
 
             <View style={styles.reviewSection}>
               <View style={styles.reviewLabelRow}>
-                <Feather name="calendar" size={14} color={COLORS.primary} />
+                <Feather name="clock" size={14} color={COLORS.textSecondary} />
+                <Text style={styles.reviewLabel}>Duration</Text>
+              </View>
+              <Text style={styles.reviewValue}>
+                {selectedService?.duration} minutes
+              </Text>
+            </View>
+
+            <View style={styles.reviewSection}>
+              <View style={styles.reviewLabelRow}>
+                <Feather name="calendar" size={14} color={COLORS.textSecondary} />
                 <Text style={styles.reviewLabel}>Date & Time</Text>
               </View>
               <Text style={styles.reviewValue}>
@@ -519,7 +653,7 @@ export default function BookScreen() {
 
             <View style={styles.reviewSection}>
               <View style={styles.reviewLabelRow}>
-                <Feather name="user" size={14} color={COLORS.primary} />
+                <Feather name="user" size={14} color={COLORS.textSecondary} />
                 <Text style={styles.reviewLabel}>Name</Text>
               </View>
               <Text style={styles.reviewValue}>
@@ -529,7 +663,7 @@ export default function BookScreen() {
 
             <View style={styles.reviewSection}>
               <View style={styles.reviewLabelRow}>
-                <Feather name="mail" size={14} color={COLORS.primary} />
+                <Feather name="mail" size={14} color={COLORS.textSecondary} />
                 <Text style={styles.reviewLabel}>Email</Text>
               </View>
               <Text style={styles.reviewValue}>{clientInfo.email}</Text>
@@ -537,15 +671,33 @@ export default function BookScreen() {
 
             <View style={styles.reviewSection}>
               <View style={styles.reviewLabelRow}>
-                <Feather name="phone" size={14} color={COLORS.primary} />
+                <Feather name="phone" size={14} color={COLORS.textSecondary} />
                 <Text style={styles.reviewLabel}>Phone</Text>
               </View>
               <Text style={styles.reviewValue}>{clientInfo.phone}</Text>
             </View>
+
+            {clientInfo.notes ? (
+              <View style={styles.reviewSection}>
+                <View style={styles.reviewLabelRow}>
+                  <Feather name="message-square" size={14} color={COLORS.textSecondary} />
+                  <Text style={styles.reviewLabel}>Notes</Text>
+                </View>
+                <Text style={styles.reviewValue}>{clientInfo.notes}</Text>
+              </View>
+            ) : null}
           </GradientCard>
 
+          {/* Cancellation Policy */}
+          <View style={styles.cancellationPolicy}>
+            <Text style={styles.cancellationPolicyText}>
+              <Text style={styles.cancellationPolicyBold}>Cancellation Policy: </Text>
+              24-hour notice required. 50% charge for cancellations within 24 hours.
+            </Text>
+          </View>
+
           <Text style={styles.confirmNote}>
-            We'll contact you to confirm your appointment within 24 hours.
+            I'll contact you to confirm your appointment within 24 hours.
           </Text>
         </Animated.View>
       )}
@@ -563,19 +715,22 @@ export default function BookScreen() {
           </View>
         )}
 
-        <View style={{ flex: 1 }}>
-          <GradientButton
-            title={step === 5 ? 'Book Now' : 'Next'}
-            onPress={handleNextStep}
-            disabled={
-              !validation[`isStep${step}Valid` as keyof typeof validation] ||
-              isLoading
-            }
-            loading={isLoading && step === 5}
-            icon={step === 5 ? 'check' : undefined}
-            iconRight={step < 5 ? 'arrow-right' : undefined}
-          />
-        </View>
+        {/* Only show Next/Book button when not on step 1 with Hair category (use stacking continue instead) */}
+        {!(step === 1 && selectedCategory === 'Hair') && (
+          <View style={{ flex: 1 }}>
+            <GradientButton
+              title={step === 5 ? 'Book Now' : 'Next'}
+              onPress={handleNextStep}
+              disabled={
+                !validation[`isStep${step}Valid` as keyof typeof validation] ||
+                isLoading
+              }
+              loading={isLoading && step === 5}
+              icon={step === 5 ? 'check' : undefined}
+              iconRight={step < 5 ? 'arrow-right' : undefined}
+            />
+          </View>
+        )}
       </View>
     </ScrollView>
   );
@@ -592,7 +747,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   progressBar: {
     height: 4,
-    backgroundColor: COLORS.bgSecondary,
+    backgroundColor: COLORS.borderColor,
     borderRadius: BORDER_RADIUS.full,
     overflow: 'hidden',
     marginBottom: SPACING.lg,
@@ -604,6 +759,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   progressFill: {
     flex: 1,
+    backgroundColor: COLORS.primary,
   } as ViewStyle,
   stepsContainer: {
     flexDirection: 'row',
@@ -621,16 +777,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: SPACING.xs,
   } as ViewStyle,
+  stepCircleActive: {
+    backgroundColor: COLORS.primary,
+  } as ViewStyle,
   stepCircleInactive: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
     backgroundColor: COLORS.bgSecondary,
     borderColor: COLORS.borderColor,
     borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: SPACING.xs,
   } as ViewStyle,
   stepNumber: {
     fontSize: FONTS.sm,
@@ -638,9 +791,7 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
   } as TextStyle,
   stepNumberActive: {
-    fontSize: FONTS.sm,
-    fontFamily: FONTS.sansSerifSemiBold,
-    color: COLORS.bgPrimary,
+    color: '#ffffff',
   } as TextStyle,
   stepLabel: {
     fontSize: FONTS.xs,
@@ -667,6 +818,126 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
     fontFamily: FONTS.sansSerif,
   } as TextStyle,
+  // Category tabs
+  categoriesScroll: {
+    marginBottom: SPACING.md,
+  } as ViewStyle,
+  categoriesContent: {
+    gap: SPACING.sm,
+  } as ViewStyle,
+  categoryTab: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    borderRadius: BORDER_RADIUS.full,
+    backgroundColor: COLORS.bgTertiary,
+    borderColor: COLORS.borderColor,
+    borderWidth: 1,
+    gap: SPACING.sm,
+  } as ViewStyle,
+  categoryTabActive: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+  } as ViewStyle,
+  categoryTabText: {
+    fontSize: FONTS.sm,
+    fontFamily: FONTS.sansSerifSemiBold,
+    color: COLORS.textSecondary,
+  } as TextStyle,
+  categoryTabTextActive: {
+    color: '#ffffff',
+  } as TextStyle,
+  countBadge: {
+    backgroundColor: COLORS.borderColor,
+    borderRadius: BORDER_RADIUS.full,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
+  } as ViewStyle,
+  countBadgeActive: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  } as ViewStyle,
+  countBadgeText: {
+    fontSize: FONTS.xs - 1,
+    fontFamily: FONTS.sansSerifSemiBold,
+    color: COLORS.textMuted,
+  } as TextStyle,
+  countBadgeTextActive: {
+    color: '#ffffff',
+  } as TextStyle,
+  stackingHint: {
+    fontSize: FONTS.xs,
+    color: COLORS.textMuted,
+    marginBottom: SPACING.md,
+    fontFamily: FONTS.sansSerif,
+  } as TextStyle,
+  // Order Summary
+  orderSummary: {
+    backgroundColor: COLORS.bgSecondary,
+    borderColor: COLORS.borderColor,
+    borderWidth: 1,
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SPACING.lg,
+    marginTop: SPACING.lg,
+  } as ViewStyle,
+  orderSummaryTitle: {
+    fontSize: FONTS.sm,
+    fontFamily: FONTS.sansSerifSemiBold,
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.md,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  } as TextStyle,
+  orderSummaryItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: COLORS.bgTertiary,
+    borderColor: COLORS.borderColor,
+    borderWidth: 1,
+    borderRadius: BORDER_RADIUS.md,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    marginBottom: SPACING.sm,
+  } as ViewStyle,
+  orderSummaryItemText: {
+    fontSize: FONTS.sm,
+    fontFamily: FONTS.sansSerifMedium,
+    color: COLORS.textPrimary,
+    flex: 1,
+  } as TextStyle,
+  orderSummaryStats: {
+    flexDirection: 'row',
+    gap: SPACING.md,
+    marginVertical: SPACING.md,
+  } as ViewStyle,
+  orderSummaryStat: {
+    flex: 1,
+    backgroundColor: COLORS.bgTertiary,
+    borderColor: COLORS.borderColor,
+    borderWidth: 1,
+    borderRadius: BORDER_RADIUS.lg,
+    padding: SPACING.md,
+  } as ViewStyle,
+  orderSummaryStatLabel: {
+    fontSize: 10,
+    fontFamily: FONTS.sansSerifMedium,
+    color: COLORS.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: SPACING.xs,
+  } as TextStyle,
+  orderSummaryStatValue: {
+    fontSize: FONTS.sm,
+    fontFamily: FONTS.sansSerifBold,
+    color: COLORS.textPrimary,
+  } as TextStyle,
+  durationWarning: {
+    fontSize: FONTS.xs,
+    color: COLORS.warning,
+    fontFamily: FONTS.sansSerif,
+    marginBottom: SPACING.md,
+  } as TextStyle,
   loadingTimeSlots: {
     paddingVertical: SPACING.lg,
   } as ViewStyle,
@@ -684,16 +955,26 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     marginLeft: SPACING.sm,
   } as TextStyle,
+  labelOptional: {
+    fontSize: FONTS.xs,
+    fontFamily: FONTS.sansSerif,
+    color: COLORS.textMuted,
+    marginLeft: SPACING.xs,
+  } as TextStyle,
   input: {
-    backgroundColor: COLORS.inputBg,
-    borderColor: COLORS.inputBorder,
+    backgroundColor: '#ffffff',
+    borderColor: COLORS.borderColor,
     borderWidth: 1,
-    borderRadius: BORDER_RADIUS.md,
+    borderRadius: BORDER_RADIUS.lg,
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.md,
     color: COLORS.textPrimary,
     fontSize: FONTS.base,
     fontFamily: FONTS.sansSerif,
+  } as TextStyle,
+  textArea: {
+    minHeight: 80,
+    paddingTop: SPACING.md,
   } as TextStyle,
   inputError: {
     borderColor: COLORS.error,
@@ -730,6 +1011,25 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.borderColor,
     marginVertical: SPACING.md,
   } as ViewStyle,
+  cancellationPolicy: {
+    backgroundColor: COLORS.bgSecondary,
+    borderColor: COLORS.borderColor,
+    borderWidth: 1,
+    borderRadius: BORDER_RADIUS.xl,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    marginTop: SPACING.md,
+  } as ViewStyle,
+  cancellationPolicyText: {
+    fontSize: FONTS.xs,
+    color: COLORS.textMuted,
+    fontFamily: FONTS.sansSerif,
+    lineHeight: 18,
+  } as TextStyle,
+  cancellationPolicyBold: {
+    color: COLORS.textSecondary,
+    fontFamily: FONTS.sansSerifMedium,
+  } as TextStyle,
   confirmNote: {
     fontSize: FONTS.sm,
     color: COLORS.textSecondary,

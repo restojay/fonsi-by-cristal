@@ -26,6 +26,7 @@ export interface ClientInfo {
   lastName: string;
   email: string;
   phone: string;
+  notes?: string;
 }
 
 export interface Appointment {
