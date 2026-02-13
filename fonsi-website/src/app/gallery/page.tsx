@@ -1,65 +1,64 @@
 'use client'
 
 import Link from 'next/link'
-import { Instagram } from 'lucide-react'
 import ScrollReveal from '@/components/ScrollReveal'
 import { HoverBorderGradient } from '@/components/ui/hover-border-gradient'
+import { SocialLinks } from '@/components/ui/social-links'
+import { InstagramGradient } from '@/components/ui/instagram-gradient'
+
+const socials = [
+  {
+    name: '@fonsi_by_cristal',
+    url: 'https://www.instagram.com/fonsi_by_cristal/',
+    icon: <InstagramGradient size={48} />,
+  },
+]
 
 export default function GalleryPage() {
   return (
     <>
       {/* Header */}
-      <section className="pt-28 md:pt-36 pb-6 md:pb-8 bg-black">
-        <div className="container-custom">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-10">
-            <ScrollReveal>
-              <p className="text-xs uppercase tracking-[0.3em] text-neutral-400 font-sans mb-6">
-                Our Work
-              </p>
-              <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6">
-                Gallery
-              </h1>
-              <p className="text-neutral-400 font-sans max-w-lg leading-relaxed">
-                See the transformations our clients have experienced. Follow us on Instagram
-                for our latest work.
-              </p>
-            </ScrollReveal>
+      <div className="container-custom pt-16 md:pt-24">
+        <section className="relative pb-6 md:pb-8 bg-neutral-900 rounded-2xl overflow-hidden">
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundImage: `repeating-linear-gradient(135deg, transparent, transparent 7px, rgba(255,255,255,0.06) 7px, rgba(255,255,255,0.06) 8px)`,
+            }}
+          />
+          <div className="relative px-8 md:px-12 pt-8 md:pt-10 pb-2">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-10">
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-neutral-500 font-sans mb-6">
+                  My Work
+                </p>
+                <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6">
+                  Gallery
+                </h1>
+                <p className="text-neutral-400 font-sans max-w-lg leading-relaxed">
+                  See the transformations my clients have experienced. Follow me on Instagram
+                  for my latest work.
+                </p>
+              </div>
 
-            <ScrollReveal direction="right">
-              <div className="flex flex-col items-start md:items-end gap-4 md:pb-1">
-                <div className="flex items-center gap-3">
-                  <Instagram size={20} className="text-neutral-400" />
-                  <p className="text-neutral-400 font-sans text-sm">
-                    Follow along for the latest
-                  </p>
-                </div>
-                <div className="flex flex-row gap-4">
-                  <HoverBorderGradient
-                    as="a"
-                    href="https://www.instagram.com/fonsi_by_cristal/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    containerClassName="rounded-full"
-                    className="bg-black text-white px-6 py-2.5 font-sans text-sm uppercase tracking-[0.15em] font-medium inline-flex items-center justify-center gap-2"
-                  >
-                    <Instagram size={14} />
-                    @fonsi_by_cristal
-                  </HoverBorderGradient>
+              <ScrollReveal direction="right">
+                <div className="flex flex-col items-start md:items-end gap-4 md:pb-1">
+                  <SocialLinks socials={socials} className="text-white" animationDirection="up" />
                   <Link href="/booking">
                     <HoverBorderGradient
                       as="div"
-                      containerClassName="rounded-full"
+                      containerClassName="rounded-full btn-pop"
                       className="bg-black text-white px-6 py-2.5 font-sans text-sm uppercase tracking-[0.15em] font-medium"
                     >
                       Book Now
                     </HoverBorderGradient>
                   </Link>
                 </div>
-              </div>
-            </ScrollReveal>
+              </ScrollReveal>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {/* Gallery Grid */}
       <section className="pt-10 md:pt-14 pb-16 md:pb-20">

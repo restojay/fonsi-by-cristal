@@ -6,8 +6,8 @@ export interface Service {
   priceMin: number
   priceMax: number
   duration: number
-  createdAt: Date
-  updatedAt: Date
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export interface Appointment {

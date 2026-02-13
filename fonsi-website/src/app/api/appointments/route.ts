@@ -4,7 +4,7 @@ import { bookingSchema } from '@/lib/validation'
 import { sendConfirmationEmail } from '@/lib/email'
 import { format } from 'date-fns'
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const appointments = await prisma.appointment.findMany({
       include: {

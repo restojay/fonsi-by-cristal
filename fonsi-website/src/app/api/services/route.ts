@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { servicesData } from '@/lib/services-data'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const services = servicesData.map((service, index) => ({
     id: `service-${index + 1}`,
     ...service,

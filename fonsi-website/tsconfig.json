@@ -30,9 +30,11 @@
       "@/components/*": ["src/components/*"],
       "@/app/*": ["src/app/*"],
       "@/lib/*": ["src/lib/*"],
-      "@/types/*": ["src/types/*"]
+      "@/types/*": ["src/types/*"],
+      "@/generated/*": ["prisma/generated/*"]
     }
   },
-  "include": ["src", "seed.ts"],
+  "include": ["src"],
+  "exclude": ["seed.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

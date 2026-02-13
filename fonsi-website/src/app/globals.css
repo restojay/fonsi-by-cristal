@@ -94,6 +94,17 @@ select:focus-visible {
   outline-offset: 2px;
 }
 
+/* Book button pop */
+@keyframes btn-pop {
+  0%, 85%, 100% { transform: scale(1); }
+  90% { transform: scale(1.07); }
+  95% { transform: scale(0.97); }
+}
+
+.btn-pop {
+  animation: btn-pop 2s ease-in-out infinite;
+}
+
 /* ===== Utilities ===== */
 
 .divider {
@@ -119,6 +130,7 @@ select:focus-visible {
     padding-bottom: 8rem;
   }
 }
+
 
 .container-custom {
   max-width: 72rem;

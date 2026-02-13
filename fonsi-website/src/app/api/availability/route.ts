@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { generateTimeSlots } from '@/lib/utils'
-import { format, parse } from 'date-fns'
+import { parse } from 'date-fns'
 
 export async function GET(request: NextRequest) {
   try {

@@ -15,12 +15,14 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
+    "@prisma/adapter-better-sqlite3": "^7.4.0",
     "@prisma/client": "^7.3.0",
     "@radix-ui/react-slot": "^1.2.4",
     "@tailwindcss/postcss": "^4.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.0",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.3.0",
     "framer-motion": "^12.34.0",
     "lucide-react": "^0.475.0",
     "next": "^16.1.6",
