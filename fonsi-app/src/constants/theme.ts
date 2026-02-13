@@ -84,8 +84,9 @@ export const FONTS = {
   xl: 20,
   '2xl': 24,
   '3xl': 28,
-  '4xl': 32,
-  '5xl': 36,
+  '4xl': 36,
+  '5xl': 42,
+  '6xl': 52,
 
   // Font weights
   light: '300' as const,
@@ -101,11 +102,12 @@ export const SPACING = {
   sm: 8,
   md: 12,
   lg: 16,
-  xl: 20,
-  '2xl': 24,
-  '3xl': 32,
-  '4xl': 40,
-  '5xl': 48,
+  xl: 24,
+  '2xl': 32,
+  '3xl': 40,
+  '4xl': 56,
+  '5xl': 72,
+  '6xl': 96,
 };
 
 export const BORDER_RADIUS = {
@@ -121,50 +123,62 @@ export const SHADOWS = {
   sm: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    shadowOpacity: 0.06,
+    shadowRadius: 3,
     elevation: 1,
   },
   md: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   lg: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 6,
   },
   xl: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  pressed: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 2,
+    elevation: 1,
   },
   gold: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 4,
   },
 };
 
 export const ANIMATION = {
   spring: {
-    damping: 15,
-    stiffness: 150,
+    damping: 30,
+    stiffness: 300,
     mass: 1,
   },
   springBouncy: {
     damping: 10,
     stiffness: 200,
     mass: 0.8,
+  },
+  springGentle: {
+    damping: 20,
+    stiffness: 120,
+    mass: 1,
   },
   timing: {
     fast: 200,
@@ -176,12 +190,32 @@ export const ANIMATION = {
   },
 };
 
+export const TYPOGRAPHY = {
+  sectionLabel: {
+    fontSize: 10,
+    fontFamily: 'Inter-SemiBold',
+    textTransform: 'uppercase' as const,
+    letterSpacing: 4,
+    color: '#a3a3a3',
+  },
+  sectionTitle: {
+    fontSize: 30,
+    fontFamily: 'PlayfairDisplay-Bold',
+    color: '#171717',
+  },
+  heroTitle: {
+    fontSize: 52,
+    fontFamily: 'PlayfairDisplay-Bold',
+    color: '#171717',
+  },
+};
+
 export const ICONS = {
   // Tab bar
   home: 'home' as const,
   services: 'scissors' as const,
   book: 'calendar' as const,
-  profile: 'user' as const,
+  about: 'info' as const,
 
   // General
   sparkles: 'sparkles' as const,

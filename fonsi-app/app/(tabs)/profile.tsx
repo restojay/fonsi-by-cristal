@@ -1,305 +1,227 @@
 /**
- * Profile screen with dark avatar, stats row, Feather icons, and light cards
+ * About screen — mirrors the website's About page
+ * Certifications, values, specializations, story, and contact info
  */
 
-import React, { useMemo, useState } from 'react';
+import React from 'react';
 import {
   ScrollView,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
-  Alert,
+  Linking,
   ViewStyle,
   TextStyle,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { Header } from '@components/Header';
-import { AppointmentCard } from '@components/AppointmentCard';
 import { AnimatedSection } from '@components/AnimatedSection';
 import { GradientButton } from '@components/GradientButton';
 import { GradientCard } from '@components/GradientCard';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS } from '@constants/theme';
-import { useBookingStore } from '@store/bookingStore';
-import { useAppointmentStore } from '@store/appointmentStore';
+import { SectionLabel } from '@components/SectionLabel';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS } from '@constants/theme';
 
-const SETTINGS_ITEMS: {
-  label: string;
-  subtitle: string;
-  icon: keyof typeof Feather.glyphMap;
-}[] = [
-  { label: 'Notifications', subtitle: 'Manage alerts', icon: 'bell' },
-  { label: 'Preferences', subtitle: 'App settings', icon: 'settings' },
-  { label: 'Privacy Policy', subtitle: 'Your data', icon: 'shield' },
-  { label: 'Terms of Service', subtitle: 'Legal', icon: 'file-text' },
+const certifications = [
+  'MAC Pro Certified',
+  'OLAPLEX Certified',
+  'Wella Professional',
+  'MOROCCANOIL Certified',
+  'Licensed Cosmetologist, 10+ yrs',
 ];
 
-export default function ProfileScreen() {
-  const { clientInfo } = useBookingStore();
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const appointments = useAppointmentStore((state) => state.appointments);
-  const upcoming = useMemo(() => {
-    const now = new Date();
-    return appointments
-      .filter((apt) => {
-        const aptDate = new Date(`${apt.date}T${apt.time}`);
-        return aptDate > now && (apt.status === 'confirmed' || apt.status === 'pending');
-      })
-      .sort(
-        (a, b) =>
-          new Date(`${a.date}T${a.time}`).getTime() -
-          new Date(`${b.date}T${b.time}`).getTime()
-      );
-  }, [appointments]);
-  const past = useMemo(() => {
-    const now = new Date();
-    return appointments
-      .filter((apt) => {
-        const aptDate = new Date(`${apt.date}T${apt.time}`);
-        return aptDate <= now || apt.status === 'completed' || apt.status === 'cancelled';
-      })
-      .sort(
-        (a, b) =>
-          new Date(`${b.date}T${b.time}`).getTime() -
-          new Date(`${a.date}T${a.time}`).getTime()
-      );
-  }, [appointments]);
+const values = [
+  {
+    title: 'Client Care',
+    desc: 'Every client is treated like family. I listen to your needs and work with you to create the look that makes you feel your best.',
+  },
+  {
+    title: 'Excellence',
+    desc: 'I use only premium products and the latest techniques. Continuous learning ensures you receive the highest quality service.',
+  },
+  {
+    title: 'Artistry',
+    desc: 'Beauty is an art form. I bring creativity, skill, and passion to every service, creating results that inspire confidence.',
+  },
+];
 
-  const totalVisits = appointments.filter((a) => a.status === 'completed').length;
+const specializations: { title: string; icon: keyof typeof Feather.glyphMap; items: string[] }[] = [
+  {
+    title: 'Color & Correction',
+    icon: 'droplet',
+    items: ['Full color transformations', 'Balayage & highlights', 'Color correction', 'Toning & gloss treatments'],
+  },
+  {
+    title: 'Cuts & Styling',
+    icon: 'scissors',
+    items: ['Precision cuts', 'Blowouts & styling', 'Special occasion updos', 'Keratin & smoothing treatments'],
+  },
+  {
+    title: 'Bridal',
+    icon: 'heart',
+    items: ['Bride hair & makeup', 'Wedding party styling', 'Trials & consultations', 'On-site services available'],
+  },
+  {
+    title: 'Makeup & Beauty',
+    icon: 'star',
+    items: ['Professional MAC application', 'Editorial & glam looks', 'Lash & brow services', 'Waxing treatments'],
+  },
+];
 
-  const handleLogout = () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        { text: 'Cancel', onPress: () => {} },
-        {
-          text: 'Sign Out',
-          onPress: () => {
-            router.replace('/');
-          },
-          style: 'destructive',
-        },
-      ]
-    );
-  };
-
-  const handleCancelAppointment = (appointmentId: string) => {
-    Alert.alert(
-      'Cancel Appointment',
-      'Are you sure you want to cancel this appointment?',
-      [
-        { text: 'Keep', onPress: () => {} },
-        {
-          text: 'Cancel Appointment',
-          onPress: () => {
-            Alert.alert('Success', 'Appointment cancelled');
-          },
-          style: 'destructive',
-        },
-      ]
-    );
-  };
-
-  const handleAppointmentPress = (appointmentId: string) => {
-    router.push(`/appointment/${appointmentId}`);
-  };
-
+export default function AboutScreen() {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Header title="Profile" subtitle="Your account" showLogo={false} />
+      <Header title="Meet Cristal" subtitle="THE ARTIST" showLogo={false} />
 
-      {/* Client Info Card */}
+      {/* Story */}
       <AnimatedSection delay={100} style={styles.section}>
-        <GradientCard>
-          <View style={styles.profileHeader}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
-                {clientInfo.firstName ? clientInfo.firstName.charAt(0).toUpperCase() : 'G'}
-              </Text>
-            </View>
-            <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>
-                {clientInfo.firstName || 'Guest'} {clientInfo.lastName}
-              </Text>
-              {clientInfo.email ? (
-                <View style={styles.profileDetailRow}>
-                  <Feather name="mail" size={12} color={COLORS.textMuted} />
-                  <Text style={styles.profileDetail}>{clientInfo.email}</Text>
-                </View>
-              ) : null}
-              {clientInfo.phone ? (
-                <View style={styles.profileDetailRow}>
-                  <Feather name="phone" size={12} color={COLORS.textMuted} />
-                  <Text style={styles.profileDetail}>{clientInfo.phone}</Text>
-                </View>
-              ) : null}
-            </View>
-            {!isEditingProfile && (
-              <TouchableOpacity
-                onPress={() => setIsEditingProfile(true)}
-                style={styles.editButton}
-              >
-                <Feather name="edit-2" size={16} color={COLORS.primary} />
-              </TouchableOpacity>
-            )}
-          </View>
-
-          {isEditingProfile && (
-            <View style={styles.editSection}>
-              <Text style={styles.editNote}>
-                Edit your information below
-              </Text>
-              <GradientButton
-                title="Done"
-                onPress={() => setIsEditingProfile(false)}
-                size="small"
-              />
-            </View>
-          )}
-        </GradientCard>
+        <SectionLabel text="THE STORY" />
+        <Text style={styles.sectionTitle}>A Decade of Artistry</Text>
+        <Text style={styles.bodyText}>
+          With over a decade of experience as a licensed cosmetologist, Cristal has
+          built Fonsi into one of San Antonio's trusted destinations for professional
+          beauty services. Working across salon and studio settings for diverse occasions
+          including bridal events, pageants, and runway work, she brings depth and
+          versatility to every appointment.
+        </Text>
+        <Text style={styles.bodyText}>
+          What started as a passion for making people feel confident has grown into a
+          thriving studio beloved by the San Antonio community. Every client receives
+          personalized attention and care, from the initial consultation to the final look.
+        </Text>
       </AnimatedSection>
 
-      {/* Stats Row */}
+      {/* Quote */}
       <AnimatedSection delay={200} style={styles.section}>
-        <View style={styles.statsRow}>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{totalVisits}</Text>
-            <Text style={styles.statLabel}>Total Visits</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>2025</Text>
-            <Text style={styles.statLabel}>Member Since</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{upcoming.length}</Text>
-            <Text style={styles.statLabel}>Upcoming</Text>
-          </View>
+        <View style={styles.quoteCard}>
+          <Text style={styles.quoteOpen}>{'\u201C'}</Text>
+          <Text style={styles.quoteText}>
+            You know you've gotten a really superb service when strangers stop
+            you and ask who your stylist is.
+          </Text>
+          <View style={styles.quoteLine} />
         </View>
       </AnimatedSection>
 
-      {/* Upcoming Appointments */}
+      {/* Certifications */}
       <AnimatedSection delay={300} style={styles.section}>
-        <Text style={styles.sectionTitle}>Upcoming Appointments</Text>
-        {upcoming.length === 0 ? (
-          <GradientCard variant="glass" showAccent={false}>
-            <View style={styles.emptyState}>
-              <Feather name="calendar" size={24} color={COLORS.textMuted} />
-              <Text style={styles.emptyText}>No upcoming appointments</Text>
-              <View style={{ marginTop: SPACING.md }}>
-                <GradientButton
-                  title="Book Now"
-                  onPress={() => router.push('/book')}
-                  size="small"
-                  icon="calendar"
-                />
-              </View>
+        <SectionLabel text="CREDENTIALS" />
+        <Text style={styles.sectionTitle}>Certifications</Text>
+        <View style={styles.certGrid}>
+          {certifications.map((cert) => (
+            <View key={cert} style={styles.certPill}>
+              <Text style={styles.certText}>{cert}</Text>
             </View>
-          </GradientCard>
-        ) : (
-          <View>
-            {upcoming.map((appointment) => (
-              <View key={appointment.id} style={styles.appointmentContainer}>
-                <AppointmentCard
-                  appointment={appointment}
-                  onPress={() => handleAppointmentPress(appointment.id)}
-                />
-                {appointment.status !== 'cancelled' && (
-                  <TouchableOpacity
-                    onPress={() => handleCancelAppointment(appointment.id)}
-                    style={styles.cancelButton}
-                  >
-                    <Feather name="x" size={14} color={COLORS.error} />
-                    <Text style={styles.cancelButtonText}>Cancel Appointment</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            ))}
-          </View>
-        )}
+          ))}
+        </View>
       </AnimatedSection>
 
-      {/* Past Appointments */}
-      {past.length > 0 && (
-        <AnimatedSection delay={400} style={styles.section}>
-          <Text style={styles.sectionTitle}>Past Appointments</Text>
-          <View>
-            {past.map((appointment) => (
-              <AppointmentCard
-                key={appointment.id}
-                appointment={appointment}
-                onPress={() => handleAppointmentPress(appointment.id)}
-                isPast={true}
-              />
-            ))}
+      {/* Values */}
+      <AnimatedSection delay={400} style={styles.section}>
+        <SectionLabel text="PHILOSOPHY" />
+        <Text style={styles.sectionTitle}>My Approach</Text>
+        {values.map((value, i) => (
+          <View key={value.title} style={styles.valueCard}>
+            <Text style={styles.valueNumber}>0{i + 1}</Text>
+            <Text style={styles.valueTitle}>{value.title}</Text>
+            <Text style={styles.valueDesc}>{value.desc}</Text>
           </View>
-        </AnimatedSection>
-      )}
-
-      {/* Settings */}
-      <AnimatedSection delay={500} style={styles.section}>
-        <Text style={styles.sectionTitle}>Settings</Text>
-        {SETTINGS_ITEMS.map((item, index) => (
-          <TouchableOpacity
-            key={item.label}
-            style={styles.settingItem}
-            activeOpacity={0.7}
-          >
-            <View style={styles.settingIconContainer}>
-              <Feather name={item.icon} size={18} color={COLORS.primary} />
-            </View>
-            <View style={styles.settingContent}>
-              <Text style={styles.settingLabel}>{item.label}</Text>
-              <Text style={styles.settingValue}>{item.subtitle}</Text>
-            </View>
-            <Feather name="chevron-right" size={18} color={COLORS.textMuted} />
-          </TouchableOpacity>
         ))}
       </AnimatedSection>
 
-      {/* About */}
+      {/* Specializations */}
+      <AnimatedSection delay={500} style={styles.section}>
+        <SectionLabel text="WHAT I DO" />
+        <Text style={styles.sectionTitle}>Specializations</Text>
+        <View style={styles.specGrid}>
+          {specializations.map((spec) => (
+            <View key={spec.title} style={styles.specCard}>
+              <View style={styles.specIconCircle}>
+                <Feather name={spec.icon} size={16} color="#ffffff" />
+              </View>
+              <Text style={styles.specTitle}>{spec.title}</Text>
+              {spec.items.map((item) => (
+                <View key={item} style={styles.specItem}>
+                  <View style={styles.specDot} />
+                  <Text style={styles.specItemText}>{item}</Text>
+                </View>
+              ))}
+            </View>
+          ))}
+        </View>
+      </AnimatedSection>
+
+      {/* Contact Info */}
       <AnimatedSection delay={600} style={styles.section}>
+        <SectionLabel text="GET IN TOUCH" />
         <GradientCard>
-          <Text style={styles.aboutTitle}>About Fonsi by Cristal</Text>
-          <Text style={styles.aboutText}>
-            Beauty is my passion and my passion shows on every client that walks out of my doors. Through extensive, ongoing continuing education I stay up to date on the latest cut and color styles and techniques to bring you the looks you want.
-          </Text>
-          <View style={styles.aboutInfo}>
-            <View style={styles.aboutLabelRow}>
-              <Feather name="map-pin" size={12} color={COLORS.primary} />
-              <Text style={styles.aboutLabel}>Address</Text>
+          <View style={styles.contactRow}>
+            <View style={styles.contactIconCircle}>
+              <Feather name="map-pin" size={14} color="#ffffff" />
             </View>
-            <Text style={styles.aboutValue}>6626 West Loop 1604 North suite 105</Text>
-            <Text style={styles.aboutValue}>San Antonio, TX 78254</Text>
+            <View style={styles.contactContent}>
+              <Text style={styles.contactLabel}>Location</Text>
+              <Text style={styles.contactValue}>6626 West Loop 1604 North, Suite 105</Text>
+              <Text style={styles.contactDetail}>San Antonio, TX 78254 (Suites 39 & 41)</Text>
+            </View>
           </View>
-          <View style={styles.aboutInfo}>
-            <View style={styles.aboutLabelRow}>
-              <Feather name="phone" size={12} color={COLORS.primary} />
-              <Text style={styles.aboutLabel}>Phone</Text>
+          <View style={styles.contactDivider} />
+          <View style={styles.contactRow}>
+            <View style={styles.contactIconCircle}>
+              <Feather name="phone" size={14} color="#ffffff" />
             </View>
-            <Text style={styles.aboutValue}>(210) 551-7742</Text>
+            <View style={styles.contactContent}>
+              <Text style={styles.contactLabel}>Phone</Text>
+              <Text
+                style={[styles.contactValue, styles.contactLink]}
+                onPress={() => Linking.openURL('tel:2105517742')}
+              >
+                (210) 551-7742
+              </Text>
+            </View>
           </View>
-          <View style={styles.aboutInfo}>
-            <View style={styles.aboutLabelRow}>
-              <Feather name="info" size={12} color={COLORS.primary} />
-              <Text style={styles.aboutLabel}>Version</Text>
+          <View style={styles.contactDivider} />
+          <View style={styles.contactRow}>
+            <View style={styles.contactIconCircle}>
+              <Feather name="clock" size={14} color="#ffffff" />
             </View>
-            <Text style={styles.aboutValue}>1.0.0</Text>
+            <View style={styles.contactContent}>
+              <Text style={styles.contactLabel}>Hours</Text>
+              <Text style={styles.contactValue}>Tue - Sat: 10 AM - 6:30 PM</Text>
+              <Text style={styles.contactDetail}>Sun & Mon: Closed</Text>
+            </View>
+          </View>
+          <View style={styles.contactDivider} />
+          <View style={styles.contactRow}>
+            <View style={styles.contactIconCircle}>
+              <Feather name="instagram" size={14} color="#ffffff" />
+            </View>
+            <View style={styles.contactContent}>
+              <Text style={styles.contactLabel}>Instagram</Text>
+              <Text
+                style={[styles.contactValue, styles.contactLink]}
+                onPress={() => Linking.openURL('https://www.instagram.com/fonsi_by_cristal/')}
+              >
+                @fonsi_by_cristal
+              </Text>
+            </View>
           </View>
         </GradientCard>
       </AnimatedSection>
 
-      {/* Logout Button */}
-      <AnimatedSection delay={700} style={styles.section}>
+      {/* Book CTA */}
+      <AnimatedSection delay={700} style={styles.ctaSection}>
+        <Text style={styles.ctaTitle}>Ready to book?</Text>
+        <Text style={styles.ctaSubtext}>By appointment only. Tue - Sat, 10 AM - 6:30 PM.</Text>
         <GradientButton
-          title="Sign Out"
-          onPress={handleLogout}
-          variant="outline"
-          icon="log-out"
+          title="Book Appointment"
+          onPress={() => router.push('/book')}
+          icon="calendar"
+          iconRight="arrow-right"
         />
-        <View style={{ height: SPACING.xl }} />
       </AnimatedSection>
+
+      <View style={{ height: SPACING['2xl'] }} />
     </ScrollView>
   );
 }
@@ -310,194 +232,206 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgPrimary,
   } as ViewStyle,
   section: {
-    paddingHorizontal: SPACING.lg,
-    marginBottom: SPACING.xl,
+    paddingHorizontal: SPACING.xl,
+    marginBottom: SPACING['3xl'],
   } as ViewStyle,
   sectionTitle: {
-    fontSize: FONTS.lg,
-    fontFamily: FONTS.serifSemiBold,
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.md,
-  } as TextStyle,
-  profileHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  } as ViewStyle,
-  avatar: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: '#171717',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: SPACING.lg,
-  } as ViewStyle,
-  avatarText: {
-    fontSize: FONTS['3xl'],
+    fontSize: FONTS['2xl'],
     fontFamily: FONTS.serifBold,
-    color: COLORS.bgPrimary,
-  } as TextStyle,
-  profileInfo: {
-    flex: 1,
-  } as ViewStyle,
-  profileName: {
-    fontSize: FONTS.lg,
-    fontFamily: FONTS.sansSerifSemiBold,
     color: COLORS.textPrimary,
-    marginBottom: SPACING.xs,
+    marginBottom: SPACING.lg,
   } as TextStyle,
-  profileDetailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: SPACING.xs,
-  } as ViewStyle,
-  profileDetail: {
+  bodyText: {
     fontSize: FONTS.sm,
-    color: COLORS.textSecondary,
     fontFamily: FONTS.sansSerif,
-    marginLeft: SPACING.sm,
-  } as TextStyle,
-  editButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f5f5f5',
-    borderColor: '#e5e5e5',
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  } as ViewStyle,
-  editSection: {
-    marginTop: SPACING.lg,
-    borderTopColor: COLORS.borderColor,
-    borderTopWidth: 1,
-    paddingTop: SPACING.lg,
-  } as ViewStyle,
-  editNote: {
-    fontSize: FONTS.sm,
     color: COLORS.textSecondary,
+    lineHeight: 22,
     marginBottom: SPACING.md,
-    fontFamily: FONTS.sansSerif,
   } as TextStyle,
-  statsRow: {
+
+  // Quote
+  quoteCard: {
+    borderLeftWidth: 2,
+    borderLeftColor: COLORS.borderColor,
+    paddingLeft: SPACING.lg,
+    paddingVertical: SPACING.sm,
+  } as ViewStyle,
+  quoteOpen: {
+    fontSize: 48,
+    fontFamily: FONTS.serif,
+    color: COLORS.textPrimary,
+    lineHeight: 48,
+    marginBottom: -SPACING.sm,
+  } as TextStyle,
+  quoteText: {
+    fontSize: FONTS.lg,
+    fontFamily: FONTS.serif,
+    fontStyle: 'italic',
+    color: COLORS.textPrimary,
+    lineHeight: 28,
+  } as TextStyle,
+  quoteLine: {
+    width: 40,
+    height: 1,
+    backgroundColor: COLORS.borderColor,
+    marginTop: SPACING.lg,
+  } as ViewStyle,
+
+  // Certifications
+  certGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: SPACING.sm,
   } as ViewStyle,
-  statCard: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-    borderColor: '#e5e5e5',
+  certPill: {
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: BORDER_RADIUS.full,
     borderWidth: 1,
-    borderRadius: BORDER_RADIUS.lg,
-    paddingVertical: SPACING.lg,
-    alignItems: 'center',
+    borderColor: COLORS.borderColor,
+    backgroundColor: COLORS.bgSecondary,
   } as ViewStyle,
-  statValue: {
-    fontSize: FONTS['2xl'],
-    fontFamily: FONTS.sansSerifBold,
-    color: COLORS.primary,
-    marginBottom: SPACING.xs,
-  } as TextStyle,
-  statLabel: {
+  certText: {
     fontSize: FONTS.xs,
     fontFamily: FONTS.sansSerifMedium,
+    color: COLORS.textPrimary,
+    letterSpacing: 0.5,
+  } as TextStyle,
+
+  // Values
+  valueCard: {
+    borderRadius: BORDER_RADIUS['2xl'],
+    borderWidth: 1,
+    borderColor: COLORS.borderColor,
+    padding: SPACING.xl,
+    marginBottom: SPACING.md,
+  } as ViewStyle,
+  valueNumber: {
+    fontSize: FONTS['3xl'],
+    fontFamily: FONTS.serif,
     color: COLORS.textMuted,
-  } as TextStyle,
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: SPACING.lg,
-  } as ViewStyle,
-  emptyText: {
-    fontSize: FONTS.base,
-    color: COLORS.textSecondary,
-    fontFamily: FONTS.sansSerif,
-    marginTop: SPACING.sm,
-  } as TextStyle,
-  appointmentContainer: {
-    marginBottom: SPACING.lg,
-  } as ViewStyle,
-  cancelButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: SPACING.sm,
-    paddingVertical: SPACING.md,
-    borderWidth: 1,
-    borderColor: COLORS.error,
-    borderRadius: BORDER_RADIUS.md,
-  } as ViewStyle,
-  cancelButtonText: {
-    color: COLORS.error,
-    fontFamily: FONTS.sansSerifSemiBold,
-    fontSize: FONTS.sm,
-    marginLeft: SPACING.sm,
-  } as TextStyle,
-  settingItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.md,
-    backgroundColor: '#f5f5f5',
-    borderColor: '#e5e5e5',
-    borderWidth: 1,
-    borderRadius: BORDER_RADIUS.lg,
     marginBottom: SPACING.sm,
+  } as TextStyle,
+  valueTitle: {
+    fontSize: FONTS.lg,
+    fontFamily: FONTS.serifBold,
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.sm,
+  } as TextStyle,
+  valueDesc: {
+    fontSize: FONTS.sm,
+    fontFamily: FONTS.sansSerif,
+    color: COLORS.textSecondary,
+    lineHeight: 22,
+  } as TextStyle,
+
+  // Specializations
+  specGrid: {
+    gap: SPACING.md,
   } as ViewStyle,
-  settingIconContainer: {
+  specCard: {
+    borderRadius: BORDER_RADIUS['2xl'],
+    borderWidth: 1,
+    borderColor: COLORS.borderColor,
+    padding: SPACING.xl,
+  } as ViewStyle,
+  specIconCircle: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#e5e5e5',
+    backgroundColor: '#171717',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: SPACING.md,
+  } as ViewStyle,
+  specTitle: {
+    fontSize: FONTS.base,
+    fontFamily: FONTS.serifBold,
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.md,
+  } as TextStyle,
+  specItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  } as ViewStyle,
+  specDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: COLORS.textMuted,
+    marginRight: SPACING.md,
+  } as ViewStyle,
+  specItemText: {
+    fontSize: FONTS.sm,
+    fontFamily: FONTS.sansSerif,
+    color: COLORS.textSecondary,
+  } as TextStyle,
+
+  // Contact
+  contactRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  } as ViewStyle,
+  contactIconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#171717',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: SPACING.md,
+    marginTop: 2,
   } as ViewStyle,
-  settingContent: {
+  contactContent: {
     flex: 1,
   } as ViewStyle,
-  settingLabel: {
-    fontSize: FONTS.base,
-    fontFamily: FONTS.sansSerifMedium,
-    color: COLORS.textPrimary,
-  } as TextStyle,
-  settingValue: {
-    fontSize: FONTS.xs,
-    color: COLORS.textMuted,
-    fontFamily: FONTS.sansSerif,
-    marginTop: 2,
-  } as TextStyle,
-  aboutTitle: {
-    fontSize: FONTS.lg,
-    fontFamily: FONTS.serifSemiBold,
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.md,
-  } as TextStyle,
-  aboutText: {
-    fontSize: FONTS.sm,
-    color: COLORS.textSecondary,
-    lineHeight: 20,
-    marginBottom: SPACING.md,
-    fontFamily: FONTS.sansSerif,
-  } as TextStyle,
-  aboutInfo: {
-    marginBottom: SPACING.md,
-  } as ViewStyle,
-  aboutLabelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: SPACING.xs,
-  } as ViewStyle,
-  aboutLabel: {
+  contactLabel: {
     fontSize: FONTS.xs,
     fontFamily: FONTS.sansSerifSemiBold,
-    color: COLORS.primary,
-    marginLeft: SPACING.sm,
+    color: COLORS.textPrimary,
+    marginBottom: 2,
   } as TextStyle,
-  aboutValue: {
+  contactValue: {
     fontSize: FONTS.sm,
+    fontFamily: FONTS.sansSerif,
     color: COLORS.textSecondary,
     lineHeight: 20,
+  } as TextStyle,
+  contactDetail: {
+    fontSize: FONTS.xs,
     fontFamily: FONTS.sansSerif,
-    marginLeft: SPACING.xl,
+    color: COLORS.textMuted,
+    marginTop: 2,
+  } as TextStyle,
+  contactLink: {
+    color: COLORS.textPrimary,
+    textDecorationLine: 'underline',
+  } as TextStyle,
+  contactDivider: {
+    height: 1,
+    backgroundColor: COLORS.borderColor,
+    marginVertical: SPACING.md,
+  } as ViewStyle,
+
+  // CTA
+  ctaSection: {
+    paddingHorizontal: SPACING.xl,
+    marginBottom: SPACING['2xl'],
+    alignItems: 'center',
+  } as ViewStyle,
+  ctaTitle: {
+    fontSize: FONTS['2xl'],
+    fontFamily: FONTS.serifBold,
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.sm,
+    textAlign: 'center',
+  } as TextStyle,
+  ctaSubtext: {
+    fontSize: FONTS.sm,
+    fontFamily: FONTS.sansSerif,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xl,
+    textAlign: 'center',
   } as TextStyle,
 });

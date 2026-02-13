@@ -3,11 +3,12 @@
 import Link from 'next/link'
 import { SocialLinks } from '@/components/ui/social-links'
 import { InstagramGradient } from '@/components/ui/instagram-gradient'
+import { BUSINESS } from '@/lib/constants'
 
 const socials = [
   {
-    name: '@fonsi_by_cristal',
-    url: 'https://www.instagram.com/fonsi_by_cristal/',
+    name: BUSINESS.social.instagramHandle,
+    url: BUSINESS.social.instagram,
     icon: <InstagramGradient size={40} />,
   },
 ]
@@ -70,12 +71,12 @@ export default function Footer() {
                 Contact
               </h4>
               <div className="space-y-1.5 text-sm font-sans text-white">
-                <a href="tel:2105517742" className="block text-neutral-400 hover:text-white">
-                  (210) 551-7742
+                <a href={`tel:${BUSINESS.phoneTel}`} className="block text-neutral-400 hover:text-white">
+                  {BUSINESS.phone}
                 </a>
                 <p>
-                  6626 West Loop 1604 North<br />
-                  Suite 105, San Antonio, TX 78254
+                  {BUSINESS.address.street}<br />
+                  {BUSINESS.address.suite}, {BUSINESS.address.city}, {BUSINESS.address.state} {BUSINESS.address.zip}
                 </p>
               </div>
             </div>
@@ -86,9 +87,9 @@ export default function Footer() {
                 Hours
               </h4>
               <div className="space-y-1 text-sm font-sans text-white">
-                <p>Tue &ndash; Sat: 10 AM &ndash; 6:30 PM</p>
-                <p>Sun &amp; Mon: Closed</p>
-                <p className="text-xs text-white font-bold mt-2">By appointment only</p>
+                <p>{BUSINESS.hours.openShort}: {BUSINESS.hours.time}</p>
+                <p>{BUSINESS.hours.closedShort}: Closed</p>
+                <p className="text-xs text-white font-bold mt-2">{BUSINESS.hours.note}</p>
               </div>
             </div>
           </div>
@@ -96,10 +97,10 @@ export default function Footer() {
           {/* Bottom */}
           <div className="mt-6 pt-4 border-t border-neutral-800 flex flex-col md:flex-row justify-between items-center gap-2">
             <p className="text-white text-xs font-sans">
-              &copy; {currentYear} Fonsi by Cristal
+              &copy; {currentYear} {BUSINESS.name}
             </p>
             <p className="text-neutral-400 text-xs font-sans">
-              24-hour cancellation policy &middot; 50% charge within 24 hours
+              {BUSINESS.cancellation}
             </p>
           </div>
         </div>

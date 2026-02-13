@@ -1,5 +1,5 @@
 /**
- * Fade-in + slide-up animation wrapper with stagger support
+ * Fade-in + slide-up animation wrapper with spring-based entrance
  */
 
 import React, { useEffect } from 'react';
@@ -7,9 +7,8 @@ import { ViewStyle } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withTiming,
+  withSpring,
   withDelay,
-  Easing,
 } from 'react-native-reanimated';
 import { ANIMATION } from '@constants/theme';
 
@@ -27,24 +26,18 @@ export const AnimatedSection: React.FC<AnimatedSectionProps> = ({
   style,
 }) => {
   const opacity = useSharedValue(0);
-  const translateY = useSharedValue(20);
+  const translateY = useSharedValue(28);
 
   const totalDelay = delay + index * ANIMATION.stagger.delay;
 
   useEffect(() => {
     opacity.value = withDelay(
       totalDelay,
-      withTiming(1, {
-        duration: ANIMATION.timing.slow,
-        easing: Easing.out(Easing.cubic),
-      })
+      withSpring(1, ANIMATION.springGentle)
     );
     translateY.value = withDelay(
       totalDelay,
-      withTiming(0, {
-        duration: ANIMATION.timing.slow,
-        easing: Easing.out(Easing.cubic),
-      })
+      withSpring(0, ANIMATION.springGentle)
     );
   }, []);
 

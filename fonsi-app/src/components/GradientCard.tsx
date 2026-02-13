@@ -1,5 +1,5 @@
 /**
- * Light card with flat background and subtle border
+ * Light card with flat background, visible shadow, and subtle border
  */
 
 import React from 'react';
@@ -34,15 +34,15 @@ export const GradientCard: React.FC<GradientCardProps> = ({
 
 const styles = StyleSheet.create({
   cardContainer: {
-    borderRadius: BORDER_RADIUS.xl,
+    borderRadius: BORDER_RADIUS['2xl'],
     backgroundColor: COLORS.bgSecondary,
     borderColor: COLORS.borderColor,
     borderWidth: 1,
     overflow: 'hidden',
-    ...SHADOWS.sm,
+    ...SHADOWS.md,
   } as ViewStyle,
   glassCard: {
-    borderRadius: BORDER_RADIUS.xl,
+    borderRadius: BORDER_RADIUS['2xl'],
     backgroundColor: COLORS.bgTertiary,
     borderColor: COLORS.borderColor,
     borderWidth: 1,
@@ -53,6 +53,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   } as ViewStyle,
   content: {
-    padding: SPACING.lg,
+    padding: SPACING.xl,
   } as ViewStyle,
 });

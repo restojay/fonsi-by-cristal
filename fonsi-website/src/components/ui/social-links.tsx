@@ -18,30 +18,13 @@ interface SocialLinksProps extends React.HTMLAttributes<HTMLDivElement> {
 export function SocialLinks({ socials, className, animationDirection = 'down', ...props }: SocialLinksProps) {
   const [hoveredSocial, setHoveredSocial] = React.useState<string | null>(null)
   const [rotation, setRotation] = React.useState<number>(0)
-  const [clicked, setClicked] = React.useState<boolean>(false)
-
-  const animation = {
-    scale: clicked ? [1, 1.3, 1] : 1,
-    transition: { duration: 0.3 },
-  }
-
-  React.useEffect(() => {
-    const handleClick = () => {
-      setClicked(true)
-      setTimeout(() => {
-        setClicked(false)
-      }, 200)
-    }
-    window.addEventListener("click", handleClick)
-    return () => window.removeEventListener("click", handleClick)
-  }, [clicked])
 
   return (
     <div
       className={cn("flex items-center justify-center gap-0", className)}
       {...props}
     >
-      {socials.map((social, index) => (
+      {socials.map((social) => (
         <a
           className={cn(
             "relative cursor-pointer px-5 py-2 transition-opacity duration-200",
@@ -49,7 +32,7 @@ export function SocialLinks({ socials, className, animationDirection = 'down', .
               ? "opacity-50"
               : "opacity-100"
           )}
-          key={index}
+          key={social.name}
           href={social.url}
           target="_blank"
           rel="noopener noreferrer"
@@ -64,7 +47,6 @@ export function SocialLinks({ socials, className, animationDirection = 'down', .
             {hoveredSocial === social.name && (
               <motion.div
                 className="absolute top-0 left-0 right-0 flex h-full w-full items-center justify-center pointer-events-none"
-                animate={animation}
               >
                 <motion.div
                   key={social.name}

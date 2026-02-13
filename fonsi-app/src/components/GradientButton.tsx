@@ -1,7 +1,7 @@
 /**
  * Flat monochrome button with press scale animation
- * Primary: dark bg, white text, rounded-full
- * Outline: white bg, dark border, rounded-full
+ * Primary: dark bg, white text, rounded-full, uppercase
+ * Outline: white bg, dark border, rounded-full, uppercase
  */
 
 import React from 'react';
@@ -62,8 +62,8 @@ export const GradientButton: React.FC<GradientButtonProps> = ({
   };
 
   const sizeStyles = {
-    small: { paddingVertical: SPACING.sm, paddingHorizontal: SPACING.md },
-    medium: { paddingVertical: SPACING.md + 2, paddingHorizontal: SPACING.xl },
+    small: { paddingVertical: SPACING.sm, paddingHorizontal: SPACING.lg },
+    medium: { paddingVertical: SPACING.lg, paddingHorizontal: SPACING.xl + 4 },
     large: { paddingVertical: SPACING.lg, paddingHorizontal: SPACING['2xl'] },
   };
 
@@ -174,6 +174,8 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontFamily: FONTS.sansSerifSemiBold,
     fontSize: FONTS.base,
+    textTransform: 'uppercase',
+    letterSpacing: 2,
   } as TextStyle,
   disabledPrimary: {
     backgroundColor: COLORS.buttonDisabled,
@@ -191,6 +193,8 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     fontFamily: FONTS.sansSerifSemiBold,
     fontSize: FONTS.base,
+    textTransform: 'uppercase',
+    letterSpacing: 2,
   } as TextStyle,
   disabledOutline: {
     borderColor: COLORS.borderColor,

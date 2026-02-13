@@ -1,6 +1,6 @@
 /**
  * Time slot picker grouped by Morning/Afternoon/Evening
- * Light theme with dark selected state
+ * Pill-shaped slots with uppercase tracked group labels
  */
 
 import React, { useMemo } from 'react';
@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { TimeSlot } from '@types/index';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS } from '@constants/theme';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS } from '@constants/theme';
 
 interface TimeSlotPickerProps {
   slots: TimeSlot[];
@@ -161,11 +161,13 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   } as ViewStyle,
   groupLabel: {
-    fontSize: FONTS.base,
+    fontSize: 10,
     fontFamily: FONTS.sansSerifSemiBold,
-    color: COLORS.textPrimary,
+    color: COLORS.textSecondary,
     marginLeft: SPACING.sm,
     flex: 1,
+    textTransform: 'uppercase',
+    letterSpacing: 3,
   } as TextStyle,
   groupCount: {
     fontSize: FONTS.xs,
@@ -183,13 +185,14 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   slot: {
     paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.lg,
+    borderRadius: BORDER_RADIUS.full,
     backgroundColor: COLORS.bgSecondary,
     borderColor: COLORS.borderColor,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
+    ...SHADOWS.sm,
   } as ViewStyle,
   selectedSlot: {
     backgroundColor: COLORS.primary,

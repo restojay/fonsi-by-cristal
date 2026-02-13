@@ -1,5 +1,5 @@
 /**
- * Appointment card with monochrome status badges
+ * Appointment card with uppercase tracked status badges and larger service name
  */
 
 import React from 'react';
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     marginRight: SPACING.md,
   } as ViewStyle,
   serviceName: {
-    fontSize: FONTS.lg,
+    fontSize: FONTS['2xl'],
     fontFamily: FONTS.serifSemiBold,
     color: COLORS.textPrimary,
   } as TextStyle,
@@ -174,9 +174,11 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xs + 2,
   } as ViewStyle,
   statusText: {
-    fontSize: FONTS.xs,
+    fontSize: 10,
     fontFamily: FONTS.sansSerifSemiBold,
     marginLeft: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 2,
   } as TextStyle,
   details: {
     borderTopColor: COLORS.borderColor,

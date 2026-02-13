@@ -2,8 +2,9 @@
 
 import BookingWidget from '@/components/BookingWidget'
 import { servicesData } from '@/lib/services-data'
+import { BUSINESS } from '@/lib/constants'
 
-const services = servicesData.map((s, i) => ({ id: `service-${i + 1}`, ...s }))
+const services = servicesData
 
 export default function BookingPage() {
 
@@ -26,7 +27,7 @@ export default function BookingPage() {
                 Book
               </h1>
               <p className="text-neutral-400 font-sans max-w-lg leading-relaxed">
-                Available Tuesday through Saturday, 10 AM &ndash; 6:30 PM. All services by appointment only.
+                Available {BUSINESS.hours.open}, {BUSINESS.hours.time}. All services by appointment only.
               </p>
           </div>
         </section>

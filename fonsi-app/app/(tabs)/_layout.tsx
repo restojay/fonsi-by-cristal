@@ -1,5 +1,5 @@
 /**
- * Custom animated tab bar with Feather icons, flat background, and dark indicator
+ * Custom animated tab bar with tubelight glow indicator
  */
 
 import React from 'react';
@@ -20,15 +20,15 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { COLORS, FONTS, SPACING, ANIMATION, BORDER_RADIUS } from '@constants/theme';
+import { COLORS, FONTS, SPACING, ANIMATION, BORDER_RADIUS, SHADOWS } from '@constants/theme';
 
-type TabIconName = 'home' | 'scissors' | 'calendar' | 'user';
+type TabIconName = 'home' | 'scissors' | 'calendar' | 'info';
 
 const TAB_CONFIG: { name: string; title: string; icon: TabIconName }[] = [
   { name: 'index', title: 'Home', icon: 'home' },
   { name: 'services', title: 'Services', icon: 'scissors' },
   { name: 'book', title: 'Book', icon: 'calendar' },
-  { name: 'profile', title: 'Profile', icon: 'user' },
+  { name: 'profile', title: 'About', icon: 'info' },
 ];
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
@@ -67,7 +67,14 @@ function TabButton({
       style={[styles.tabButton, animatedStyle]}
     >
       {isFocused && (
-        <View style={styles.activeIndicator} />
+        <View style={styles.glowContainer}>
+          {/* Outer glow layer */}
+          <View style={styles.glowOuter} />
+          {/* Inner glow layer */}
+          <View style={styles.glowInner} />
+          {/* Main bar (anchor) */}
+          <View style={styles.glowBar} />
+        </View>
       )}
       <Feather
         name={icon}
@@ -96,7 +103,6 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
         { paddingBottom: insets.bottom > 0 ? insets.bottom : SPACING.sm },
       ]}
     >
-      <View style={styles.tabBarSeparator} />
       <View style={styles.tabBar}>
         {state.routes.map((route: any, index: number) => {
           const config = TAB_CONFIG.find((t) => t.name === route.name);
@@ -136,11 +142,12 @@ export default function TabsLayout() {
     <Tabs
       tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{ headerShown: false }}
+      sceneContainerStyle={{ backgroundColor: '#171717' }}
     >
       <Tabs.Screen name="index" options={{ title: 'Home' }} />
       <Tabs.Screen name="services" options={{ title: 'Services' }} />
       <Tabs.Screen name="book" options={{ title: 'Book' }} />
-      <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
+      <Tabs.Screen name="profile" options={{ title: 'About' }} />
     </Tabs>
   );
 }
@@ -148,17 +155,9 @@ export default function TabsLayout() {
 const styles = StyleSheet.create({
   tabBarContainer: {
     backgroundColor: '#ffffff',
-    borderTopColor: '#e5e5e5',
-    borderTopWidth: 1,
     paddingTop: SPACING.sm,
-  } as ViewStyle,
-  tabBarSeparator: {
-    height: 1,
-    backgroundColor: '#e5e5e5',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
+    ...SHADOWS.md,
+    shadowOffset: { width: 0, height: -3 },
   } as ViewStyle,
   tabBar: {
     flexDirection: 'row',
@@ -172,11 +171,29 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.sm,
     flex: 1,
   } as ViewStyle,
-  activeIndicator: {
+  glowContainer: {
     position: 'absolute',
     top: -SPACING.sm,
-    height: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  } as ViewStyle,
+  glowOuter: {
+    position: 'absolute',
+    width: 40,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: 'rgba(23, 23, 23, 0.12)',
+  } as ViewStyle,
+  glowInner: {
+    position: 'absolute',
+    width: 28,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: 'rgba(23, 23, 23, 0.10)',
+  } as ViewStyle,
+  glowBar: {
     width: 24,
+    height: 3,
     borderRadius: BORDER_RADIUS.full,
     backgroundColor: '#171717',
   } as ViewStyle,

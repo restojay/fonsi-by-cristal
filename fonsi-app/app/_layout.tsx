@@ -49,12 +49,12 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#171717' }}>
       <SafeAreaProvider>
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: '#ffffff' },
+            contentStyle: { backgroundColor: '#171717' },
           }}
         >
           <Stack.Screen

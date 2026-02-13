@@ -1,6 +1,5 @@
 /**
- * Light service card with monochrome style
- * Selected state: inverted (dark bg, white text)
+ * Service card with scale-up press animation, animated border/shadow, dark icon circles
  */
 
 import React from 'react';
@@ -17,6 +16,8 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
+  interpolateColor,
+  interpolate,
 } from 'react-native-reanimated';
 import { Service } from '@types/index';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS, ANIMATION } from '@constants/theme';
@@ -45,6 +46,7 @@ const getCategoryIcon = (category: string): { name: any; type: 'feather' | 'mate
 };
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+const AnimatedView = Animated.createAnimatedComponent(View);
 
 export const ServiceCard: React.FC<ServiceCardProps> = ({
   service,
@@ -52,18 +54,39 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
   onBookPress,
   isSelected = false,
 }) => {
-  const scale = useSharedValue(1);
+  const pressed = useSharedValue(0);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+  const animatedStyle = useAnimatedStyle(() => {
+    const scale = interpolate(pressed.value, [0, 1], [1, 1.02]);
+    return {
+      transform: [{ scale }],
+    };
+  });
+
+  const cardAnimatedStyle = useAnimatedStyle(() => {
+    const borderColor = interpolateColor(
+      pressed.value,
+      [0, 1],
+      [COLORS.borderColor, '#a3a3a3']
+    );
+    const shadowOpacity = interpolate(pressed.value, [0, 1], [0.1, 0.12]);
+    const shadowRadius = interpolate(pressed.value, [0, 1], [8, 12]);
+    const elevation = interpolate(pressed.value, [0, 1], [3, 6]);
+
+    return {
+      borderColor,
+      shadowOpacity,
+      shadowRadius,
+      elevation,
+    };
+  });
 
   const handlePressIn = () => {
-    scale.value = withSpring(0.98, ANIMATION.spring);
+    pressed.value = withSpring(1, ANIMATION.spring);
   };
 
   const handlePressOut = () => {
-    scale.value = withSpring(1, ANIMATION.spring);
+    pressed.value = withSpring(0, ANIMATION.spring);
   };
 
   const priceRange =
@@ -83,7 +106,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
       activeOpacity={0.9}
       style={[animatedStyle, styles.wrapper]}
     >
-      <View style={[styles.card, isSelected && styles.selectedCard]}>
+      <AnimatedView style={[styles.card, isSelected && styles.selectedCard, cardAnimatedStyle]}>
         <View style={styles.content}>
           <View style={styles.headerRow}>
             <View style={styles.titleRow}>
@@ -91,7 +114,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
                 <MaterialCommunityIcons
                   name={categoryIcon.name}
                   size={16}
-                  color={isSelected ? '#ffffff' : COLORS.primary}
+                  color={isSelected ? '#ffffff' : '#ffffff'}
                 />
               </View>
               <Text style={[styles.name, isSelected && styles.nameSelected]} numberOfLines={2}>{service.name}</Text>
@@ -120,7 +143,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
             )}
           </View>
         </View>
-      </View>
+      </AnimatedView>
     </AnimatedTouchable>
   );
 };
@@ -133,9 +156,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgTertiary,
     borderColor: COLORS.borderColor,
     borderWidth: 1,
-    borderRadius: BORDER_RADIUS.xl,
-    padding: SPACING.lg,
-    ...SHADOWS.sm,
+    borderRadius: BORDER_RADIUS['2xl'],
+    padding: SPACING.xl,
+    ...SHADOWS.md,
   } as ViewStyle,
   selectedCard: {
     backgroundColor: COLORS.primary,
@@ -156,10 +179,10 @@ const styles = StyleSheet.create({
     flex: 1,
   } as ViewStyle,
   iconContainer: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: COLORS.borderColor,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#171717',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: SPACING.sm,

@@ -10,7 +10,7 @@ import { HoverBorderGradient } from '@/components/ui/hover-border-gradient'
 import { Clock } from 'lucide-react'
 import type { Service } from '@/types'
 
-const services = servicesData.map((s, i) => ({ id: `service-${i + 1}`, ...s }))
+const services = servicesData
 
 export default function ServicesPage() {
   return (

@@ -1,5 +1,5 @@
 /**
- * Booking screen with service stacking, dynamic time slots, and light theme
+ * Booking screen with section labels, larger step titles, glowing Book Now, upgraded inputs
  */
 
 import React, { useEffect, useState, useRef } from 'react';
@@ -35,7 +35,9 @@ import { ServiceCard } from '@components/ServiceCard';
 import { TimeSlotPicker } from '@components/TimeSlotPicker';
 import { GradientButton } from '@components/GradientButton';
 import { GradientCard } from '@components/GradientCard';
+import { GlowingBorderButton } from '@components/GlowingBorderButton';
 import { AnimatedSection } from '@components/AnimatedSection';
+import { SectionLabel } from '@components/SectionLabel';
 import { SkeletonList, SkeletonLoader } from '@components/SkeletonLoader';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS, ANIMATION } from '@constants/theme';
 import { useBookingStore, useBookingValidation } from '@store/bookingStore';
@@ -146,6 +148,19 @@ export default function BookScreen() {
       loadSlots();
     }
   }, [selectedDate, selectedService]);
+
+  const getMinDate = () => {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const blockToday = hours > 17 || (hours === 17 && minutes >= 30);
+    const start = blockToday ? addDays(now, 1) : now;
+    return format(start, 'yyyy-MM-dd');
+  };
+
+  const getMaxDate = () => {
+    return format(addDays(new Date(), 90), 'yyyy-MM-dd');
+  };
 
   const getDisabledDates = () => {
     const disabled: { [key: string]: { disabled: boolean; disableTouchEvent: boolean } } = {};
@@ -340,6 +355,7 @@ export default function BookScreen() {
       {/* Step 1: Service Selection with category tabs and stacking */}
       {step === 1 && (
         <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
+          <SectionLabel text="STEP 1 OF 5" />
           <Text style={styles.stepTitle}>Select a Service</Text>
 
           {/* Category Tabs */}
@@ -445,6 +461,7 @@ export default function BookScreen() {
       {/* Step 2: Date Selection */}
       {step === 2 && (
         <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
+          <SectionLabel text="STEP 2 OF 5" />
           <Text style={styles.stepTitle}>Choose a Date</Text>
           <Text style={styles.stepSubtitle}>
             Available: Tuesday - Saturday
@@ -452,6 +469,8 @@ export default function BookScreen() {
           <GradientCard showAccent={false}>
             <Calendar
               onDayPress={(day) => setSelectedDate(day.dateString)}
+              minDate={getMinDate()}
+              maxDate={getMaxDate()}
               markedDates={{
                 ...getDisabledDates(),
                 [selectedDate || '']: {
@@ -475,10 +494,10 @@ export default function BookScreen() {
                 arrowColor: COLORS.primary,
                 disabledArrowColor: COLORS.textMuted,
                 textDayFontFamily: FONTS.sansSerif,
-                textMonthFontFamily: FONTS.serifSemiBold,
+                textMonthFontFamily: FONTS.serifBold,
                 textDayHeaderFontFamily: FONTS.sansSerifMedium,
                 textDayFontSize: 14,
-                textMonthFontSize: 18,
+                textMonthFontSize: 22,
                 textDayHeaderFontSize: 12,
               }}
             />
@@ -489,6 +508,7 @@ export default function BookScreen() {
       {/* Step 3: Time Selection */}
       {step === 3 && (
         <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
+          <SectionLabel text="STEP 3 OF 5" />
           <Text style={styles.stepTitle}>Select a Time</Text>
           {isLoading ? (
             <View style={styles.loadingTimeSlots}>
@@ -517,6 +537,7 @@ export default function BookScreen() {
       {/* Step 4: Contact Info + Notes */}
       {step === 4 && (
         <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
+          <SectionLabel text="STEP 4 OF 5" />
           <Text style={styles.stepTitle}>Your Information</Text>
 
           <View style={styles.formGroup}>
@@ -604,12 +625,15 @@ export default function BookScreen() {
       {/* Step 5: Review + Cancellation Policy */}
       {step === 5 && (
         <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
+          <SectionLabel text="STEP 5 OF 5" />
           <Text style={styles.stepTitle}>Confirm Your Booking</Text>
 
           <GradientCard>
             <View style={styles.reviewSection}>
               <View style={styles.reviewLabelRow}>
-                <Feather name="scissors" size={14} color={COLORS.textSecondary} />
+                <View style={styles.reviewIconCircle}>
+                  <Feather name="scissors" size={14} color="#ffffff" />
+                </View>
                 <Text style={styles.reviewLabel}>Service</Text>
               </View>
               <Text style={styles.reviewValue}>
@@ -619,7 +643,9 @@ export default function BookScreen() {
 
             <View style={styles.reviewSection}>
               <View style={styles.reviewLabelRow}>
-                <Feather name="dollar-sign" size={14} color={COLORS.textSecondary} />
+                <View style={styles.reviewIconCircle}>
+                  <Feather name="dollar-sign" size={14} color="#ffffff" />
+                </View>
                 <Text style={styles.reviewLabel}>Price Range</Text>
               </View>
               <Text style={styles.reviewValue}>
@@ -629,7 +655,9 @@ export default function BookScreen() {
 
             <View style={styles.reviewSection}>
               <View style={styles.reviewLabelRow}>
-                <Feather name="clock" size={14} color={COLORS.textSecondary} />
+                <View style={styles.reviewIconCircle}>
+                  <Feather name="clock" size={14} color="#ffffff" />
+                </View>
                 <Text style={styles.reviewLabel}>Duration</Text>
               </View>
               <Text style={styles.reviewValue}>
@@ -639,7 +667,9 @@ export default function BookScreen() {
 
             <View style={styles.reviewSection}>
               <View style={styles.reviewLabelRow}>
-                <Feather name="calendar" size={14} color={COLORS.textSecondary} />
+                <View style={styles.reviewIconCircle}>
+                  <Feather name="calendar" size={14} color="#ffffff" />
+                </View>
                 <Text style={styles.reviewLabel}>Date & Time</Text>
               </View>
               <Text style={styles.reviewValue}>
@@ -653,7 +683,9 @@ export default function BookScreen() {
 
             <View style={styles.reviewSection}>
               <View style={styles.reviewLabelRow}>
-                <Feather name="user" size={14} color={COLORS.textSecondary} />
+                <View style={styles.reviewIconCircle}>
+                  <Feather name="user" size={14} color="#ffffff" />
+                </View>
                 <Text style={styles.reviewLabel}>Name</Text>
               </View>
               <Text style={styles.reviewValue}>
@@ -663,7 +695,9 @@ export default function BookScreen() {
 
             <View style={styles.reviewSection}>
               <View style={styles.reviewLabelRow}>
-                <Feather name="mail" size={14} color={COLORS.textSecondary} />
+                <View style={styles.reviewIconCircle}>
+                  <Feather name="mail" size={14} color="#ffffff" />
+                </View>
                 <Text style={styles.reviewLabel}>Email</Text>
               </View>
               <Text style={styles.reviewValue}>{clientInfo.email}</Text>
@@ -671,7 +705,9 @@ export default function BookScreen() {
 
             <View style={styles.reviewSection}>
               <View style={styles.reviewLabelRow}>
-                <Feather name="phone" size={14} color={COLORS.textSecondary} />
+                <View style={styles.reviewIconCircle}>
+                  <Feather name="phone" size={14} color="#ffffff" />
+                </View>
                 <Text style={styles.reviewLabel}>Phone</Text>
               </View>
               <Text style={styles.reviewValue}>{clientInfo.phone}</Text>
@@ -680,7 +716,9 @@ export default function BookScreen() {
             {clientInfo.notes ? (
               <View style={styles.reviewSection}>
                 <View style={styles.reviewLabelRow}>
-                  <Feather name="message-square" size={14} color={COLORS.textSecondary} />
+                  <View style={styles.reviewIconCircle}>
+                    <Feather name="message-square" size={14} color="#ffffff" />
+                  </View>
                   <Text style={styles.reviewLabel}>Notes</Text>
                 </View>
                 <Text style={styles.reviewValue}>{clientInfo.notes}</Text>
@@ -718,17 +756,28 @@ export default function BookScreen() {
         {/* Only show Next/Book button when not on step 1 with Hair category (use stacking continue instead) */}
         {!(step === 1 && selectedCategory === 'Hair') && (
           <View style={{ flex: 1 }}>
-            <GradientButton
-              title={step === 5 ? 'Book Now' : 'Next'}
-              onPress={handleNextStep}
-              disabled={
-                !validation[`isStep${step}Valid` as keyof typeof validation] ||
-                isLoading
-              }
-              loading={isLoading && step === 5}
-              icon={step === 5 ? 'check' : undefined}
-              iconRight={step < 5 ? 'arrow-right' : undefined}
-            />
+            {step === 5 ? (
+              <GlowingBorderButton
+                title="Book Now"
+                onPress={handleNextStep}
+                icon="check"
+                disabled={
+                  !validation[`isStep${step}Valid` as keyof typeof validation] ||
+                  isLoading
+                }
+                loading={isLoading}
+              />
+            ) : (
+              <GradientButton
+                title="Next"
+                onPress={handleNextStep}
+                disabled={
+                  !validation[`isStep${step}Valid` as keyof typeof validation] ||
+                  isLoading
+                }
+                iconRight="arrow-right"
+              />
+            )}
           </View>
         )}
       </View>
@@ -742,15 +791,15 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgPrimary,
   } as ViewStyle,
   progressSection: {
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.lg,
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.xl,
   } as ViewStyle,
   progressBar: {
     height: 4,
     backgroundColor: COLORS.borderColor,
     borderRadius: BORDER_RADIUS.full,
     overflow: 'hidden',
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.xl,
   } as ViewStyle,
   progressFillContainer: {
     height: '100%',
@@ -770,9 +819,9 @@ const styles = StyleSheet.create({
     flex: 1,
   } as ViewStyle,
   stepCircle: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SPACING.xs,
@@ -802,20 +851,20 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
   } as TextStyle,
   stepContent: {
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.lg,
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.xl,
     minHeight: 300,
   } as ViewStyle,
   stepTitle: {
-    fontSize: FONTS['2xl'],
-    fontFamily: FONTS.serifSemiBold,
+    fontSize: 30,
+    fontFamily: FONTS.serifBold,
     color: COLORS.textPrimary,
     marginBottom: SPACING.sm,
   } as TextStyle,
   stepSubtitle: {
     fontSize: FONTS.sm,
     color: COLORS.textSecondary,
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.xl,
     fontFamily: FONTS.sansSerif,
   } as TextStyle,
   // Category tabs
@@ -828,7 +877,7 @@ const styles = StyleSheet.create({
   categoryTab: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.xl,
     paddingVertical: SPACING.md,
     borderRadius: BORDER_RADIUS.full,
     backgroundColor: COLORS.bgTertiary,
@@ -876,9 +925,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgSecondary,
     borderColor: COLORS.borderColor,
     borderWidth: 1,
-    borderRadius: BORDER_RADIUS.xl,
-    padding: SPACING.lg,
-    marginTop: SPACING.lg,
+    borderRadius: BORDER_RADIUS['2xl'],
+    padding: SPACING.xl,
+    marginTop: SPACING.xl,
   } as ViewStyle,
   orderSummaryTitle: {
     fontSize: FONTS.sm,
@@ -886,7 +935,7 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     marginBottom: SPACING.md,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 3,
   } as TextStyle,
   orderSummaryItem: {
     flexDirection: 'row',
@@ -924,7 +973,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.sansSerifMedium,
     color: COLORS.textMuted,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 3,
     marginBottom: SPACING.xs,
   } as TextStyle,
   orderSummaryStatValue: {
@@ -939,10 +988,10 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   } as TextStyle,
   loadingTimeSlots: {
-    paddingVertical: SPACING.lg,
+    paddingVertical: SPACING.xl,
   } as ViewStyle,
   formGroup: {
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.xl,
   } as ViewStyle,
   labelRow: {
     flexDirection: 'row',
@@ -965,16 +1014,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderColor: COLORS.borderColor,
     borderWidth: 1,
-    borderRadius: BORDER_RADIUS.lg,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.md,
+    borderRadius: BORDER_RADIUS.xl,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.lg,
     color: COLORS.textPrimary,
     fontSize: FONTS.base,
     fontFamily: FONTS.sansSerif,
   } as TextStyle,
   textArea: {
     minHeight: 80,
-    paddingTop: SPACING.md,
+    paddingTop: SPACING.lg,
   } as TextStyle,
   inputError: {
     borderColor: COLORS.error,
@@ -993,18 +1042,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: SPACING.xs,
   } as ViewStyle,
+  reviewIconCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#171717',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: SPACING.sm,
+  } as ViewStyle,
   reviewLabel: {
     fontSize: FONTS.sm,
     color: COLORS.textSecondary,
     fontFamily: FONTS.sansSerifMedium,
-    marginLeft: SPACING.sm,
   } as TextStyle,
   reviewValue: {
     fontSize: FONTS.base,
     color: COLORS.textPrimary,
     fontFamily: FONTS.sansSerifMedium,
     lineHeight: 22,
-    marginLeft: SPACING.xl + 2,
+    marginLeft: SPACING['3xl'] + SPACING.sm,
   } as TextStyle,
   reviewDivider: {
     height: 1,
@@ -1015,9 +1072,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgSecondary,
     borderColor: COLORS.borderColor,
     borderWidth: 1,
-    borderRadius: BORDER_RADIUS.xl,
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
+    borderRadius: BORDER_RADIUS['2xl'],
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.lg,
     marginTop: SPACING.md,
   } as ViewStyle,
   cancellationPolicyText: {
@@ -1034,13 +1091,13 @@ const styles = StyleSheet.create({
     fontSize: FONTS.sm,
     color: COLORS.textSecondary,
     textAlign: 'center',
-    marginVertical: SPACING.lg,
+    marginVertical: SPACING.xl,
     fontStyle: 'italic',
     fontFamily: FONTS.sansSerif,
   } as TextStyle,
   buttonContainer: {
     flexDirection: 'row',
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.xl,
     paddingVertical: SPACING.xl,
     gap: SPACING.md,
   } as ViewStyle,

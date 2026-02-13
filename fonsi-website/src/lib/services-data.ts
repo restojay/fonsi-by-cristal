@@ -1,4 +1,5 @@
 export interface ServiceData {
+  id: string
   category: string
   name: string
   description?: string
@@ -10,6 +11,7 @@ export interface ServiceData {
 export const servicesData: ServiceData[] = [
   // Hair Services
   {
+    id: 'hair-1',
     category: 'Hair',
     name: 'Cuts',
     description: 'Professional hair cutting service',
@@ -18,6 +20,7 @@ export const servicesData: ServiceData[] = [
     duration: 45,
   },
   {
+    id: 'hair-2',
     category: 'Hair',
     name: 'Fringe Trim',
     description: 'Quick fringe/bangs trim',
@@ -26,6 +29,7 @@ export const servicesData: ServiceData[] = [
     duration: 15,
   },
   {
+    id: 'hair-3',
     category: 'Hair',
     name: 'Shampoo & Blowouts',
     description: 'Shampoo, condition, and style blowout',
@@ -34,6 +38,7 @@ export const servicesData: ServiceData[] = [
     duration: 60,
   },
   {
+    id: 'hair-4',
     category: 'Hair',
     name: 'Styling',
     description: 'Professional hair styling service',
@@ -42,6 +47,7 @@ export const servicesData: ServiceData[] = [
     duration: 60,
   },
   {
+    id: 'hair-5',
     category: 'Hair',
     name: 'Special Occasion Updo',
     description: 'Elegant updo styling for special events',
@@ -50,6 +56,7 @@ export const servicesData: ServiceData[] = [
     duration: 90,
   },
   {
+    id: 'hair-6',
     category: 'Hair',
     name: 'Men Cuts',
     description: 'Professional men\'s haircut',
@@ -58,6 +65,7 @@ export const servicesData: ServiceData[] = [
     duration: 30,
   },
   {
+    id: 'hair-7',
     category: 'Hair',
     name: 'Perm',
     description: 'Permanent wave treatment',
@@ -66,6 +74,7 @@ export const servicesData: ServiceData[] = [
     duration: 180,
   },
   {
+    id: 'hair-8',
     category: 'Hair',
     name: 'Keratin Treatment',
     description: 'Keratin smoothing treatment (consultation required)',
@@ -74,6 +83,7 @@ export const servicesData: ServiceData[] = [
     duration: 180,
   },
   {
+    id: 'hair-9',
     category: 'Hair',
     name: 'Color Retouch',
     description: 'Root touch-up and color refresh',
@@ -82,6 +92,7 @@ export const servicesData: ServiceData[] = [
     duration: 90,
   },
   {
+    id: 'hair-10',
     category: 'Hair',
     name: 'Full Color',
     description: 'Complete hair coloring service',
@@ -90,6 +101,7 @@ export const servicesData: ServiceData[] = [
     duration: 120,
   },
   {
+    id: 'hair-11',
     category: 'Hair',
     name: 'Color Correction',
     description: 'Color correction service (in-person consultation)',
@@ -98,6 +110,7 @@ export const servicesData: ServiceData[] = [
     duration: 180,
   },
   {
+    id: 'hair-12',
     category: 'Hair',
     name: 'Foil Highlights',
     description: 'Foil highlights and dimensional coloring',
@@ -106,6 +119,7 @@ export const servicesData: ServiceData[] = [
     duration: 150,
   },
   {
+    id: 'hair-13',
     category: 'Hair',
     name: 'Ombre/Balayage',
     description: 'Ombre or balayage hair coloring (in-person consultation)',
@@ -114,6 +128,7 @@ export const servicesData: ServiceData[] = [
     duration: 150,
   },
   {
+    id: 'hair-14',
     category: 'Hair',
     name: 'Additional Colors',
     description: 'Additional color services',
@@ -122,6 +137,7 @@ export const servicesData: ServiceData[] = [
     duration: 30,
   },
   {
+    id: 'hair-15',
     category: 'Hair',
     name: 'Partial Foil',
     description: 'Partial foil highlights',
@@ -130,6 +146,7 @@ export const servicesData: ServiceData[] = [
     duration: 120,
   },
   {
+    id: 'hair-16',
     category: 'Hair',
     name: 'Toners',
     description: 'Hair toning service',
@@ -138,6 +155,7 @@ export const servicesData: ServiceData[] = [
     duration: 45,
   },
   {
+    id: 'hair-17',
     category: 'Hair',
     name: 'Hair Treatments',
     description: 'Various hair treatment services',
@@ -146,6 +164,7 @@ export const servicesData: ServiceData[] = [
     duration: 60,
   },
   {
+    id: 'hair-18',
     category: 'Hair',
     name: 'Olaplex Treatment',
     description: 'Olaplex hair treatment for damage repair',
@@ -156,6 +175,7 @@ export const servicesData: ServiceData[] = [
 
   // Bridal Services
   {
+    id: 'bridal-1',
     category: 'Bridal',
     name: 'Bride Package',
     description: 'Complete bridal hair and makeup package',
@@ -164,6 +184,7 @@ export const servicesData: ServiceData[] = [
     duration: 180,
   },
   {
+    id: 'bridal-2',
     category: 'Bridal',
     name: 'Day of Wedding Party',
     description: 'Wedding party styling and makeup (upon request)',
@@ -172,6 +193,7 @@ export const servicesData: ServiceData[] = [
     duration: 120,
   },
   {
+    id: 'bridal-3',
     category: 'Bridal',
     name: 'On Site Service',
     description: 'On-site bridal services (upon request)',
@@ -182,6 +204,7 @@ export const servicesData: ServiceData[] = [
 
   // Makeup Services
   {
+    id: 'makeup-1',
     category: 'Makeup',
     name: 'MAC Full Face',
     description: 'Full face makeup application',
@@ -190,6 +213,7 @@ export const servicesData: ServiceData[] = [
     duration: 60,
   },
   {
+    id: 'makeup-2',
     category: 'Makeup',
     name: 'MAC Eye Only',
     description: 'Eye makeup application only',
@@ -198,6 +222,7 @@ export const servicesData: ServiceData[] = [
     duration: 30,
   },
   {
+    id: 'makeup-3',
     category: 'Makeup',
     name: 'On-Site Makeup',
     description: 'On-site makeup services (consultation required)',
@@ -208,6 +233,7 @@ export const servicesData: ServiceData[] = [
 
   // Waxing Services
   {
+    id: 'waxing-1',
     category: 'Waxing',
     name: 'Eyebrow Waxing',
     description: 'Professional eyebrow waxing',

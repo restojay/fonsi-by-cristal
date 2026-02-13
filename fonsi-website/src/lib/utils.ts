@@ -2,11 +2,15 @@ export function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(' ')
 }
 
+function formatDollars(amount: number): string {
+  return amount % 1 === 0 ? `$${amount}` : `$${amount.toFixed(2)}`
+}
+
 export function formatPrice(min: number, max: number): string {
   if (min === max) {
-    return `$${min.toFixed(2)}`
+    return formatDollars(min)
   }
-  return `$${min.toFixed(2)} - $${max.toFixed(2)}`
+  return `${formatDollars(min)} - ${formatDollars(max)}`
 }
 
 export function formatTime(time: string): string {

@@ -5,10 +5,11 @@ import { Service } from '@/types'
 import { bookingSchema } from '@/lib/validation'
 import { generateTimeSlots, formatTime, formatPrice } from '@/lib/utils'
 import { format } from 'date-fns'
-import { ChevronRight, ChevronLeft, Clock, Check, Plus, X, User, Mail, Phone, MessageSquare, Scissors, CalendarDays, DollarSign } from 'lucide-react'
+import { ChevronRight, ChevronLeft, Clock, Check, Plus, X, User, Mail, Phone, MessageSquare, Scissors, CalendarDays } from 'lucide-react'
 import { HoverBorderGradient } from '@/components/ui/hover-border-gradient'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Calendar } from '@/components/ui/calendar'
+import { BUSINESS } from '@/lib/constants'
 
 interface BookingWidgetProps {
   services: Service[]
@@ -40,6 +41,7 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
     notes: '',
   })
   const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>([])
+  const [slotsLoading, setSlotsLoading] = useState(false)
 
   const goToStep = (newStep: BookingStep) => {
     const currentIdx = steps.indexOf(step)
@@ -48,15 +50,38 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
     setStep(newStep)
   }
 
-  const updateTimeSlots = (serviceDuration: number) => {
-    // Cap at 3 hours so one customer can't block an entire day
+  // Generate time slots client-side as fallback
+  const generateFallbackSlots = (serviceDuration: number): string[] => {
     const clampedDuration = Math.min(serviceDuration, 180)
-    // Last slot must allow the service to finish by 6 PM (18:00)
     const lastSlotMinutes = 18 * 60 - clampedDuration
     const endMinutes = lastSlotMinutes + 30
     const endTime = `${String(Math.floor(endMinutes / 60)).padStart(2, '0')}:${String(endMinutes % 60).padStart(2, '0')}`
-    const slots = generateTimeSlots('10:00', endTime, 30)
-    setAvailableTimeSlots(slots)
+    return generateTimeSlots('10:00', endTime, 30)
+  }
+
+  // Fetch real availability from API, fallback to client-side generation
+  const fetchAvailability = async (date: string, serviceId: string, duration: number) => {
+    setSlotsLoading(true)
+    try {
+      const res = await fetch(`/api/availability?date=${date}&serviceId=${serviceId}`)
+      if (res.ok) {
+        const data = await res.json()
+        if (data.slots && data.slots.length > 0) {
+          setAvailableTimeSlots(data.slots)
+          return
+        }
+      }
+      // API returned no slots or failed — use fallback
+      setAvailableTimeSlots(generateFallbackSlots(duration))
+    } catch {
+      setAvailableTimeSlots(generateFallbackSlots(duration))
+    } finally {
+      setSlotsLoading(false)
+    }
+  }
+
+  const updateTimeSlots = (serviceDuration: number) => {
+    setAvailableTimeSlots(generateFallbackSlots(serviceDuration))
   }
 
   const handleServiceSelect = (service: Service) => {
@@ -96,9 +121,12 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
   const handleDateChange = (date: Date | undefined) => {
     if (!date) return
     setCalendarDate(date)
-    setSelectedDate(format(date, 'yyyy-MM-dd'))
+    const dateStr = format(date, 'yyyy-MM-dd')
+    setSelectedDate(dateStr)
     setSelectedTime('')
-    updateTimeSlots(selectedService?.duration || 30)
+    if (selectedService) {
+      fetchAvailability(dateStr, selectedService.id, selectedService.duration)
+    }
   }
 
   const handleContinueToInfo = () => {
@@ -363,7 +391,7 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
                     transition={{ duration: 0.2 }}
                     className="grid grid-cols-1 sm:grid-cols-2 gap-3"
                   >
-                    {(groupedServices[selectedCategory] || []).map((service, i) => {
+                    {(groupedServices[selectedCategory] || []).map((service) => {
                       const isStacked = selectedCategory === 'Hair' && stackedServices.some((s) => s.id === service.id)
                       return (
                         <button
@@ -427,11 +455,11 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
                       <Clock size={14} className="text-neutral-400 flex-shrink-0" />
-                      <span className="font-sans text-sm text-neutral-900">Tue – Sat, 10 AM – 6:30 PM</span>
+                      <span className="font-sans text-sm text-neutral-900">{BUSINESS.hours.openShort}, {BUSINESS.hours.time}</span>
                     </div>
-                    <a href="tel:2105517742" className="flex items-center gap-3 text-neutral-900 hover:text-neutral-600 transition-colors">
+                    <a href={`tel:${BUSINESS.phoneTel}`} className="flex items-center gap-3 text-neutral-900 hover:text-neutral-600 transition-colors">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-400 flex-shrink-0"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                      <span className="font-sans text-sm">(210) 551-7742</span>
+                      <span className="font-sans text-sm">{BUSINESS.phone}</span>
                     </a>
                     <div className="flex items-center gap-3">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-400 flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -564,6 +592,21 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
                 const isToday = selectedDate === format(new Date(), 'yyyy-MM-dd')
                 const now = new Date()
                 const currentMinutes = now.getHours() * 60 + now.getMinutes()
+
+                if (slotsLoading) {
+                  return (
+                    <div>
+                      <label className="block text-sm uppercase tracking-[0.15em] text-neutral-600 font-sans mb-4 text-center">
+                        Time
+                      </label>
+                      <div className="grid grid-cols-3 md:grid-cols-4 gap-2 max-w-lg mx-auto">
+                        {Array.from({ length: 8 }).map((_, i) => (
+                          <div key={i} className="h-11 rounded-xl bg-neutral-100 animate-pulse" />
+                        ))}
+                      </div>
+                    </div>
+                  )
+                }
 
                 return (
                   <div>
@@ -803,8 +846,7 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
                     <div className="bg-white border border-neutral-200 rounded-xl p-3">
                       <p className="text-[10px] uppercase tracking-[0.1em] font-sans text-neutral-400 mb-1">Estimate</p>
                       <p className="text-sm font-sans font-bold text-neutral-900 inline-flex items-center gap-1.5">
-                        <DollarSign size={13} strokeWidth={2} />
-                        {selectedService.priceMin} – ${selectedService.priceMax}
+                        {formatPrice(selectedService.priceMin, selectedService.priceMax)}
                       </p>
                     </div>
                   </div>

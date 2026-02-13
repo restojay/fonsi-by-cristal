@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import ScrollReveal from '@/components/ScrollReveal'
 import { SilkBackground } from '@/components/ui/silk-background-animation'
 import { HoverBorderGradient } from '@/components/ui/hover-border-gradient'
+import { BUSINESS } from '@/lib/constants'
 
 export default function Home() {
   return (
@@ -185,7 +186,7 @@ export default function Home() {
                 Ready to book?
               </h2>
               <p className="text-neutral-600 font-sans mb-10 leading-relaxed">
-                By appointment only. Tuesday through Saturday, 10 AM &ndash; 6:30 PM.
+                {BUSINESS.hours.note}. {BUSINESS.hours.open}, {BUSINESS.hours.time}.
               </p>
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                 <Link href="/booking">
@@ -199,12 +200,12 @@ export default function Home() {
                 </Link>
                 <HoverBorderGradient
                   as="a"
-                  href="tel:2105517742"
+                  href={`tel:${BUSINESS.phoneTel}`}
                   containerClassName="rounded-full"
                   className="bg-black text-white px-8 py-3 font-sans text-sm uppercase tracking-[0.15em] font-medium inline-flex items-center justify-center gap-2"
                 >
                   <Phone size={14} />
-                  (210) 551-7742
+                  {BUSINESS.phone}
                 </HoverBorderGradient>
               </div>
             </div>

@@ -74,24 +74,10 @@ export function NavBar({ items, variant = 'light', className }: NavBarProps) {
                     damping: 30,
                   }}
                 >
-                  <div
-                    className={cn(
-                      'absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-1 rounded-t-full',
-                      isLight ? 'bg-white' : 'bg-white'
-                    )}
-                  >
-                    <div className={cn(
-                      'absolute w-12 h-6 rounded-full blur-md -top-2 -left-2',
-                      isLight ? 'bg-white/20' : 'bg-white/20'
-                    )} />
-                    <div className={cn(
-                      'absolute w-8 h-6 rounded-full blur-md -top-1',
-                      isLight ? 'bg-white/20' : 'bg-white/20'
-                    )} />
-                    <div className={cn(
-                      'absolute w-4 h-4 rounded-full blur-sm top-0 left-2',
-                      isLight ? 'bg-white/20' : 'bg-white/20'
-                    )} />
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-1 rounded-t-full bg-white">
+                    <div className="absolute w-12 h-6 rounded-full blur-md -top-2 -left-2 bg-white/20" />
+                    <div className="absolute w-8 h-6 rounded-full blur-md -top-1 bg-white/20" />
+                    <div className="absolute w-4 h-4 rounded-full blur-sm top-0 left-2 bg-white/20" />
                   </div>
                 </motion.div>
               )}

@@ -6,12 +6,13 @@ import { ChevronDown, MapPin, Phone, Clock, AlertCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ScrollReveal from '@/components/ScrollReveal'
 import { HoverBorderGradient } from '@/components/ui/hover-border-gradient'
+import { BUSINESS } from '@/lib/constants'
 
 const faqs = [
   {
     question: 'Do you accept walk-ins?',
     answer:
-      'No, Fonsi operates by appointment only. This ensures you receive personalized attention and avoid wait times. Please call (210) 551-7742 to schedule your appointment.',
+      `No, Fonsi operates by appointment only. This ensures you receive personalized attention and avoid wait times. Please call ${BUSINESS.phone} to schedule your appointment.`,
   },
   {
     question: 'What is your cancellation policy?',
@@ -108,16 +109,16 @@ export default function ContactPage() {
                   <MapPin size={16} strokeWidth={1.5} className="text-white" />
                 </div>
                 <p className="text-neutral-900 font-sans text-sm font-semibold mb-1">Location</p>
-                <p className="text-neutral-600 font-sans text-sm leading-relaxed">6626 West Loop 1604 N, Suite 105</p>
-                <p className="text-neutral-500 font-sans text-xs mt-0.5">San Antonio, TX 78254 (Suites 39 &amp; 41)</p>
+                <p className="text-neutral-600 font-sans text-sm leading-relaxed">{BUSINESS.address.street}, {BUSINESS.address.suite}</p>
+                <p className="text-neutral-500 font-sans text-xs mt-0.5">{BUSINESS.address.city}, {BUSINESS.address.state} {BUSINESS.address.zip} ({BUSINESS.address.detail})</p>
               </div>
 
-              <a href="tel:2105517742" className="group rounded-xl border border-neutral-200 bg-neutral-50 p-5 hover:border-neutral-400 transition-colors">
+              <a href={`tel:${BUSINESS.phoneTel}`} className="group rounded-xl border border-neutral-200 bg-neutral-50 p-5 hover:border-neutral-400 transition-colors">
                 <div className="flex items-center justify-center w-9 h-9 rounded-full bg-neutral-900 mb-4">
                   <Phone size={16} strokeWidth={1.5} className="text-white" />
                 </div>
                 <p className="text-neutral-900 font-sans text-sm font-semibold mb-1">Phone</p>
-                <p className="text-neutral-600 font-sans text-sm group-hover:text-neutral-900 transition-colors">(210) 551-7742</p>
+                <p className="text-neutral-600 font-sans text-sm group-hover:text-neutral-900 transition-colors">{BUSINESS.phone}</p>
                 <p className="text-neutral-500 font-sans text-xs mt-0.5">Call to book or modify appointments</p>
               </a>
 
@@ -126,9 +127,9 @@ export default function ContactPage() {
                   <Clock size={16} strokeWidth={1.5} className="text-white" />
                 </div>
                 <p className="text-neutral-900 font-sans text-sm font-semibold mb-1">Hours</p>
-                <p className="text-neutral-600 font-sans text-sm">Tue &ndash; Sat: 10 AM &ndash; 6:30 PM</p>
-                <p className="text-neutral-600 font-sans text-sm">Sun &amp; Mon: Closed</p>
-                <p className="text-neutral-500 font-sans text-xs mt-0.5">By appointment only</p>
+                <p className="text-neutral-600 font-sans text-sm">{BUSINESS.hours.openShort}: {BUSINESS.hours.time}</p>
+                <p className="text-neutral-600 font-sans text-sm">{BUSINESS.hours.closedShort}: Closed</p>
+                <p className="text-neutral-500 font-sans text-xs mt-0.5">{BUSINESS.hours.note}</p>
               </div>
 
               <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-5">
@@ -136,7 +137,7 @@ export default function ContactPage() {
                   <AlertCircle size={16} strokeWidth={1.5} className="text-white" />
                 </div>
                 <p className="text-neutral-900 font-sans text-sm font-semibold mb-1">Cancellation Policy</p>
-                <p className="text-neutral-600 font-sans text-sm leading-relaxed">24-hour notice required. 50% charge within 24 hours.</p>
+                <p className="text-neutral-600 font-sans text-sm leading-relaxed">{BUSINESS.cancellation}</p>
               </div>
             </div>
 
@@ -152,7 +153,7 @@ export default function ContactPage() {
                   </div>
                 )}
                 <iframe
-                  src="https://maps.google.com/maps?q=6626+W+Loop+1604+N+Suite+105,+San+Antonio,+TX+78254&output=embed"
+                  src={`https://maps.google.com/maps?q=${BUSINESS.address.mapQuery}&output=embed`}
                   width="100%"
                   height="100%"
                   style={{ border: 0, minHeight: '300px' }}
@@ -207,11 +208,11 @@ export default function ContactPage() {
               </Link>
               <HoverBorderGradient
                 as="a"
-                href="tel:2105517742"
+                href={`tel:${BUSINESS.phoneTel}`}
                 containerClassName="rounded-full"
                 className="bg-black text-white px-8 py-3 font-sans text-sm uppercase tracking-[0.15em] font-medium"
               >
-                (210) 551-7742
+                {BUSINESS.phone}
               </HoverBorderGradient>
             </div>
           </ScrollReveal>

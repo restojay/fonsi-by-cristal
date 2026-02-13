@@ -1,5 +1,5 @@
 /**
- * Services screen with category icons, flat active tabs, skeleton loading, and staggered cards
+ * Services screen with grid cards, category tabs, and floating book button
  */
 
 import React, { useEffect, useState } from 'react';
@@ -13,16 +13,16 @@ import {
   TextStyle,
 } from 'react-native';
 import { router } from 'expo-router';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Header } from '@components/Header';
-import { ServiceCard } from '@components/ServiceCard';
 import { AnimatedSection } from '@components/AnimatedSection';
-import { SkeletonList } from '@components/SkeletonLoader';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS } from '@constants/theme';
+import { SectionLabel } from '@components/SectionLabel';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS } from '@constants/theme';
 import { useBookingStore } from '@store/bookingStore';
 import { apiClient } from '@api/client';
 import { Service } from '@types/index';
 import { SERVICES } from '@constants/services';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type ServiceCategory = 'Hair' | 'Bridal' | 'Makeup' | 'Waxing';
 
@@ -36,11 +36,23 @@ const CATEGORY_CONFIG: {
   { name: 'Waxing', icon: 'spa' },
 ];
 
+const getCategoryIcon = (category: string): string => {
+  switch (category) {
+    case 'Hair': return 'content-cut';
+    case 'Bridal': return 'diamond-stone';
+    case 'Makeup': return 'brush';
+    case 'Waxing': return 'spa';
+    default: return 'star';
+  }
+};
+
 export default function ServicesScreen() {
   const [selectedCategory, setSelectedCategory] = useState<ServiceCategory>('Hair');
+  const [selectedServices, setSelectedServices] = useState<Service[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { setSelectedService, setStep } = useBookingStore();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     const loadServices = async () => {
@@ -63,123 +75,198 @@ export default function ServicesScreen() {
   const categoryCount = (cat: ServiceCategory) =>
     services.filter((s) => s.category === cat).length;
 
-  const handleBookService = (service: Service) => {
-    setSelectedService(service);
-    setStep(2);
+  const handleSelectService = (service: Service) => {
+    if (selectedCategory === 'Hair') {
+      // Multi-select for Hair
+      setSelectedServices((prev) => {
+        const exists = prev.find((s) => s.id === service.id);
+        if (exists) return prev.filter((s) => s.id !== service.id);
+        return [...prev, service];
+      });
+    } else {
+      // Single-select for other categories
+      setSelectedServices((prev) =>
+        prev.length === 1 && prev[0].id === service.id ? [] : [service]
+      );
+    }
+  };
+
+  const handleBook = () => {
+    if (selectedServices.length === 1) {
+      setSelectedService(selectedServices[0]);
+      setStep(2);
+    } else if (selectedServices.length > 1) {
+      // Set first as primary, store will handle stacking
+      setSelectedService(selectedServices[0]);
+      setStep(2);
+    } else {
+      setStep(1);
+    }
     router.push('/book');
   };
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Header
-        title="Services"
-        subtitle="Explore our offerings"
-        showLogo={false}
-      />
+    <View style={styles.screen}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <Header
+          title="Services"
+          subtitle="Explore our offerings"
+          showLogo={false}
+        />
 
-      {/* Category Tabs */}
-      <View style={styles.categoriesSection}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoriesContent}
-        >
-          {CATEGORY_CONFIG.map((cat) => {
-            const isActive = selectedCategory === cat.name;
-            const count = categoryCount(cat.name);
+        {/* Category Tabs */}
+        <View style={styles.categoriesSection}>
+          <View style={styles.categoriesGrid}>
+            {CATEGORY_CONFIG.map((cat) => {
+              const isActive = selectedCategory === cat.name;
+              const count = categoryCount(cat.name);
 
-            if (isActive) {
               return (
                 <TouchableOpacity
                   key={cat.name}
-                  onPress={() => setSelectedCategory(cat.name)}
-                  activeOpacity={0.8}
+                  onPress={() => {
+                    setSelectedCategory(cat.name);
+                    setSelectedServices([]);
+                  }}
+                  activeOpacity={0.7}
+                  style={[
+                    styles.categoryGridItem,
+                    isActive ? styles.categoryTab : styles.categoryTabInactive,
+                  ]}
                 >
-                  <View style={styles.categoryTab}>
-                    <MaterialCommunityIcons
-                      name={cat.icon as any}
-                      size={16}
-                      color={COLORS.bgPrimary}
-                    />
-                    <Text style={styles.categoryTabTextActive}>{cat.name}</Text>
-                    {count > 0 && (
-                      <View style={styles.countBadgeActive}>
-                        <Text style={styles.countBadgeTextActive}>{count}</Text>
-                      </View>
-                    )}
-                  </View>
+                  <MaterialCommunityIcons
+                    name={cat.icon as any}
+                    size={16}
+                    color={isActive ? COLORS.bgPrimary : COLORS.textSecondary}
+                  />
+                  <Text style={isActive ? styles.categoryTabTextActive : styles.categoryTabText}>
+                    {cat.name}
+                  </Text>
+                  {count > 0 && (
+                    <View style={isActive ? styles.countBadgeActive : styles.countBadge}>
+                      <Text style={isActive ? styles.countBadgeTextActive : styles.countBadgeText}>
+                        {count}
+                      </Text>
+                    </View>
+                  )}
                 </TouchableOpacity>
               );
-            }
-
-            return (
-              <TouchableOpacity
-                key={cat.name}
-                onPress={() => setSelectedCategory(cat.name)}
-                style={styles.categoryTabInactive}
-                activeOpacity={0.7}
-              >
-                <MaterialCommunityIcons
-                  name={cat.icon as any}
-                  size={16}
-                  color={COLORS.textSecondary}
-                />
-                <Text style={styles.categoryTabText}>{cat.name}</Text>
-                {count > 0 && (
-                  <View style={styles.countBadge}>
-                    <Text style={styles.countBadgeText}>{count}</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      </View>
-
-      {/* Services List */}
-      <View style={styles.servicesSection}>
-        {isLoading ? (
-          <SkeletonList count={4} />
-        ) : filteredServices.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <MaterialCommunityIcons name="magnify" size={32} color={COLORS.textMuted} />
-            <Text style={styles.emptyText}>No services found</Text>
+            })}
           </View>
-        ) : (
-          <View>
-            <Text style={styles.categoryCount}>
-              {filteredServices.length} {selectedCategory} Service
-              {filteredServices.length !== 1 ? 's' : ''}
-            </Text>
-            {filteredServices.map((service, index) => (
-              <AnimatedSection key={service.id} index={index}>
-                <ServiceCard
-                  service={service}
-                  onBookPress={() => handleBookService(service)}
-                />
-              </AnimatedSection>
-            ))}
-          </View>
-        )}
-      </View>
-    </ScrollView>
+        </View>
+
+        {/* Services Grid */}
+        <View style={styles.servicesSection}>
+          {isLoading ? (
+            <View style={styles.loadingGrid}>
+              {[1, 2, 3, 4].map((i) => (
+                <View key={i} style={styles.skeletonCard} />
+              ))}
+            </View>
+          ) : filteredServices.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <MaterialCommunityIcons name="magnify" size={32} color={COLORS.textMuted} />
+              <Text style={styles.emptyText}>No services found</Text>
+            </View>
+          ) : (
+            <>
+              <Text style={styles.categoryCount}>
+                {filteredServices.length} {selectedCategory} Service
+                {filteredServices.length !== 1 ? 's' : ''}
+              </Text>
+              <View style={styles.grid}>
+                {filteredServices.map((service, index) => {
+                  const isSelected = selectedServices.some((s) => s.id === service.id);
+                  const priceText =
+                    service.priceMin === service.priceMax
+                      ? `$${service.priceMin}`
+                      : `$${service.priceMin} - $${service.priceMax}`;
+
+                  return (
+                    <AnimatedSection key={service.id} index={index} style={styles.gridItem}>
+                      <TouchableOpacity
+                        style={[styles.card, isSelected && styles.cardSelected]}
+                        activeOpacity={0.7}
+                        onPress={() => handleSelectService(service)}
+                      >
+                        <View style={[styles.cardIcon, isSelected && styles.cardIconSelected]}>
+                          <MaterialCommunityIcons
+                            name={getCategoryIcon(service.category) as any}
+                            size={16}
+                            color="#ffffff"
+                          />
+                        </View>
+                        <Text
+                          style={[styles.cardName, isSelected && styles.cardNameSelected]}
+                          numberOfLines={2}
+                        >
+                          {service.name}
+                        </Text>
+                        <Text style={[styles.cardPrice, isSelected && styles.cardPriceSelected]}>
+                          {priceText}
+                        </Text>
+                        <View style={styles.cardFooter}>
+                          <Feather
+                            name="clock"
+                            size={10}
+                            color={isSelected ? 'rgba(255,255,255,0.5)' : COLORS.textMuted}
+                          />
+                          <Text style={[styles.cardDuration, isSelected && styles.cardDurationSelected]}>
+                            {service.duration}m
+                          </Text>
+                        </View>
+                        {isSelected && (
+                          <View style={styles.checkBadge}>
+                            <Feather name="check" size={12} color="#171717" />
+                          </View>
+                        )}
+                      </TouchableOpacity>
+                    </AnimatedSection>
+                  );
+                })}
+              </View>
+            </>
+          )}
+          {/* Bottom spacer for floating button */}
+          <View style={{ height: 80 }} />
+        </View>
+      </ScrollView>
+
+      {/* Floating Book Button */}
+      <TouchableOpacity
+        style={[styles.fab, { bottom: insets.bottom + 70 }]}
+        activeOpacity={0.85}
+        onPress={handleBook}
+      >
+        <Feather name="calendar" size={20} color="#ffffff" />
+        <Text style={styles.fabText}>Book</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   } as ViewStyle,
+  container: {
+    flex: 1,
+  } as ViewStyle,
   categoriesSection: {
-    paddingVertical: SPACING.md,
+    paddingVertical: SPACING.lg,
+    paddingHorizontal: SPACING.xl,
     borderBottomColor: '#e5e5e5',
     borderBottomWidth: 1,
   } as ViewStyle,
-  categoriesContent: {
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.sm,
+  categoriesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: SPACING.sm,
+  } as ViewStyle,
+  categoryGridItem: {
+    width: '48%',
+    justifyContent: 'center',
   } as ViewStyle,
   categoryTab: {
     flexDirection: 'row',
@@ -188,7 +275,7 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.md,
     borderRadius: BORDER_RADIUS.full,
     backgroundColor: '#171717',
-    gap: SPACING.sm,
+    gap: SPACING.xs,
   } as ViewStyle,
   categoryTabInactive: {
     flexDirection: 'row',
@@ -199,15 +286,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     borderColor: '#e5e5e5',
     borderWidth: 1,
-    gap: SPACING.sm,
+    gap: SPACING.xs,
   } as ViewStyle,
   categoryTabText: {
-    fontSize: FONTS.sm,
+    fontSize: FONTS.xs,
     fontFamily: FONTS.sansSerifSemiBold,
     color: COLORS.textSecondary,
   } as TextStyle,
   categoryTabTextActive: {
-    fontSize: FONTS.sm,
+    fontSize: FONTS.xs,
     fontFamily: FONTS.sansSerifSemiBold,
     color: COLORS.bgPrimary,
   } as TextStyle,
@@ -234,15 +321,106 @@ const styles = StyleSheet.create({
     color: COLORS.bgPrimary,
   } as TextStyle,
   servicesSection: {
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.xl,
+    paddingHorizontal: SPACING.xl,
+    paddingTop: SPACING.xl,
   } as ViewStyle,
   categoryCount: {
-    fontSize: FONTS.sm,
+    fontSize: 10,
     color: COLORS.textMuted,
-    marginBottom: SPACING.md,
-    fontFamily: FONTS.sansSerifMedium,
+    marginBottom: SPACING.lg,
+    fontFamily: FONTS.sansSerifSemiBold,
+    textTransform: 'uppercase',
+    letterSpacing: 3,
   } as TextStyle,
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -SPACING.xs,
+  } as ViewStyle,
+  gridItem: {
+    width: '50%',
+    paddingHorizontal: SPACING.xs,
+    marginBottom: SPACING.sm,
+  } as ViewStyle,
+  card: {
+    backgroundColor: '#f5f5f5',
+    borderColor: '#e5e5e5',
+    borderWidth: 1,
+    borderRadius: BORDER_RADIUS['2xl'],
+    padding: SPACING.lg,
+    height: 150,
+    justifyContent: 'space-between',
+    ...SHADOWS.sm,
+  } as ViewStyle,
+  cardSelected: {
+    backgroundColor: '#171717',
+    borderColor: '#171717',
+  } as ViewStyle,
+  cardIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#171717',
+    alignItems: 'center',
+    justifyContent: 'center',
+  } as ViewStyle,
+  cardIconSelected: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  } as ViewStyle,
+  cardName: {
+    fontSize: FONTS.sm,
+    fontFamily: FONTS.serifSemiBold,
+    color: COLORS.textPrimary,
+    lineHeight: 18,
+  } as TextStyle,
+  cardNameSelected: {
+    color: '#ffffff',
+  } as TextStyle,
+  cardPrice: {
+    fontSize: FONTS.sm,
+    fontFamily: FONTS.sansSerifBold,
+    color: COLORS.primary,
+  } as TextStyle,
+  cardPriceSelected: {
+    color: '#ffffff',
+  } as TextStyle,
+  cardFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  } as ViewStyle,
+  cardDuration: {
+    fontSize: FONTS.xs,
+    color: COLORS.textMuted,
+    fontFamily: FONTS.sansSerifMedium,
+    marginLeft: 4,
+  } as TextStyle,
+  cardDurationSelected: {
+    color: 'rgba(255,255,255,0.5)',
+  } as TextStyle,
+  checkBadge: {
+    position: 'absolute',
+    top: SPACING.md,
+    right: SPACING.md,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  } as ViewStyle,
+  loadingGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -SPACING.xs,
+  } as ViewStyle,
+  skeletonCard: {
+    width: '48%',
+    height: 150,
+    backgroundColor: '#f0f0f0',
+    borderRadius: BORDER_RADIUS['2xl'],
+    marginHorizontal: '1%',
+    marginBottom: SPACING.sm,
+  } as ViewStyle,
   emptyContainer: {
     alignItems: 'center',
     paddingVertical: SPACING['4xl'],
@@ -252,5 +430,24 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     fontFamily: FONTS.sansSerifMedium,
     marginTop: SPACING.md,
+  } as TextStyle,
+  fab: {
+    position: 'absolute',
+    right: SPACING.xl,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#171717',
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.lg,
+    borderRadius: BORDER_RADIUS.full,
+    gap: SPACING.sm,
+    ...SHADOWS.lg,
+  } as ViewStyle,
+  fabText: {
+    fontSize: FONTS.base,
+    fontFamily: FONTS.sansSerifSemiBold,
+    color: '#ffffff',
+    textTransform: 'uppercase',
+    letterSpacing: 2,
   } as TextStyle,
 });

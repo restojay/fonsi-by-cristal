@@ -40,12 +40,4 @@ export interface BusinessHours {
   updatedAt: Date
 }
 
-export interface BookingFormData {
-  serviceId: string
-  date: Date
-  time: string
-  name: string
-  email: string
-  phone: string
-  notes?: string
-}
+export type { BookingFormData } from '@/lib/validation'

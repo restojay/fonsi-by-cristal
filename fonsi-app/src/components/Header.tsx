@@ -1,5 +1,5 @@
 /**
- * Dark flat header with diagonal stripe pattern
+ * Dark flat header with diagonal stripe pattern overlay
  */
 
 import React from 'react';
@@ -13,7 +13,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, FONTS, SPACING } from '@constants/theme';
+import { COLORS, FONTS, SPACING, TYPOGRAPHY } from '@constants/theme';
+import { DiagonalStripePattern } from './DiagonalStripePattern';
 
 interface HeaderProps {
   title?: string;
@@ -34,6 +35,7 @@ export const Header: React.FC<HeaderProps> = ({
     <>
       <StatusBar barStyle="light-content" backgroundColor={backgroundColor || COLORS.primary} />
       <View style={[styles.headerBg, backgroundColor ? { backgroundColor } : undefined]}>
+        <DiagonalStripePattern opacity={0.08} />
         <SafeAreaView style={[styles.container, style]} edges={['top']}>
           <View style={styles.content}>
             {showLogo && (
@@ -56,14 +58,15 @@ export const Header: React.FC<HeaderProps> = ({
 const styles = StyleSheet.create({
   headerBg: {
     backgroundColor: COLORS.primary,
+    overflow: 'hidden',
   } as ViewStyle,
   container: {
-    paddingVertical: SPACING.md,
+    paddingVertical: SPACING.xl,
   } as ViewStyle,
   content: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.xl,
   } as ViewStyle,
   logoSection: {
     marginRight: SPACING.md,
@@ -78,15 +81,17 @@ const styles = StyleSheet.create({
     flex: 1,
   } as ViewStyle,
   title: {
-    fontSize: FONTS.xl,
-    fontFamily: FONTS.serifSemiBold,
+    fontSize: 30,
+    fontFamily: FONTS.serifBold,
     color: '#ffffff',
   } as TextStyle,
   subtitle: {
-    fontSize: FONTS.sm,
-    color: 'rgba(255, 255, 255, 0.7)',
+    fontSize: TYPOGRAPHY.sectionLabel.fontSize,
+    color: 'rgba(255, 255, 255, 0.5)',
     marginTop: SPACING.xs,
-    fontFamily: FONTS.sansSerif,
+    fontFamily: FONTS.sansSerifSemiBold,
+    textTransform: 'uppercase',
+    letterSpacing: TYPOGRAPHY.sectionLabel.letterSpacing,
   } as TextStyle,
   separator: {
     height: 1,
