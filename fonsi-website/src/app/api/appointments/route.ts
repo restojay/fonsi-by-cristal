@@ -61,6 +61,17 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    // Check for existing appointment at same date+time
+    const existing = await prisma.appointment.findFirst({
+      where: {
+        date: appointmentDate,
+        status: { in: ['pending', 'confirmed'] },
+      },
+    })
+    if (existing) {
+      return NextResponse.json({ error: 'This time slot is already booked' }, { status: 409 })
+    }
+
     // Create appointment
     const appointment = await prisma.appointment.create({
       data: {

@@ -76,7 +76,7 @@ function ServicesContent() {
       <section className="pt-6 pb-4 sticky top-0 bg-white/80 backdrop-blur-lg z-30">
         <div className="container-custom">
           <div className="relative inline-flex items-center gap-1 border border-neutral-200 py-1 px-1 rounded-full bg-neutral-50 overflow-visible">
-            {categories.map((category, idx) => (
+            {categories.map((category) => (
               <button
                 key={category}
 

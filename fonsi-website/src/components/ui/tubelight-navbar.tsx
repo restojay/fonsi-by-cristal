@@ -39,7 +39,6 @@ export function NavBar({ items, variant = 'light', className }: NavBarProps) {
         )}
       >
         {items.map((item) => {
-          const Icon = item.icon
           const isActive = activeTab === item.name
 
           return (

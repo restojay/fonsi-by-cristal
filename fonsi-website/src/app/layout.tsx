@@ -10,6 +10,7 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://fonsibycristal.com'),
   title: 'Fonsi by Cristal | Hair Salon & Makeup Studio San Antonio',
   description:
     'Hair salon and makeup studio in San Antonio, TX. Professional hair cuts, color, styling, bridal services, and makeup. By appointment only.',
