@@ -32,7 +32,7 @@ export function NavBar({ items, variant = 'light', className }: NavBarProps) {
     >
       <div
         className={cn(
-          'flex items-center gap-3 backdrop-blur-lg py-1 px-1 rounded-full shadow-lg border',
+          'flex items-center gap-1 sm:gap-3 backdrop-blur-lg py-1 px-1 rounded-full shadow-lg border',
           isLight
             ? 'bg-white/5 border-white/10'
             : 'bg-neutral-950 border-neutral-800'
@@ -47,17 +47,14 @@ export function NavBar({ items, variant = 'light', className }: NavBarProps) {
               key={item.name}
               href={item.url}
               className={cn(
-                'relative cursor-pointer text-sm font-semibold px-6 py-2 rounded-full transition-colors',
+                'relative cursor-pointer text-xs sm:text-sm font-semibold px-3 sm:px-6 py-2 rounded-full transition-colors',
                 isLight
                   ? 'text-white/70 hover:text-white'
                   : 'text-neutral-500 hover:text-white',
                 isActive && (isLight ? 'text-white' : 'text-white'),
               )}
             >
-              <span className="hidden md:inline">{item.name}</span>
-              <span className="md:hidden">
-                <Icon size={18} strokeWidth={2.5} />
-              </span>
+              <span>{item.name}</span>
               {isActive && (
                 <motion.div
                   layoutId="lamp"

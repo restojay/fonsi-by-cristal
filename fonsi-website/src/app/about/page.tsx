@@ -75,8 +75,8 @@ export default function AboutPage() {
         <div className="container-custom">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch">
             {/* Col 1 — Photo */}
-            <ScrollReveal direction="left" className="lg:col-span-4 h-full">
-              <div className="relative h-full">
+            <ScrollReveal direction="left" className="lg:col-span-4 h-full flex justify-start">
+              <div className="relative h-full max-w-xs">
                 <div className="h-full overflow-hidden rounded-2xl">
                   <img
                     src="/images/cristal-headshot.jpg"

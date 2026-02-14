@@ -546,7 +546,7 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
                     {/* TOS */}
                     <div className="border-t border-neutral-200 pt-3 mt-1">
                       <p className="text-neutral-400 font-sans text-[10px] leading-relaxed">
-                        Prices are estimates — final pricing based on hair length, density, and complexity. Consultations may be required for color correction, keratin, and on-site services. 24-hour cancellation notice required; 50% charge within 24 hours.
+                        Prices are estimates — final pricing based on hair length, density, and complexity. Consultations may be required for color correction, keratin, and on-site services. A non-refundable deposit may be required for select services, to be determined at the time of initial consultation. 24-hour cancellation notice required; 50% charge within 24 hours.
                       </p>
                     </div>
                   </div>

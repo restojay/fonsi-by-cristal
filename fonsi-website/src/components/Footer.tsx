@@ -30,12 +30,11 @@ export default function Footer() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-6">
             {/* Brand */}
             <div>
-              <h3 className="text-lg font-display font-bold text-white tracking-wide mb-1">
-                FONSI
-              </h3>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-white font-sans mb-3">
-                by Cristal
-              </p>
+              <img
+                src="/images/fonsi-logo-white.svg"
+                alt="FONSI by Cristal"
+                className="h-6 w-auto mb-3"
+              />
               <SocialLinks socials={socials} className="justify-start text-neutral-400 text-sm [&_span]:text-sm [&_a]:px-0 [&_a]:py-0" />
             </div>
 

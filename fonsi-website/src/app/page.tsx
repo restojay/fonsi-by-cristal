@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { ArrowRight, Phone, Scissors, Heart, Sparkles, Droplets } from 'lucide-react'
 import { motion } from 'framer-motion'
 import ScrollReveal from '@/components/ScrollReveal'
-import { SilkBackground } from '@/components/ui/silk-background-animation'
 import { HoverBorderGradient } from '@/components/ui/hover-border-gradient'
 import { BUSINESS } from '@/lib/constants'
 
@@ -13,37 +12,66 @@ export default function Home() {
     <>
       {/* Hero */}
       <div className="container-custom pt-16 md:pt-24">
-        <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden bg-neutral-900 rounded-2xl">
-          <SilkBackground />
-          <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/30 via-transparent to-black/50 pointer-events-none rounded-2xl" />
+        <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden bg-black rounded-2xl">
+          {/* Background photo — cinematic Ken Burns zoom */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-            className="text-center relative z-10 px-8 py-16 md:py-20"
+            transition={{ duration: 2, delay: 0.3 }}
+            className="absolute inset-0 z-0"
           >
-            <p className="text-xs uppercase tracking-[0.4em] text-white font-sans mb-8">
+            <img
+              src="/images/hero-bg.webp"
+              alt=""
+              className="w-full h-full object-cover object-center"
+            />
+          </motion.div>
+
+          {/* Dark overlays — ensure text readability */}
+          <div className="absolute inset-0 z-[1] bg-black/50 pointer-events-none" />
+          <div className="absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_center,transparent_10%,rgba(0,0,0,0.5)_60%,rgba(0,0,0,0.8)_100%)] pointer-events-none" />
+          <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/70 via-transparent to-black/50 pointer-events-none" />
+
+          {/* Content — staggered entrance */}
+          <div className="text-center relative z-10 px-8 py-16 md:py-20">
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="text-xs uppercase tracking-[0.4em] text-white/80 font-sans mb-8"
+            >
               Hair Salon & Makeup Studio &mdash; San Antonio, TX
-            </p>
+            </motion.p>
 
-            <h1 className="text-8xl sm:text-9xl md:text-[10rem] lg:text-[12rem] font-heading font-normal text-white leading-[0.9] tracking-wide mb-4">
-              FONSI
-            </h1>
+            <motion.img
+              src="/images/fonsi-logo-white.svg"
+              alt="FONSI by Cristal"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 1.2 }}
+              className="h-16 sm:h-20 md:h-28 lg:h-36 w-auto mx-auto mb-12"
+            />
 
-            <p className="text-2xl md:text-3xl font-heading font-normal text-neutral-400 mb-12 uppercase tracking-widest">
-              By Cristal
-            </p>
-
-            <p className="text-white font-sans text-base md:text-lg max-w-md mx-auto mb-14 leading-relaxed">
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.6 }}
+              className="text-white/90 font-sans text-base md:text-lg max-w-md mx-auto mb-14 leading-relaxed"
+            >
               Let me help you shine. Professional hair and makeup services, by appointment only.
-            </p>
+            </motion.p>
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 2 }}
+              className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+            >
               <Link href="/booking">
                 <HoverBorderGradient
                   as="div"
                   containerClassName="rounded-full btn-pop"
-                  className="bg-black text-white px-8 py-3 font-sans text-sm uppercase tracking-[0.15em] font-medium inline-flex items-center justify-center gap-3"
+                  className="bg-black/60 backdrop-blur-sm text-white px-8 py-3 font-sans text-sm uppercase tracking-[0.15em] font-medium inline-flex items-center justify-center gap-3 border-white/10"
                 >
                   Book Appointment
                   <ArrowRight size={16} />
@@ -53,13 +81,13 @@ export default function Home() {
                 <HoverBorderGradient
                   as="div"
                   containerClassName="rounded-full"
-                  className="bg-black text-white px-8 py-3 font-sans text-sm uppercase tracking-[0.15em] font-medium"
+                  className="bg-black/60 backdrop-blur-sm text-white px-8 py-3 font-sans text-sm uppercase tracking-[0.15em] font-medium border-white/10"
                 >
                   View Services
                 </HoverBorderGradient>
               </Link>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </section>
       </div>
 
@@ -149,7 +177,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 pt-10">
-            <div className="text-center lg:text-left">
+            <div className="flex justify-center lg:justify-start">
               <Link href="/about">
                 <HoverBorderGradient
                   as="div"
@@ -161,7 +189,7 @@ export default function Home() {
                 </HoverBorderGradient>
               </Link>
             </div>
-            <div className="text-center">
+            <div className="flex justify-center">
               <Link href="/services">
                 <HoverBorderGradient
                   as="div"
