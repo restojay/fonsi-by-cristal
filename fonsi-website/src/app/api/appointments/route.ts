@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { headers } from 'next/headers'
 import { prisma } from '@/lib/db'
 import { bookingSchema } from '@/lib/validation'
 import { sendConfirmationEmail } from '@/lib/email'
+import { rateLimit } from '@/lib/rate-limit'
 import { format } from 'date-fns'
 
 export async function GET(_request: NextRequest) {
@@ -27,6 +29,12 @@ export async function GET(_request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const headersList = await headers()
+  const ip = headersList.get('x-forwarded-for') || 'unknown'
+  if (!rateLimit(ip)) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+  }
+
   try {
     const body = await request.json()
 

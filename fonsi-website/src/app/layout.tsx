@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -52,9 +53,11 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-white text-neutral-600 font-sans antialiased">
-        <Navbar />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+        <ErrorBoundary>
+          <Navbar />
+          <main className="min-h-screen">{children}</main>
+          <Footer />
+        </ErrorBoundary>
       </body>
     </html>
   )

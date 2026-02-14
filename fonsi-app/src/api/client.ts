@@ -18,7 +18,7 @@ import {
 import { SERVICES } from '@constants/services';
 
 // Configure base URL - can be changed via environment or runtime config
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://api.fonsibycrystal.com';
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
 
 class ApiClient {
   private client: AxiosInstance;
