@@ -344,12 +344,12 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
             <h2 className="text-2xl font-serif font-bold text-neutral-900 mb-6 text-center">Select a Service</h2>
 
             {/* Category Tabs */}
-            <div className="inline-flex items-center gap-1 bg-neutral-100 border border-neutral-200 py-1 px-1 rounded-full mb-6">
+            <div className="inline-flex items-center gap-1 bg-neutral-100 border border-neutral-200 py-1 px-1 rounded-full mb-6 overflow-visible">
               {categories.map((category) => (
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`relative cursor-pointer text-sm font-sans font-semibold px-5 py-1.5 rounded-full transition-colors ${
+                  className={`relative overflow-visible cursor-pointer text-sm font-sans font-semibold px-5 py-1.5 rounded-full transition-colors ${
                     selectedCategory === category
                       ? 'text-neutral-900'
                       : 'text-neutral-500 hover:text-neutral-900'
@@ -358,14 +358,21 @@ export default function BookingWidget({ services, onSuccess }: BookingWidgetProp
                   {selectedCategory === category && (
                     <motion.div
                       layoutId="booking-tab"
-                      className="absolute inset-0 w-full bg-white rounded-full -z-10 shadow-sm"
+                      className="absolute inset-0 w-full bg-white rounded-full border border-neutral-300 shadow-md"
+                      style={{ zIndex: 0 }}
                       initial={false}
                       transition={{
                         type: 'spring',
                         stiffness: 300,
                         damping: 30,
                       }}
-                    />
+                    >
+                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-1 rounded-t-full bg-neutral-900">
+                        <div className="absolute w-12 h-6 rounded-full blur-md -top-2 -left-2 bg-neutral-900/15" />
+                        <div className="absolute w-8 h-6 rounded-full blur-md -top-1 bg-neutral-900/15" />
+                        <div className="absolute w-4 h-4 rounded-full blur-sm top-0 left-2 bg-neutral-900/15" />
+                      </div>
+                    </motion.div>
                   )}
                   <span className="relative z-10">{category}</span>
                 </button>

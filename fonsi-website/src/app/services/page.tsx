@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { formatPrice } from '@/lib/utils'
 import Link from 'next/link'
@@ -28,20 +28,6 @@ function ServicesContent() {
     categoryParam && categories.includes(categoryParam) ? categoryParam : 'Hair'
   )
 
-  const containerRef = useRef<HTMLDivElement>(null)
-  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([])
-  const [glowLeft, setGlowLeft] = useState(0)
-
-  const updateGlowPosition = useCallback(() => {
-    const idx = categories.indexOf(selectedCategory)
-    const btn = buttonRefs.current[idx]
-    const container = containerRef.current
-    if (btn && container) {
-      const containerRect = container.getBoundingClientRect()
-      const btnRect = btn.getBoundingClientRect()
-      setGlowLeft(btnRect.left - containerRect.left + btnRect.width / 2)
-    }
-  }, [selectedCategory])
 
   useEffect(() => {
     if (categoryParam && categories.includes(categoryParam)) {
@@ -49,9 +35,6 @@ function ServicesContent() {
     }
   }, [categoryParam])
 
-  useEffect(() => {
-    updateGlowPosition()
-  }, [updateGlowPosition])
   const groupedServices = services.reduce(
     (acc, service) => {
       if (!acc[service.category]) acc[service.category] = []
@@ -92,13 +75,13 @@ function ServicesContent() {
       {/* Category Tabs */}
       <section className="pt-6 pb-4 sticky top-0 bg-white/80 backdrop-blur-lg z-30">
         <div className="container-custom">
-          <div ref={containerRef} className="relative inline-flex items-center gap-1 border border-neutral-200 py-1 px-1 rounded-full bg-neutral-50">
+          <div className="relative inline-flex items-center gap-1 border border-neutral-200 py-1 px-1 rounded-full bg-neutral-50 overflow-visible">
             {categories.map((category, idx) => (
               <button
                 key={category}
-                ref={(el) => { buttonRefs.current[idx] = el }}
+
                 onClick={() => setSelectedCategory(category)}
-                className={`relative cursor-pointer text-sm font-sans font-semibold px-6 py-2 rounded-full transition-colors ${
+                className={`relative overflow-visible cursor-pointer text-sm font-sans font-semibold px-6 py-2 rounded-full transition-colors ${
                   selectedCategory === category
                     ? 'text-neutral-900'
                     : 'text-neutral-400 hover:text-neutral-900'
@@ -107,35 +90,25 @@ function ServicesContent() {
                 {selectedCategory === category && (
                   <motion.div
                     layoutId="tab-indicator"
-                    className="absolute inset-0 w-full rounded-full border border-neutral-200 bg-white shadow-sm"
+                    className="absolute inset-0 w-full rounded-full border border-neutral-300 bg-white shadow-md"
+                    style={{ zIndex: 0 }}
                     initial={false}
                     transition={{
                       type: 'spring',
                       stiffness: 300,
                       damping: 30,
                     }}
-                  />
+                  >
+                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-1 rounded-t-full bg-neutral-900">
+                      <div className="absolute w-12 h-6 rounded-full blur-md -top-2 -left-2 bg-neutral-900/15" />
+                      <div className="absolute w-8 h-6 rounded-full blur-md -top-1 bg-neutral-900/15" />
+                      <div className="absolute w-4 h-4 rounded-full blur-sm top-0 left-2 bg-neutral-900/15" />
+                    </div>
+                  </motion.div>
                 )}
                 <span className="relative z-10">{category}</span>
               </button>
             ))}
-            {/* Tubelight glow — rendered outside the pill container */}
-            <motion.div
-              className="absolute -top-1 h-1 w-8 rounded-t-full bg-neutral-900 pointer-events-none"
-              animate={{
-                left: glowLeft,
-                x: '-50%',
-              }}
-              transition={{
-                type: 'spring',
-                stiffness: 300,
-                damping: 30,
-              }}
-            >
-              <div className="absolute w-12 h-6 rounded-full blur-md -top-2 -left-2 bg-neutral-900/15" />
-              <div className="absolute w-8 h-6 rounded-full blur-md -top-1 bg-neutral-900/15" />
-              <div className="absolute w-4 h-4 rounded-full blur-sm top-0 left-2 bg-neutral-900/15" />
-            </motion.div>
           </div>
         </div>
       </section>
