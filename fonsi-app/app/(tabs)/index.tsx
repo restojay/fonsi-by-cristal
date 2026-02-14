@@ -24,6 +24,7 @@ import { SectionLabel } from '@components/SectionLabel';
 import { SilkBackground } from '@components/SilkBackground';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, SHADOWS, TYPOGRAPHY } from '@constants/theme';
+import { BUSINESS } from '@constants/business';
 import { useBookingStore } from '@store/bookingStore';
 import { apiClient } from '@api/client';
 import { Service } from '@types/index';
@@ -174,9 +175,9 @@ export default function HomeScreen() {
               <Text style={styles.contactLabel}>Address</Text>
             </View>
             <Text style={styles.contactValue}>
-              6626 West Loop 1604 North suite 105
+              {BUSINESS.address.street}, {BUSINESS.address.suite}
             </Text>
-            <Text style={styles.contactValue}>San Antonio, TX 78254</Text>
+            <Text style={styles.contactValue}>{BUSINESS.address.city}, {BUSINESS.address.state} {BUSINESS.address.zip}</Text>
           </View>
           <View style={styles.contactItem}>
             <View style={styles.contactLabelRow}>
@@ -186,7 +187,7 @@ export default function HomeScreen() {
               <Text style={styles.contactLabel}>Phone</Text>
             </View>
             <TouchableOpacity>
-              <Text style={styles.contactLink}>(210) 551-7742</Text>
+              <Text style={styles.contactLink}>{BUSINESS.phone}</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.contactItem}>
@@ -196,9 +197,9 @@ export default function HomeScreen() {
               </View>
               <Text style={styles.contactLabel}>Hours</Text>
             </View>
-            <Text style={styles.contactValue}>Tuesday - Saturday</Text>
-            <Text style={styles.contactValue}>10:00 AM - 6:30 PM</Text>
-            <Text style={styles.contactValueMuted}>Sunday & Monday - Closed</Text>
+            <Text style={styles.contactValue}>{BUSINESS.hours.open}</Text>
+            <Text style={styles.contactValue}>{BUSINESS.hours.time}</Text>
+            <Text style={styles.contactValueMuted}>{BUSINESS.hours.closed} - Closed</Text>
           </View>
         </GradientCard>
       </AnimatedSection>

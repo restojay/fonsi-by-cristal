@@ -77,14 +77,14 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
   },
 
   setStep: (step: number) => {
-    if (step >= 1 && step <= 5) {
+    if (step >= 1 && step <= 4) {
       set({ step });
     }
   },
 
   nextStep: () => {
     set((state) => ({
-      step: Math.min(state.step + 1, 5),
+      step: Math.min(state.step + 1, 4),
     }));
   },
 
@@ -108,11 +108,6 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
         selectedDate: null,
         selectedTime: null,
         step: 2,
-      });
-    } else if (step === 3) {
-      set({
-        selectedTime: null,
-        step: 3,
       });
     }
   },
@@ -140,20 +135,18 @@ export const useBookingValidation = () => {
     useBookingStore();
 
   const isStep1Valid = selectedService !== null;
-  const isStep2Valid = selectedDate !== null;
-  const isStep3Valid = selectedTime !== null;
-  const isStep4Valid =
+  const isStep2Valid = selectedDate !== null && selectedTime !== null;
+  const isStep3Valid =
     clientInfo.firstName.trim() !== '' &&
     clientInfo.lastName.trim() !== '' &&
     clientInfo.email.trim() !== '' &&
     clientInfo.phone.trim() !== '';
-  const isStep5Valid = isStep1Valid && isStep2Valid && isStep3Valid && isStep4Valid;
+  const isStep4Valid = isStep1Valid && isStep2Valid && isStep3Valid;
 
   return {
     isStep1Valid,
     isStep2Valid,
     isStep3Valid,
     isStep4Valid,
-    isStep5Valid,
   };
 };

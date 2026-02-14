@@ -23,6 +23,7 @@ import { GradientButton } from '@components/GradientButton';
 import { GradientCard } from '@components/GradientCard';
 import { SectionLabel } from '@components/SectionLabel';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS } from '@constants/theme';
+import { BUSINESS } from '@constants/business';
 
 const certifications = [
   'MAC Pro Certified',
@@ -174,8 +175,8 @@ export default function AboutScreen() {
             </View>
             <View style={styles.contactContent}>
               <Text style={styles.contactLabel}>Location</Text>
-              <Text style={styles.contactValue}>6626 West Loop 1604 North, Suite 105</Text>
-              <Text style={styles.contactDetail}>San Antonio, TX 78254 (Suites 39 & 41)</Text>
+              <Text style={styles.contactValue}>{BUSINESS.address.street}, {BUSINESS.address.suite}</Text>
+              <Text style={styles.contactDetail}>{BUSINESS.address.city}, {BUSINESS.address.state} {BUSINESS.address.zip} ({BUSINESS.address.detail})</Text>
             </View>
           </View>
           <View style={styles.contactDivider} />
@@ -187,9 +188,9 @@ export default function AboutScreen() {
               <Text style={styles.contactLabel}>Phone</Text>
               <Text
                 style={[styles.contactValue, styles.contactLink]}
-                onPress={() => Linking.openURL('tel:2105517742')}
+                onPress={() => Linking.openURL(`tel:${BUSINESS.phoneTel}`)}
               >
-                (210) 551-7742
+                {BUSINESS.phone}
               </Text>
             </View>
           </View>
@@ -200,8 +201,8 @@ export default function AboutScreen() {
             </View>
             <View style={styles.contactContent}>
               <Text style={styles.contactLabel}>Hours</Text>
-              <Text style={styles.contactValue}>Tue - Sat: 10 AM - 6:30 PM</Text>
-              <Text style={styles.contactDetail}>Sun & Mon: Closed</Text>
+              <Text style={styles.contactValue}>{BUSINESS.hours.openShort}: {BUSINESS.hours.time}</Text>
+              <Text style={styles.contactDetail}>{BUSINESS.hours.closedShort}: Closed</Text>
             </View>
           </View>
           <View style={styles.contactDivider} />
@@ -213,9 +214,9 @@ export default function AboutScreen() {
               <Text style={styles.contactLabel}>Instagram</Text>
               <Text
                 style={[styles.contactValue, styles.contactLink]}
-                onPress={() => Linking.openURL('https://www.instagram.com/fonsi_by_cristal/')}
+                onPress={() => Linking.openURL(BUSINESS.social.instagram)}
               >
-                @fonsi_by_cristal
+                {BUSINESS.social.instagramHandle}
               </Text>
             </View>
           </View>
@@ -225,7 +226,7 @@ export default function AboutScreen() {
       {/* Book CTA */}
       <AnimatedSection delay={700} style={styles.ctaSection}>
         <Text style={styles.ctaTitle}>Ready to book?</Text>
-        <Text style={styles.ctaSubtext}>By appointment only. Tue - Sat, 10 AM - 6:30 PM.</Text>
+        <Text style={styles.ctaSubtext}>{BUSINESS.hours.note}. {BUSINESS.hours.openShort}, {BUSINESS.hours.time}.</Text>
         <GradientButton
           title="Book Appointment"
           onPress={() => router.push('/book')}

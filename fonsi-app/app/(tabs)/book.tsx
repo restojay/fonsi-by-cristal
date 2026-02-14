@@ -48,8 +48,9 @@ import { useAppointmentStore } from '@store/appointmentStore';
 import { apiClient } from '@api/client';
 import { Service, TimeSlot } from '@types/index';
 import { SERVICES, SERVICES_BY_CATEGORY } from '@constants/services';
+import { BUSINESS } from '@constants/business';
 
-const STEPS = ['Service', 'Date', 'Time', 'Info', 'Review'];
+const STEPS = ['Service', 'Date & Time', 'Info', 'Confirm'];
 
 type ServiceCategory = 'Hair' | 'Bridal' | 'Makeup' | 'Waxing';
 
@@ -104,7 +105,7 @@ export default function BookScreen() {
   }, [step, stackedServices.length]);
 
   useEffect(() => {
-    progressWidth.value = withTiming((step / 5) * 100, {
+    progressWidth.value = withTiming((step / 4) * 100, {
       duration: ANIMATION.timing.normal,
       easing: Easing.out(Easing.cubic),
     });
@@ -209,7 +210,13 @@ export default function BookScreen() {
     : SERVICES.filter((s) => s.category === selectedCategory);
 
   const handleServiceSelect = (service: Service) => {
-    toggleStackedService(service);
+    if (selectedCategory === 'Hair') {
+      toggleStackedService(service);
+    } else {
+      setSelectedService(service);
+      setStackedServices([]);
+      nextStep();
+    }
   };
 
   const handleStackedContinue = () => {
@@ -258,11 +265,11 @@ export default function BookScreen() {
   };
 
   const handleNextStep = async () => {
-    if (step === 4) {
+    if (step === 3) {
       if (!validateContactInfo()) return;
     }
 
-    if (step === 5) {
+    if (step === 4) {
       await handleSubmitBooking();
       return;
     }
@@ -331,7 +338,7 @@ export default function BookScreen() {
       onScroll={handleScroll}
       scrollEventThrottle={16}
     >
-      <Header title="Book Appointment" subtitle={`Step ${step} of 5`} showLogo={false} />
+      <Header title="Book Appointment" subtitle={`Step ${step} of 4`} showLogo={false} />
 
       {/* Progress Indicator */}
       <View style={styles.progressSection}>
@@ -378,7 +385,7 @@ export default function BookScreen() {
       {/* Step 1: Service Selection with category tabs and stacking */}
       {step === 1 && (
         <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
-          <SectionLabel text="STEP 1 OF 5" />
+          <SectionLabel text="STEP 1 OF 4" />
           <Text style={styles.stepTitle}>Select a Service</Text>
 
           {/* Category Tabs */}
@@ -398,9 +405,11 @@ export default function BookScreen() {
             })}
           </View>
 
-          <Text style={styles.stackingHint}>
-            Select one or more services, then press Continue
-          </Text>
+          {selectedCategory === 'Hair' && (
+            <Text style={styles.stackingHint}>
+              Select one or more services to combine them into a single appointment
+            </Text>
+          )}
 
           {allServices.length === 0 && SERVICES.length === 0 ? (
             <SkeletonList count={4} />
@@ -464,13 +473,13 @@ export default function BookScreen() {
         </Animated.View>
       )}
 
-      {/* Step 2: Date Selection */}
+      {/* Step 2: Date & Time Selection */}
       {step === 2 && (
         <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
-          <SectionLabel text="STEP 2 OF 5" />
-          <Text style={styles.stepTitle}>Choose a Date</Text>
+          <SectionLabel text="STEP 2 OF 4" />
+          <Text style={styles.stepTitle}>Choose Date & Time</Text>
           <Text style={styles.stepSubtitle}>
-            Available: Tuesday - Saturday
+            Available: {BUSINESS.hours.open}
           </Text>
           <GradientCard showAccent={false}>
             <Calendar
@@ -508,42 +517,40 @@ export default function BookScreen() {
               }}
             />
           </GradientCard>
-        </Animated.View>
-      )}
 
-      {/* Step 3: Time Selection */}
-      {step === 3 && (
-        <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
-          <SectionLabel text="STEP 3 OF 5" />
-          <Text style={styles.stepTitle}>Select a Time</Text>
-          {isLoading ? (
-            <View style={styles.loadingTimeSlots}>
-              {[0, 1, 2].map((i) => (
-                <View key={i} style={{ marginBottom: SPACING.lg }}>
-                  <SkeletonLoader width={120} height={18} style={{ marginBottom: SPACING.sm }} />
-                  <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
-                    <SkeletonLoader width="30%" height={44} borderRadius={BORDER_RADIUS.md} />
-                    <SkeletonLoader width="30%" height={44} borderRadius={BORDER_RADIUS.md} />
-                    <SkeletonLoader width="30%" height={44} borderRadius={BORDER_RADIUS.md} />
-                  </View>
+          {selectedDate && (
+            <View style={{ marginTop: SPACING.xl }}>
+              <Text style={styles.stepTitle}>Select a Time</Text>
+              {isLoading ? (
+                <View style={styles.loadingTimeSlots}>
+                  {[0, 1, 2].map((i) => (
+                    <View key={i} style={{ marginBottom: SPACING.lg }}>
+                      <SkeletonLoader width={120} height={18} style={{ marginBottom: SPACING.sm }} />
+                      <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
+                        <SkeletonLoader width="30%" height={44} borderRadius={BORDER_RADIUS.md} />
+                        <SkeletonLoader width="30%" height={44} borderRadius={BORDER_RADIUS.md} />
+                        <SkeletonLoader width="30%" height={44} borderRadius={BORDER_RADIUS.md} />
+                      </View>
+                    </View>
+                  ))}
                 </View>
-              ))}
+              ) : (
+                <TimeSlotPicker
+                  slots={timeSlots}
+                  selectedTime={selectedTime || ''}
+                  onSelectTime={setSelectedTime}
+                  selectedDate={selectedDate || undefined}
+                />
+              )}
             </View>
-          ) : (
-            <TimeSlotPicker
-              slots={timeSlots}
-              selectedTime={selectedTime || ''}
-              onSelectTime={setSelectedTime}
-              selectedDate={selectedDate || undefined}
-            />
           )}
         </Animated.View>
       )}
 
-      {/* Step 4: Contact Info + Notes */}
-      {step === 4 && (
+      {/* Step 3: Contact Info + Notes */}
+      {step === 3 && (
         <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
-          <SectionLabel text="STEP 4 OF 5" />
+          <SectionLabel text="STEP 3 OF 4" />
           <Text style={styles.stepTitle}>Your Information</Text>
 
           <View style={styles.formGroup}>
@@ -645,10 +652,10 @@ export default function BookScreen() {
         </Animated.View>
       )}
 
-      {/* Step 5: Review + Cancellation Policy */}
-      {step === 5 && (
+      {/* Step 4: Review + Cancellation Policy */}
+      {step === 4 && (
         <Animated.View entering={FadeIn.duration(300)} style={styles.stepContent}>
-          <SectionLabel text="STEP 5 OF 5" />
+          <SectionLabel text="STEP 4 OF 4" />
           <Text style={styles.stepTitle}>Confirm Your Booking</Text>
 
           <GradientCard>
@@ -753,7 +760,7 @@ export default function BookScreen() {
           <View style={styles.cancellationPolicy}>
             <Text style={styles.cancellationPolicyText}>
               <Text style={styles.cancellationPolicyBold}>Cancellation Policy: </Text>
-              24-hour notice required. 50% charge for cancellations within 24 hours.
+              {BUSINESS.cancellation}
             </Text>
           </View>
 
@@ -778,7 +785,7 @@ export default function BookScreen() {
 
         {step !== 1 && (
           <View style={{ flex: 1 }}>
-            {step === 5 ? (
+            {step === 4 ? (
               <GlowingBorderButton
                 title="Book Now"
                 onPress={handleNextStep}
