@@ -16,6 +16,9 @@ export const metadata: Metadata = {
     'hair salon, makeup studio, hair color, bridal services, San Antonio, Texas',
   authors: [{ name: 'Fonsi by Cristal' }],
   robots: 'index, follow',
+  icons: {
+    icon: '/icon.svg',
+  },
   openGraph: {
     title: 'Fonsi by Cristal | Hair Salon & Makeup Studio',
     description:
