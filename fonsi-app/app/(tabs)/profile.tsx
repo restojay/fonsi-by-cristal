@@ -8,10 +8,12 @@ import {
   ScrollView,
   View,
   Text,
+  Image,
   StyleSheet,
   Linking,
   ViewStyle,
   TextStyle,
+  ImageStyle,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
@@ -72,6 +74,17 @@ export default function AboutScreen() {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <Header title="Meet Cristal" subtitle="THE ARTIST" showLogo={false} />
+
+      {/* Photo */}
+      <AnimatedSection delay={50} style={styles.photoSection}>
+        <View style={styles.photoContainer}>
+          <Image
+            source={require('../../assets/headshot.jpg')}
+            style={styles.photo}
+            resizeMode="cover"
+          />
+        </View>
+      </AnimatedSection>
 
       {/* Story */}
       <AnimatedSection delay={100} style={styles.section}>
@@ -231,6 +244,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgPrimary,
   } as ViewStyle,
+  photoSection: {
+    alignItems: 'center',
+    paddingVertical: SPACING.xl,
+  } as ViewStyle,
+  photoContainer: {
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    overflow: 'hidden',
+    borderWidth: 3,
+    borderColor: COLORS.borderColor,
+  } as ViewStyle,
+  photo: {
+    width: '100%',
+    height: '100%',
+  } as ImageStyle,
   section: {
     paddingHorizontal: SPACING.xl,
     marginBottom: SPACING['3xl'],

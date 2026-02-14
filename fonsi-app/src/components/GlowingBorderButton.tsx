@@ -1,29 +1,23 @@
 /**
- * Glowing border button — RN equivalent of the website's HoverBorderGradient
- * Continuously spinning gradient border around a dark pill button
+ * CTA button with press-to-pop scale animation — matches website feel
  */
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
-  View,
   Text,
   StyleSheet,
   TouchableOpacity,
+  View,
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withRepeat,
-  withTiming,
   withSpring,
-  Easing,
-  interpolate,
 } from 'react-native-reanimated';
 import { Feather } from '@expo/vector-icons';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS, ANIMATION } from '@constants/theme';
+import { FONTS, SPACING, BORDER_RADIUS, ANIMATION } from '@constants/theme';
 
 interface GlowingBorderButtonProps {
   title: string;
@@ -46,34 +40,18 @@ export const GlowingBorderButton: React.FC<GlowingBorderButtonProps> = ({
   loading = false,
   style,
 }) => {
-  const rotation = useSharedValue(0);
   const scale = useSharedValue(1);
 
-  useEffect(() => {
-    rotation.value = withRepeat(
-      withTiming(360, {
-        duration: 3000,
-        easing: Easing.linear,
-      }),
-      -1,
-      false
-    );
-  }, []);
-
   const handlePressIn = () => {
-    scale.value = withSpring(0.96, ANIMATION.spring);
+    scale.value = withSpring(0.95, ANIMATION.spring);
   };
 
   const handlePressOut = () => {
-    scale.value = withSpring(1, ANIMATION.spring);
+    scale.value = withSpring(1.0, { ...ANIMATION.spring, stiffness: 300, damping: 10 });
   };
 
   const scaleStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
-  }));
-
-  const gradientStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotation.value}deg` }],
   }));
 
   return (
@@ -85,62 +63,31 @@ export const GlowingBorderButton: React.FC<GlowingBorderButtonProps> = ({
       disabled={disabled || loading}
       style={[scaleStyle, disabled && { opacity: 0.5 }, style]}
     >
-      <View style={styles.outerContainer}>
-        {/* Spinning gradient border */}
-        <Animated.View style={[styles.gradientContainer, gradientStyle]}>
-          <LinearGradient
-            colors={['#171717', '#525252', '#a3a3a3', '#525252', '#171717']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.gradient}
+      <View style={styles.button}>
+        {icon && (
+          <Feather
+            name={icon}
+            size={18}
+            color="#ffffff"
+            style={styles.iconLeft}
           />
-        </Animated.View>
-
-        {/* Inner dark pill */}
-        <View style={styles.innerButton}>
-          {icon && (
-            <Feather
-              name={icon}
-              size={18}
-              color="#ffffff"
-              style={styles.iconLeft}
-            />
-          )}
-          <Text style={styles.buttonText}>{title}</Text>
-          {iconRight && (
-            <Feather
-              name={iconRight}
-              size={18}
-              color="#ffffff"
-              style={styles.iconRight}
-            />
-          )}
-        </View>
+        )}
+        <Text style={styles.buttonText}>{title}</Text>
+        {iconRight && (
+          <Feather
+            name={iconRight}
+            size={18}
+            color="#ffffff"
+            style={styles.iconRight}
+          />
+        )}
       </View>
     </AnimatedTouchable>
   );
 };
 
 const styles = StyleSheet.create({
-  outerContainer: {
-    borderRadius: BORDER_RADIUS.full,
-    padding: 2,
-    overflow: 'hidden',
-    position: 'relative',
-    backgroundColor: '#171717',
-  } as ViewStyle,
-  gradientContainer: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: BORDER_RADIUS.full,
-  } as ViewStyle,
-  gradient: {
-    width: '150%',
-    height: '150%',
-    position: 'absolute',
-    top: '-25%',
-    left: '-25%',
-  } as ViewStyle,
-  innerButton: {
+  button: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

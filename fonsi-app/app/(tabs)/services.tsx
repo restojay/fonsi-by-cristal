@@ -72,8 +72,6 @@ export default function ServicesScreen() {
   }, []);
 
   const filteredServices = services.filter((s) => s.category === selectedCategory);
-  const categoryCount = (cat: ServiceCategory) =>
-    services.filter((s) => s.category === cat).length;
 
   const handleSelectService = (service: Service) => {
     if (selectedCategory === 'Hair') {
@@ -119,7 +117,6 @@ export default function ServicesScreen() {
           <View style={styles.categoriesGrid}>
             {CATEGORY_CONFIG.map((cat) => {
               const isActive = selectedCategory === cat.name;
-              const count = categoryCount(cat.name);
 
               return (
                 <TouchableOpacity
@@ -142,13 +139,6 @@ export default function ServicesScreen() {
                   <Text style={isActive ? styles.categoryTabTextActive : styles.categoryTabText}>
                     {cat.name}
                   </Text>
-                  {count > 0 && (
-                    <View style={isActive ? styles.countBadgeActive : styles.countBadge}>
-                      <Text style={isActive ? styles.countBadgeTextActive : styles.countBadgeText}>
-                        {count}
-                      </Text>
-                    </View>
-                  )}
                 </TouchableOpacity>
               );
             })}
@@ -234,7 +224,7 @@ export default function ServicesScreen() {
 
       {/* Floating Book Button */}
       <TouchableOpacity
-        style={[styles.fab, { bottom: insets.bottom + 70 }]}
+        style={[styles.fab, { bottom: insets.bottom + 20 }]}
         activeOpacity={0.85}
         onPress={handleBook}
       >
@@ -261,32 +251,33 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   categoriesGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: SPACING.sm,
+    gap: SPACING.xs,
   } as ViewStyle,
   categoryGridItem: {
-    width: '48%',
+    flex: 1,
     justifyContent: 'center',
   } as ViewStyle,
   categoryTab: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: SPACING.lg,
+    justifyContent: 'center',
+    paddingHorizontal: SPACING.sm,
     paddingVertical: SPACING.md,
     borderRadius: BORDER_RADIUS.full,
     backgroundColor: '#171717',
-    gap: SPACING.xs,
+    gap: 4,
   } as ViewStyle,
   categoryTabInactive: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: SPACING.lg,
+    justifyContent: 'center',
+    paddingHorizontal: SPACING.sm,
     paddingVertical: SPACING.md,
     borderRadius: BORDER_RADIUS.full,
     backgroundColor: '#f5f5f5',
     borderColor: '#e5e5e5',
     borderWidth: 1,
-    gap: SPACING.xs,
+    gap: 4,
   } as ViewStyle,
   categoryTabText: {
     fontSize: FONTS.xs,
@@ -295,28 +286,6 @@ const styles = StyleSheet.create({
   } as TextStyle,
   categoryTabTextActive: {
     fontSize: FONTS.xs,
-    fontFamily: FONTS.sansSerifSemiBold,
-    color: COLORS.bgPrimary,
-  } as TextStyle,
-  countBadge: {
-    backgroundColor: '#e5e5e5',
-    borderRadius: BORDER_RADIUS.full,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 2,
-  } as ViewStyle,
-  countBadgeText: {
-    fontSize: FONTS.xs - 1,
-    fontFamily: FONTS.sansSerifSemiBold,
-    color: COLORS.textMuted,
-  } as TextStyle,
-  countBadgeActive: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: BORDER_RADIUS.full,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 2,
-  } as ViewStyle,
-  countBadgeTextActive: {
-    fontSize: FONTS.xs - 1,
     fontFamily: FONTS.sansSerifSemiBold,
     color: COLORS.bgPrimary,
   } as TextStyle,

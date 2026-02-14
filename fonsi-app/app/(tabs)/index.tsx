@@ -95,11 +95,6 @@ export default function HomeScreen() {
           style={StyleSheet.absoluteFill}
           pointerEvents="none"
         />
-        <View style={styles.cornerLogo}>
-          <Text style={styles.cornerLogoTitle}>FONSI</Text>
-          <Text style={styles.cornerLogoSubtitle}>by Cristal</Text>
-        </View>
-
         {/* Hero Typography */}
         <AnimatedSection delay={50} style={styles.heroTypography}>
           <Text style={styles.heroTitle}>FONSI</Text>
@@ -208,11 +203,6 @@ export default function HomeScreen() {
         </GradientCard>
       </AnimatedSection>
 
-      {/* Footer */}
-      <View style={styles.footer}>
-        <View style={styles.footerLine} />
-        <Text style={styles.footerText}>Call or Text to Book</Text>
-      </View>
       </View>
     </ScrollView>
     </View>
@@ -236,23 +226,6 @@ const styles = StyleSheet.create({
     paddingBottom: SPACING.xl,
     overflow: 'hidden',
   } as ViewStyle,
-  cornerLogo: {
-    paddingHorizontal: SPACING.xl,
-    paddingTop: SPACING.md,
-  } as ViewStyle,
-  cornerLogoTitle: {
-    fontSize: FONTS.xl,
-    fontFamily: FONTS.serif,
-    color: '#ffffff',
-    letterSpacing: 3,
-  } as TextStyle,
-  cornerLogoSubtitle: {
-    fontSize: 10,
-    fontFamily: FONTS.sansSerif,
-    color: 'rgba(255, 255, 255, 0.4)',
-    letterSpacing: 3,
-    textTransform: 'uppercase',
-  } as TextStyle,
   heroTypography: {
     alignItems: 'center',
     paddingVertical: SPACING.xl,
@@ -388,21 +361,5 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.sansSerifSemiBold,
     textDecorationLine: 'underline',
     marginLeft: SPACING['3xl'] + SPACING.sm,
-  } as TextStyle,
-  footer: {
-    alignItems: 'center',
-    paddingVertical: SPACING['2xl'],
-    paddingHorizontal: SPACING.xl,
-  } as ViewStyle,
-  footerLine: {
-    height: 1,
-    width: 60,
-    backgroundColor: COLORS.borderColor,
-    marginBottom: SPACING.md,
-  } as ViewStyle,
-  footerText: {
-    fontSize: FONTS.sm,
-    color: COLORS.textMuted,
-    fontFamily: FONTS.sansSerif,
   } as TextStyle,
 });

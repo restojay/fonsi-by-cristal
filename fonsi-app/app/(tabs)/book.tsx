@@ -2,7 +2,7 @@
  * Booking screen with section labels, larger step titles, glowing Book Now, upgraded inputs
  */
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   ScrollView,
   View,
@@ -11,6 +11,8 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  Keyboard,
+  Pressable,
   ViewStyle,
   TextStyle,
   Animated as RNAnimated,
@@ -30,6 +32,7 @@ import Animated, {
   SlideInRight,
   SlideInLeft,
 } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Header } from '@components/Header';
 import { ServiceCard } from '@components/ServiceCard';
 import { TimeSlotPicker } from '@components/TimeSlotPicker';
@@ -82,7 +85,23 @@ export default function BookScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [selectedCategory, setSelectedCategory] = useState<ServiceCategory>('Hair');
+  const scrollViewRef = useRef<ScrollView>(null);
+  const orderSummaryY = useRef(0);
+  const [showFloatingContinue, setShowFloatingContinue] = useState(true);
+  const insets = useSafeAreaInsets();
   const progressWidth = useSharedValue(20);
+
+  const scrollToOrderSummary = useCallback(() => {
+    scrollViewRef.current?.scrollTo({ y: orderSummaryY.current, animated: true });
+    setShowFloatingContinue(false);
+  }, []);
+
+  const handleScroll = useCallback((e: any) => {
+    if (step !== 1 || stackedServices.length === 0) return;
+    const scrollY = e.nativeEvent.contentOffset.y;
+    const summaryVisible = scrollY >= orderSummaryY.current - 300;
+    setShowFloatingContinue(!summaryVisible);
+  }, [step, stackedServices.length]);
 
   useEffect(() => {
     progressWidth.value = withTiming((step / 5) * 100, {
@@ -190,30 +209,25 @@ export default function BookScreen() {
     : SERVICES.filter((s) => s.category === selectedCategory);
 
   const handleServiceSelect = (service: Service) => {
-    if (selectedCategory === 'Hair') {
-      // Toggle in stack (multi-select for Hair)
-      toggleStackedService(service);
-    } else {
-      // Single-select for non-Hair: auto-advance
-      setSelectedService(service);
-      setStackedServices([]);
-      nextStep();
-    }
+    toggleStackedService(service);
   };
 
   const handleStackedContinue = () => {
     if (stackedServices.length === 0) return;
-    // Create combined service
-    const combined: Service = {
-      id: stackedServices.map((s) => s.id).join('+'),
-      name: stackedServices.map((s) => s.name).join(' + '),
-      category: 'Hair',
-      description: stackedServices.map((s) => s.name).join(', '),
-      priceMin: stackedServices.reduce((sum, s) => sum + s.priceMin, 0),
-      priceMax: stackedServices.reduce((sum, s) => sum + s.priceMax, 0),
-      duration: stackedServices.reduce((sum, s) => sum + s.duration, 0),
-    };
-    setSelectedService(combined);
+    if (stackedServices.length === 1) {
+      setSelectedService(stackedServices[0]);
+    } else {
+      const combined: Service = {
+        id: stackedServices.map((s) => s.id).join('+'),
+        name: stackedServices.map((s) => s.name).join(' + '),
+        category: stackedServices[0].category,
+        description: stackedServices.map((s) => s.name).join(', '),
+        priceMin: stackedServices.reduce((sum, s) => sum + s.priceMin, 0),
+        priceMax: stackedServices.reduce((sum, s) => sum + s.priceMax, 0),
+        duration: stackedServices.reduce((sum, s) => sum + s.duration, 0),
+      };
+      setSelectedService(combined);
+    }
     nextStep();
   };
 
@@ -307,7 +321,16 @@ export default function BookScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <View style={{ flex: 1 }}>
+    <ScrollView
+      ref={scrollViewRef}
+      style={styles.container}
+      showsVerticalScrollIndicator={false}
+      keyboardDismissMode="on-drag"
+      keyboardShouldPersistTaps="handled"
+      onScroll={handleScroll}
+      scrollEventThrottle={16}
+    >
       <Header title="Book Appointment" subtitle={`Step ${step} of 5`} showLogo={false} />
 
       {/* Progress Indicator */}
@@ -359,41 +382,25 @@ export default function BookScreen() {
           <Text style={styles.stepTitle}>Select a Service</Text>
 
           {/* Category Tabs */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.categoriesContent}
-            style={styles.categoriesScroll}
-          >
+          <View style={styles.categoriesRow}>
             {(['Hair', 'Bridal', 'Makeup', 'Waxing'] as ServiceCategory[]).map((cat) => {
               const isActive = selectedCategory === cat;
-              const count = (allServices.length > 0 ? allServices : SERVICES).filter((s) => s.category === cat).length;
               return (
                 <TouchableOpacity
                   key={cat}
-                  onPress={() => {
-                    setSelectedCategory(cat);
-                    setStackedServices([]);
-                  }}
+                  onPress={() => setSelectedCategory(cat)}
                   activeOpacity={0.8}
                   style={[styles.categoryTab, isActive && styles.categoryTabActive]}
                 >
                   <Text style={[styles.categoryTabText, isActive && styles.categoryTabTextActive]}>{cat}</Text>
-                  {count > 0 && (
-                    <View style={[styles.countBadge, isActive && styles.countBadgeActive]}>
-                      <Text style={[styles.countBadgeText, isActive && styles.countBadgeTextActive]}>{count}</Text>
-                    </View>
-                  )}
                 </TouchableOpacity>
               );
             })}
-          </ScrollView>
+          </View>
 
-          {selectedCategory === 'Hair' && (
-            <Text style={styles.stackingHint}>
-              Select one or more services to combine them
-            </Text>
-          )}
+          <Text style={styles.stackingHint}>
+            Select one or more services, then press Continue
+          </Text>
 
           {allServices.length === 0 && SERVICES.length === 0 ? (
             <SkeletonList count={4} />
@@ -403,11 +410,7 @@ export default function BookScreen() {
                 <AnimatedSection key={service.id} index={index}>
                   <ServiceCard
                     service={service}
-                    isSelected={
-                      selectedCategory === 'Hair'
-                        ? stackedServices.some((s) => s.id === service.id)
-                        : selectedService?.id === service.id
-                    }
+                    isSelected={stackedServices.some((s) => s.id === service.id)}
                     onPress={() => handleServiceSelect(service)}
                   />
                 </AnimatedSection>
@@ -415,9 +418,12 @@ export default function BookScreen() {
             </View>
           )}
 
-          {/* Order Summary for Hair stacking */}
-          {selectedCategory === 'Hair' && stackedServices.length > 0 && (
-            <View style={styles.orderSummary}>
+          {/* Order Summary */}
+          {stackedServices.length > 0 && (
+            <View
+              style={styles.orderSummary}
+              onLayout={(e) => { orderSummaryY.current = e.nativeEvent.layout.y; }}
+            >
               <Text style={styles.orderSummaryTitle}>
                 Order Summary ({stackedServices.length})
               </Text>
@@ -551,6 +557,10 @@ export default function BookScreen() {
               placeholderTextColor={COLORS.textMuted}
               value={clientInfo.firstName}
               onChangeText={(text) => setClientInfo({ ...clientInfo, firstName: text })}
+              autoComplete="given-name"
+              textContentType="givenName"
+              autoCapitalize="words"
+              returnKeyType="next"
             />
             {formErrors.firstName && <Text style={styles.errorText}>{formErrors.firstName}</Text>}
           </View>
@@ -566,6 +576,10 @@ export default function BookScreen() {
               placeholderTextColor={COLORS.textMuted}
               value={clientInfo.lastName}
               onChangeText={(text) => setClientInfo({ ...clientInfo, lastName: text })}
+              autoComplete="family-name"
+              textContentType="familyName"
+              autoCapitalize="words"
+              returnKeyType="next"
             />
             {formErrors.lastName && <Text style={styles.errorText}>{formErrors.lastName}</Text>}
           </View>
@@ -582,6 +596,10 @@ export default function BookScreen() {
               keyboardType="email-address"
               value={clientInfo.email}
               onChangeText={(text) => setClientInfo({ ...clientInfo, email: text })}
+              autoComplete="email"
+              textContentType="emailAddress"
+              autoCapitalize="none"
+              returnKeyType="next"
             />
             {formErrors.email && <Text style={styles.errorText}>{formErrors.email}</Text>}
           </View>
@@ -598,6 +616,9 @@ export default function BookScreen() {
               keyboardType="phone-pad"
               value={clientInfo.phone}
               onChangeText={(text) => setClientInfo({ ...clientInfo, phone: text })}
+              autoComplete="tel"
+              textContentType="telephoneNumber"
+              returnKeyType="next"
             />
             {formErrors.phone && <Text style={styles.errorText}>{formErrors.phone}</Text>}
           </View>
@@ -617,6 +638,8 @@ export default function BookScreen() {
               multiline
               numberOfLines={3}
               textAlignVertical="top"
+              returnKeyType="done"
+              blurOnSubmit={true}
             />
           </View>
         </Animated.View>
@@ -753,8 +776,7 @@ export default function BookScreen() {
           </View>
         )}
 
-        {/* Only show Next/Book button when not on step 1 with Hair category (use stacking continue instead) */}
-        {!(step === 1 && selectedCategory === 'Hair') && (
+        {step !== 1 && (
           <View style={{ flex: 1 }}>
             {step === 5 ? (
               <GlowingBorderButton
@@ -782,6 +804,21 @@ export default function BookScreen() {
         )}
       </View>
     </ScrollView>
+
+      {/* Floating Continue — visible on step 1 when services are selected */}
+      {step === 1 && stackedServices.length > 0 && showFloatingContinue && (
+        <TouchableOpacity
+          style={[styles.floatingContinue, { bottom: insets.bottom + 20 }]}
+          activeOpacity={0.85}
+          onPress={scrollToOrderSummary}
+        >
+          <Text style={styles.floatingContinueText}>
+            Continue ({stackedServices.length})
+          </Text>
+          <Feather name="chevron-down" size={18} color="#ffffff" />
+        </TouchableOpacity>
+      )}
+    </View>
   );
 }
 
@@ -868,50 +905,31 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.sansSerif,
   } as TextStyle,
   // Category tabs
-  categoriesScroll: {
+  categoriesRow: {
+    flexDirection: 'row',
+    gap: SPACING.xs,
     marginBottom: SPACING.md,
   } as ViewStyle,
-  categoriesContent: {
-    gap: SPACING.sm,
-  } as ViewStyle,
   categoryTab: {
-    flexDirection: 'row',
+    flex: 1,
     alignItems: 'center',
-    paddingHorizontal: SPACING.xl,
+    justifyContent: 'center',
     paddingVertical: SPACING.md,
     borderRadius: BORDER_RADIUS.full,
     backgroundColor: COLORS.bgTertiary,
     borderColor: COLORS.borderColor,
     borderWidth: 1,
-    gap: SPACING.sm,
   } as ViewStyle,
   categoryTabActive: {
     backgroundColor: COLORS.primary,
     borderColor: COLORS.primary,
   } as ViewStyle,
   categoryTabText: {
-    fontSize: FONTS.sm,
+    fontSize: FONTS.xs,
     fontFamily: FONTS.sansSerifSemiBold,
     color: COLORS.textSecondary,
   } as TextStyle,
   categoryTabTextActive: {
-    color: '#ffffff',
-  } as TextStyle,
-  countBadge: {
-    backgroundColor: COLORS.borderColor,
-    borderRadius: BORDER_RADIUS.full,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 2,
-  } as ViewStyle,
-  countBadgeActive: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-  } as ViewStyle,
-  countBadgeText: {
-    fontSize: FONTS.xs - 1,
-    fontFamily: FONTS.sansSerifSemiBold,
-    color: COLORS.textMuted,
-  } as TextStyle,
-  countBadgeTextActive: {
     color: '#ffffff',
   } as TextStyle,
   stackingHint: {
@@ -1101,4 +1119,21 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xl,
     gap: SPACING.md,
   } as ViewStyle,
+  floatingContinue: {
+    position: 'absolute',
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(23, 23, 23, 0.85)',
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm + 2,
+    borderRadius: BORDER_RADIUS.full,
+    gap: 4,
+  } as ViewStyle,
+  floatingContinueText: {
+    fontSize: FONTS.xs,
+    fontFamily: FONTS.sansSerifSemiBold,
+    color: '#ffffff',
+    letterSpacing: 1,
+  } as TextStyle,
 });
