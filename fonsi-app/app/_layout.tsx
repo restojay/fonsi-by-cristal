@@ -8,6 +8,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ErrorBoundary } from '@components/ErrorBoundary';
 import {
   PlayfairDisplay_400Regular,
   PlayfairDisplay_600SemiBold,
@@ -51,26 +52,28 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#171717' }}>
       <SafeAreaProvider>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: '#171717' },
-          }}
-        >
-          <Stack.Screen
-            name="(tabs)"
-            options={{
+        <ErrorBoundary>
+          <Stack
+            screenOptions={{
               headerShown: false,
+              contentStyle: { backgroundColor: '#171717' },
             }}
-          />
-          <Stack.Screen
-            name="appointment/[id]"
-            options={{
-              presentation: 'modal',
-              headerShown: false,
-            }}
-          />
-        </Stack>
+          >
+            <Stack.Screen
+              name="(tabs)"
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="appointment/[id]"
+              options={{
+                presentation: 'modal',
+                headerShown: false,
+              }}
+            />
+          </Stack>
+        </ErrorBoundary>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
