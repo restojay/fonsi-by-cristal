@@ -4,6 +4,8 @@
  */
 
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Appointment } from '@types/index';
 
 interface AppointmentStoreState {
@@ -24,73 +26,82 @@ interface AppointmentStoreState {
   getAppointmentById: (id: string) => Appointment | undefined;
 }
 
-export const useAppointmentStore = create<AppointmentStoreState>((set, get) => ({
-  appointments: [],
-  isLoading: false,
-  error: null,
+export const useAppointmentStore = create<AppointmentStoreState>()(
+  persist(
+    (set, get) => ({
+      appointments: [],
+      isLoading: false,
+      error: null,
 
-  setAppointments: (appointments: Appointment[]) => {
-    set({ appointments });
-  },
+      setAppointments: (appointments: Appointment[]) => {
+        set({ appointments });
+      },
 
-  addAppointment: (appointment: Appointment) => {
-    set((state) => ({
-      appointments: [appointment, ...state.appointments],
-    }));
-  },
+      addAppointment: (appointment: Appointment) => {
+        set((state) => ({
+          appointments: [appointment, ...state.appointments],
+        }));
+      },
 
-  updateAppointment: (appointmentId: string, updatedAppointment: Appointment) => {
-    set((state) => ({
-      appointments: state.appointments.map((apt) =>
-        apt.id === appointmentId ? updatedAppointment : apt
-      ),
-    }));
-  },
+      updateAppointment: (appointmentId: string, updatedAppointment: Appointment) => {
+        set((state) => ({
+          appointments: state.appointments.map((apt) =>
+            apt.id === appointmentId ? updatedAppointment : apt
+          ),
+        }));
+      },
 
-  removeAppointment: (appointmentId: string) => {
-    set((state) => ({
-      appointments: state.appointments.filter((apt) => apt.id !== appointmentId),
-    }));
-  },
+      removeAppointment: (appointmentId: string) => {
+        set((state) => ({
+          appointments: state.appointments.filter((apt) => apt.id !== appointmentId),
+        }));
+      },
 
-  setLoading: (loading: boolean) => {
-    set({ isLoading: loading });
-  },
+      setLoading: (loading: boolean) => {
+        set({ isLoading: loading });
+      },
 
-  setError: (error: string | null) => {
-    set({ error });
-  },
+      setError: (error: string | null) => {
+        set({ error });
+      },
 
-  clearError: () => {
-    set({ error: null });
-  },
+      clearError: () => {
+        set({ error: null });
+      },
 
-  getUpcomingAppointments: () => {
-    const now = new Date();
-    return get()
-      .appointments.filter((apt) => {
-        const aptDate = new Date(`${apt.date}T${apt.time}`);
-        return (
-          aptDate > now &&
-          (apt.status === 'confirmed' || apt.status === 'pending')
-        );
-      })
-      .sort((a, b) => new Date(`${a.date}T${a.time}`).getTime() -
-                       new Date(`${b.date}T${b.time}`).getTime());
-  },
+      getUpcomingAppointments: () => {
+        const now = new Date();
+        return get()
+          .appointments.filter((apt) => {
+            const aptDate = new Date(`${apt.date}T${apt.time}`);
+            return (
+              aptDate > now &&
+              (apt.status === 'confirmed' || apt.status === 'pending')
+            );
+          })
+          .sort((a, b) => new Date(`${a.date}T${a.time}`).getTime() -
+                           new Date(`${b.date}T${b.time}`).getTime());
+      },
 
-  getPastAppointments: () => {
-    const now = new Date();
-    return get()
-      .appointments.filter((apt) => {
-        const aptDate = new Date(`${apt.date}T${apt.time}`);
-        return aptDate <= now || apt.status === 'completed' || apt.status === 'cancelled';
-      })
-      .sort((a, b) => new Date(`${b.date}T${b.time}`).getTime() -
-                       new Date(`${a.date}T${a.time}`).getTime());
-  },
+      getPastAppointments: () => {
+        const now = new Date();
+        return get()
+          .appointments.filter((apt) => {
+            const aptDate = new Date(`${apt.date}T${apt.time}`);
+            return aptDate <= now || apt.status === 'completed' || apt.status === 'cancelled';
+          })
+          .sort((a, b) => new Date(`${b.date}T${b.time}`).getTime() -
+                           new Date(`${a.date}T${a.time}`).getTime());
+      },
 
-  getAppointmentById: (id: string) => {
-    return get().appointments.find((apt) => apt.id === id);
-  },
-}));
+      getAppointmentById: (id: string) => {
+        return get().appointments.find((apt) => apt.id === id);
+      },
+    }),
+    {
+      name: 'appointments',
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({ appointments: state.appointments }),
+    }
+  )
+);

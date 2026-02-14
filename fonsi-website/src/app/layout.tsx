@@ -3,6 +3,7 @@ import './globals.css'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { Analytics } from '@vercel/analytics/react'
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -59,6 +60,7 @@ export default function RootLayout({
           <main className="min-h-screen">{children}</main>
           <Footer />
         </ErrorBoundary>
+        <Analytics />
       </body>
     </html>
   )

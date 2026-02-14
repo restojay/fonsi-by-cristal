@@ -258,6 +258,8 @@ export default function BookScreen() {
     }
     if (!clientInfo.phone.trim()) {
       errors.phone = 'Phone number is required';
+    } else if (!/^\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/.test(clientInfo.phone)) {
+      errors.phone = 'Enter a valid US phone number';
     }
 
     setFormErrors(errors);
